@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaCheckCircle, FaTimesCircle, FaLock, FaEye, FaEyeSlash, FaUser, FaPhoneAlt} from 'react-icons/fa'; 
-import logoLogin from "../assets/Logo Jira 5.png";
+import logoLogin from "../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from 'react-router-dom';
-import "../index.css";
-import ShinyEffect from '../components/ShinyEffect';
-import { BackgroundBeamsWithCollision } from '../components/ui/Background-beams-with-collision';
-import Reveal from '../components/Reveal';
+import styles from "./register.module.css";
+import ShinyEffect from '../../components/ShinyEffect';
+import { BackgroundBeamsWithCollision } from '../../components/ui/Background-beams-with-collision';
+import Reveal from '../../components/Reveal';
 import axios from 'axios'; // Add this import for making HTTP requests
 import { Alert } from 'antd'; // Đảm bảo đã import Alert từ antd
 
@@ -179,14 +179,14 @@ const Register: React.FC = () => {
     };
 
     return (
-        <>
-        <BackgroundBeamsWithCollision className='overflow-hidden'>
+        <div className={`${styles.bgRegister} relative overflow-hidden`}>
+        <BackgroundBeamsWithCollision className="absolute inset-0 z-0">
         <div className="flex flex-col md:flex-row lg:justify-around justify-center items-center h-screen mx-10">
             <Reveal>
             <div className="mb-4 md:mb-0">
                 <div className="flex items-center justify-center flex-col lg:flex-row md:space-x-2">
                     <img src={logoLogin} alt="Logo" className="w-1/3 md:w-1/2 h-auto object-cover mb-4 md:mb-0" />
-                    <h2 className="hidden md:block text-4xl md:text-5xl lg:text-6xl text-center font-semibold">Software</h2>
+                    <h2 className="text-gray-200 hidden md:block text-4xl md:text-5xl lg:text-6xl text-center font-semibold">Software</h2>
                 </div>   
             </div>
             </Reveal>
@@ -314,7 +314,7 @@ const Register: React.FC = () => {
             </div>
         )}
         </BackgroundBeamsWithCollision>
-    </>
+    </div>
     );
 };
 

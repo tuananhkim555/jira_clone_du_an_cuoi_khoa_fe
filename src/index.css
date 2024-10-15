@@ -5,11 +5,11 @@
 
 body{
     font-family: "Poppins", sans-serif;
-    background-color: #190b1f;
     overflow-x: hidden;
+    background-color: #eee;
 }
 h2{
-    @apply text-xl md:text-4xl text-gray-200;
+    @apply text-xl md:text-4xl text-gray-700;
 }
 
 p {
@@ -46,3 +46,21 @@ span{
 .animate-slide-in {
     animation: slide-in 0.5s forwards; /* Thời gian animation là 0.5 giây */
 }
+
+.custom-antd-message {
+    top: 20px !important;
+    left: 20px !important;
+    right: auto !important;
+    font-size: 16px;
+    padding: 15px 20px;
+    animation: slide-in 0.5s forwards;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loader {
+    animation: spin 1s linear infinite;
+  }
