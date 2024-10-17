@@ -21,10 +21,8 @@ const MainLayout = () => {
           </div>
         </>
       )}
-      <div className="flex-grow">
-        <div>
+      <div className="flex-grow">    
           <ClientRoute />
-        </div>
       </div>
       </div>
   );

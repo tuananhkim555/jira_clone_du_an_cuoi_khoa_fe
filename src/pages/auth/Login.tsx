@@ -9,7 +9,7 @@ import axios from "axios";
 import { notification } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
 import LoadingSpinner from '../../components/LoadingSpinner';
-import styles from "./login.module.css"
+import styles from "./auth.module.css"
 
 interface GoogleLoginResponse {
   success: boolean;
@@ -123,7 +123,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className={`${styles.bgLogin} relative overflow-hidden`}>
+    <div className={`${styles.bgAuth} relative overflow-hidden`}>
       {isLoading && <LoadingSpinner />}
       <BackgroundBeamsWithCollision className="absolute inset-0 z-0" children={undefined} />
       <div className="relative z-10 flex flex-col md:flex-row lg:justify-around justify-center items-center h-screen mx-1">

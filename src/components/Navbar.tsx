@@ -34,13 +34,11 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { icon: FaSearch, label: "Search" },
     { icon: FaSignOutAlt, label: "Logout" },
     { icon: FaQuestion, label: "About" },
   ];
 
   const handleItemClick = (label: string) => {
-    setIsExpanded(true);
     setActiveItem(activeItem === label ? null : label);
 
     if (label === "Logout") {
@@ -58,11 +56,13 @@ const Navbar = () => {
       navigate("/login");
     }, 2000);
   };
+
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (!(e.target instanceof HTMLElement) || !e.target.closest('.navbar')) {
       setIsExpanded(false);
     }
   };
+
   useEffect(() => {
     const handleOutsideClickWrapper = (e: MouseEvent) => handleOutsideClick(e as unknown as React.MouseEvent);
     document.addEventListener('click', handleOutsideClickWrapper);
@@ -73,47 +73,110 @@ const Navbar = () => {
 
   return (
     <div 
-      className={`flex flex-col justify-between h-screen bg-purple-950 fixed left-0 top-0 transition-all duration-300 ${isExpanded ? 'w-48' : 'w-16'}`}
+      className={`
+        navbar
+        flex ${isMobileOrTablet ? 'flex-row' : 'flex-col'} 
+        justify-between 
+        ${isMobileOrTablet ? 'w-full h-16' : `h-screen ${isExpanded ? 'w-56' : 'w-16'}`} 
+        bg-purple-950
+        fixed 
+        ${isMobileOrTablet ? 'top-0 left-0 right-0' : 'left-0 top-0'} 
+        transition-all duration-300 ease-in-out
+        z-50
+      `}
       onClick={(e) => e.stopPropagation()}
+      onMouseEnter={() => !isMobileOrTablet && setIsExpanded(true)}
+      onMouseLeave={() => !isMobileOrTablet && setIsExpanded(false)}
     >
-      <div className={isMobileOrTablet ? 'mt-8' : ''}>
-        {/* Jira logo and Search */}
-        <div className="flex flex-col items-center">
-          <div className="w-full h-32 flex items-center justify-center cursor-pointer"
-               onClick={() => setIsExpanded(!isExpanded)}>
-            <FaJira className="text-white text-4xl mt-4" />
-          </div>
+      <div className={`flex ${isMobileOrTablet ? 'flex-row justify-between w-full px-4' : 'flex-col'} items-center`}>
+        {/* Jira logo */}
+        <div 
+          className={`
+            ${isMobileOrTablet ? 'order-2' : 'w-full h-32'} 
+            flex items-center justify-center cursor-pointer
+          `}
+        >
+          <FaJira className={`text-white ${isMobileOrTablet ? 'text-2xl' : 'text-5xl'}`} />
+        </div>
+
+        {/* Search for desktop */}
+        {!isMobileOrTablet && (
           <div 
-            className={`flex items-center text-white h-16 cursor-pointer ${isExpanded ? '' : 'justify-center'} ${activeItem === "Search" ? 'bg-purple-800' : ''}`}
+            className={`
+              flex items-center text-white 
+              h-14 w-full mt-8
+              cursor-pointer 
+              ${activeItem === "Search" ? 'bg-purple-800' : 'hover:bg-purple-800'}
+              transition-colors duration-200
+            `}
             onClick={() => handleItemClick("Search")}
           >
-            <div className={`flex justify-center ${isExpanded ? 'w-16' : 'w-full'}`}>
-              <FaSearch className="text-lg" />
+            <div className="flex justify-center w-16">
+              <FaSearch className="text-xl" />
             </div>
             {isExpanded && (
-              <span className="ml-2 text-sm text-white">Search</span>
+              <span className="ml-3 text-sm text-white">Search</span>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Bottom icons: Logout and About */}
-      <div className="mb-4">
-        {navItems.slice(1).map((item, index) => (
+      {isMobileOrTablet ? (
+        <div className="order-3 flex items-center">
+          {/* Search for mobile/tablet */}
           <div 
-            key={index} 
-            className={`flex items-center text-white h-16 cursor-pointer ${isExpanded ? '' : 'justify-center'} ${activeItem === item.label ? 'bg-purple-800' : ''}`}
-            onClick={() => handleItemClick(item.label)}
+            className={`
+              flex items-center justify-center text-white 
+              px-4 h-full
+              cursor-pointer 
+              ${activeItem === "Search" ? 'bg-purple-800' : 'hover:bg-purple-800'}
+              transition-colors duration-200
+            `}
+            onClick={() => handleItemClick("Search")}
           >
-            <div className={`flex justify-center ${isExpanded ? 'w-16' : 'w-full'}`}>
-              <item.icon className="text-lg" />
-            </div>
-            {isExpanded && (
-              <span className="ml-2 text-sm text-white">{item.label}</span>
-            )}
+            <FaSearch className="text-xl" />
           </div>
-        ))}
-      </div>
+          {navItems.map((item, index) => (
+            <div 
+              key={index} 
+              className={`
+                flex items-center justify-center text-white 
+                px-4 h-full
+                cursor-pointer 
+                ${activeItem === item.label ? 'bg-purple-800' : 'hover:bg-purple-800'}
+                transition-colors duration-200
+              `}
+              onClick={() => handleItemClick(item.label)}
+            >
+              <item.icon className="text-xl" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mb-6">
+          {navItems.map((item, index) => (
+            <div 
+              key={index} 
+              className={`
+                flex items-center text-white 
+                h-14 w-full
+                cursor-pointer 
+                ${activeItem === item.label ? 'bg-purple-800' : 'hover:bg-purple-800'}
+                transition-colors duration-200
+              `}
+              onClick={() => handleItemClick(item.label)}
+            >
+              <div className="flex justify-center w-16">
+                <item.icon className="text-xl" />
+              </div>
+              {isExpanded && (
+                <span className="ml-3 text-sm text-white">{item.label}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

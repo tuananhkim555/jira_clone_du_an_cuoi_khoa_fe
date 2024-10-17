@@ -16,9 +16,7 @@ p {
     @apply text-xl tracking-tight leading-relaxed 
 }
 
-span{
-    @apply text-purple-600
-}
+
 
 .shiny-effect {
     position: absolute;
