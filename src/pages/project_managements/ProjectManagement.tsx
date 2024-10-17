@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FaPencilAlt, FaTrash } from 'react-icons/fa';
-import axios, { isAxiosError } from 'axios';
+import { FaPencilAlt, FaTrash, FaPlus } from 'react-icons/fa';
+import axios from 'axios';
 import { Pagination, Modal, message } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
@@ -103,7 +103,7 @@ const ProjectTable = () => {
         })
         .catch((error) => {
           console.error('Error deleting project:', error);
-          if (isAxiosError(error)) {
+          if (axios.isAxiosError(error)) {
             console.log('Error response:', error.response?.data);
           } else {
             console.log('Unexpected error:', error);
@@ -137,6 +137,7 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap">
+              <button className="text-blue-800 hover:text-blue-900"><FaPlus /></button>
               {project.members.map((member, index) => (
                 <img
                   key={index}
@@ -149,8 +150,8 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="text-blue-500 hover:text-blue-700"><FaPencilAlt /></button>
-            <button className="text-red-500 hover:text-red-700" onClick={() => deleteProject(project.id)}><FaTrash /></button>
+            <button className="bg-purple-800 text-white rounded-md p-1 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
+            <button className="bg-red-500 text-white rounded-md p-1 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -168,6 +169,7 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap">
+              <button className="text-blue-600 hover:text-blue-800"><FaPlus /></button>
               {project.members.map((member, index) => (
                 <img
                   key={index}
@@ -180,8 +182,8 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="text-blue-500 hover:text-blue-700"><FaPencilAlt /></button>
-            <button className="text-red-500 hover:text-red-700" onClick={() => deleteProject(project.id)}><FaTrash /></button>
+            <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
+            <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -191,24 +193,24 @@ const ProjectTable = () => {
   const renderDesktopView = () => (
     <div className="overflow-x-auto bg-white shadow-md rounded-lg">
       <table className="w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-gradient-to-r from-purple-950 via-orange-900 to-purple-700 text-white font-semibold">
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               ID
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Project name
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Category
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Creator
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Members
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Action
             </th>
           </tr>
@@ -222,6 +224,7 @@ const ProjectTable = () => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.creator.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center space-x-1">
+                  <button className="text-blue-600 hover:text-blue-800"><FaPlus /></button>
                   {project.members.map((member, index) => (
                     <img
                       key={index}
@@ -235,8 +238,8 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="text-blue-600 hover:text-blue-900"><FaPencilAlt /></button>
-                  <button className="text-red-600 hover:text-red-900" onClick={() => deleteProject(project.id)}><FaTrash /></button>
+                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
+                  <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>
             </tr>
@@ -260,7 +263,7 @@ const ProjectTable = () => {
         {isMobile && renderMobileView()}
         {isTablet && renderTabletView()}
         {!isMobile && !isTablet && renderDesktopView()}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex justify-end">
           <Pagination
             current={currentPage}
             total={totalProjects}
