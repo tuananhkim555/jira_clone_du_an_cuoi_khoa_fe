@@ -7,6 +7,7 @@ import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TitleGradient from '../../components/ui/TitleGradient';
+import Reveal from '../../components/Reveal';
 
 
 interface Project {
@@ -688,6 +689,7 @@ const ProjectTable = () => {
   }
 
   return (
+    <Reveal>
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto mt-[50px]">
         <div className="mb-[50px] flex justify-center">
@@ -740,6 +742,7 @@ const ProjectTable = () => {
         </div>
       )}
     </div>
+    </Reveal>
   );
 };
 

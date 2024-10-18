@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
 import logoLogin from "../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,7 +19,19 @@ interface GoogleLoginResponse {
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -126,22 +138,22 @@ const Login: React.FC = () => {
     <div className={`${styles.bgAuth} relative overflow-hidden`}>
       {isLoading && <LoadingSpinner />}
       <BackgroundBeamsWithCollision className="absolute inset-0 z-0" children={undefined} />
-      <div className="relative z-10 flex flex-col md:flex-row lg:justify-around justify-center items-center h-screen mx-1">
+      <div className={`relative z-10 flex ${isMobile ? 'flex-col' : 'justify-between'} items-center h-screen mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 ${isMobile ? 'pt-20' : ''}`}>
         <Reveal>
-          <div className="mb-10 md:mb-0">
-            <div className="flex items-center justify-center flex-col lg:flex-row md:space-x-2">
+          <div className={`${isMobile ? 'mb-8' : 'mb-10 md:mb-0 md:mr-10 lg:mr-20'}`}>
+            <div className={`flex items-center justify-center ${isMobile ? 'flex-col' : 'flex-col lg:flex-row'}`}>
               <img
                 src={logoLogin}
                 alt="Logo"
-                className="w-1/3 md:w-1/2 h-auto object-cover mb-4 md:mb-0"
+                className={`${isMobile ? 'w-44 mb-4' : 'w-40 sm:w-52 md:w-60 lg:w-80'} h-auto object-contain ${isMobile ? '' : 'mb-4 md:mb-0 md:mr-4'}`}
               />
-              <h2 className="text-gray-200 text-4xl md:text-5xl lg:text-6xl text-center font-semibold">
+              <h2 className={`text-gray-200 ${isMobile ? 'text-3xl' : 'text-3xl md:text-5xl lg:text-6xl'} text-center font-semibold`}>
                 Software
               </h2>
             </div>
           </div>
         </Reveal>
-        <div className="flex flex-col p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl xl:max-w-6xl z-50 bg-[gray]/5">
+        <div className={`flex flex-col p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl w-full ${isMobile ? 'max-w-md' : 'max-w-md'} z-50 bg-[gray]/5 ${isMobile ? 'mt-8' : ''}`}>
           <div className="flex flex-col">
             <h2 className="text-2xl font-semibold text-gray-200 mb-4 text-center">
               Đăng nhập
@@ -226,7 +238,7 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </form>
-            <div className="mt-4">
+            <div className="mt-4 text-center">
               <Link to="/register" className="text-gray-400 text-sm">
                 Bạn chưa có tài khoản?{" "}
                 <span className="text-orange-400 hover:underline">

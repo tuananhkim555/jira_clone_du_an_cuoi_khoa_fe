@@ -6,28 +6,27 @@ import styles from "./auth.module.css";
 import ShinyEffect from '../../components/ShinyEffect';
 import { BackgroundBeamsWithCollision } from '../../components/ui/Background-beams-with-collision';
 import Reveal from '../../components/Reveal';
-import axios from 'axios'; // Add this import for making HTTP requests
-import { Alert } from 'antd'; // Đảm bảo đã import Alert từ antd
+import axios from 'axios';
+import { Alert } from 'antd';
 
 const Register: React.FC = () => {
-    const navigate = useNavigate(); // Khởi tạo useNavigate
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
-    const [email, setEmail] = useState<string>(''); 
-    const [emailValid, setEmailValid] = useState<boolean>(false); 
-    const [emailError, setEmailError] = useState<string>(''); 
-    const [password, setPassword] = useState<string>(''); 
-    const [passwordError, setPasswordError] = useState<string>(''); 
-    const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null); // Trạng thái mật khẩu để điều chỉnh icon
-    const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null); // Trạng thái email để điều chỉnh icon
-    const [fullName, setFullName] = useState<string>(''); 
-    const [fullNameError, setFullNameError] = useState<string>(''); 
-    const [fullNameValid, setFullNameValid] = useState<boolean | null>(null); // Trạng thái họ tên để điều chỉnh icon
-    const [phoneNumber, setPhoneNumber] = useState<string>(''); 
-    const [phoneNumberError, setPhoneNumberError] = useState<string>(''); 
-    const [phoneNumberValid, setPhoneNumberValid] = useState<boolean | null>(null); // Trạng thái số điện thoại để điều chỉnh icon
+    const [email, setEmail] = useState<string>('');
+    const [emailValid, setEmailValid] = useState<boolean>(false);
+    const [emailError, setEmailError] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [passwordError, setPasswordError] = useState<string>('');
+    const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null);
+    const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
+    const [fullName, setFullName] = useState<string>('');
+    const [fullNameError, setFullNameError] = useState<string>('');
+    const [fullNameValid, setFullNameValid] = useState<boolean | null>(null);
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [phoneNumberError, setPhoneNumberError] = useState<string>('');
+    const [phoneNumberValid, setPhoneNumberValid] = useState<boolean | null>(null);
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-    // Thêm useEffect để tự động ẩn alert sau 4 giây
     useEffect(() => {
         if (alert) {
             const timer = setTimeout(() => {
@@ -76,7 +75,6 @@ const Register: React.FC = () => {
         }
     };
 
-    // Kiểm tra mật khẩu và thay đổi icon tương ứng
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setPassword(value);
@@ -90,18 +88,15 @@ const Register: React.FC = () => {
         }
     };
 
-    // Xử lý khi rời khỏi trường mật khẩu
     const handlePasswordBlur = () => {
         if (password === '') {
-            setIsPasswordValid(false); // Giữ nguyên icon Lock
-            setPasswordError('Không được để trống mật khẩu'); // Hiển thị thông báo lỗi
+            setIsPasswordValid(false);
+            setPasswordError('Không được để trống mật khẩu');
         }
     };
 
-
-    // Xử lý khi trường email được focus, reset lại icon Lock
     const handleEmailFocus = () => {
-        setIsEmailValid(null); // Reset lại icon khóa khi được focus
+        setIsEmailValid(null);
     };
 
     const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +140,7 @@ const Register: React.FC = () => {
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
         const model = {
             email,
@@ -162,15 +157,14 @@ const Register: React.FC = () => {
                 },
             });
             console.log('Signup successful:', response.data);
-            setAlert({ message: 'Đăng ký thành công!', type: 'success' }); // Hiển thị alert thành công
+            setAlert({ message: 'Đăng ký thành công!', type: 'success' });
 
-            // Chuyển đến trang đăng nhập sau 4 giây
             setTimeout(() => {
                 navigate('/login');
             }, 800);
-        } catch (error: any) { // Assert error type
+        } catch (error: any) {
             console.error('Signup error:', error.response?.data);
-            setAlert({ message: 'Đăng ký thất bại! Email đã tồn tại', type: 'error' }); // Hiển thị alert thất bại
+            setAlert({ message: 'Đăng ký thất bại! Email đã tồn tại', type: 'error' });
         }
     };
 
@@ -181,18 +175,18 @@ const Register: React.FC = () => {
     return (
         <div className={`${styles.bgAuth} relative overflow-hidden`}>
         <BackgroundBeamsWithCollision className="absolute inset-0 z-0">
-        <div className="flex flex-col md:flex-row lg:justify-around justify-center items-center h-screen mx-10">
+        <div className="flex flex-col md:flex-row justify-center items-center h-screen mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
             <Reveal>
-            <div className="mb-4 md:mb-0">
-                <div className="flex items-center justify-center flex-col lg:flex-row md:space-x-2">
-                    <img src={logoLogin} alt="Logo" className="w-1/3 md:w-1/2 h-auto object-cover mb-4 md:mb-0" />
+            <div className="mb-8 md:mb-0 md:mr-12">
+                <div className="flex items-center justify-center flex-col lg:flex-row md:space-x-4">
+                    <img src={logoLogin} alt="Logo" className="w-40 sm:w-40 md:w-52 lg:w-60 xl:w-80 h-auto object-contain mb-4 md:mb-0" />
                     <h2 className="text-gray-200 hidden md:block text-4xl md:text-5xl lg:text-6xl text-center font-semibold">Software</h2>
                 </div>   
             </div>
             </Reveal>
-            <div className="flex flex-col max-w-sm p-5 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl md:max-w-lg lg:max-w-4xl xl:max-w-6xl mx-4 z-50 inset-0 bg-[gray]/5 relative">
-                <div className="flex flex-col ">
-                    <h2 className="text-2xl font-semibold text-gray-200 mb-4 text-center">Đăng ký</h2>
+            <div className="flex flex-col w-full max-w-md p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl z-50 bg-[gray]/5">
+                <div className="flex flex-col">
+                    <h2 className="text-2xl font-semibold text-gray-200 mb-6 text-center">Đăng ký</h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-400">Email</label>
@@ -294,7 +288,7 @@ const Register: React.FC = () => {
                             </button>
                         </div>
                     </form>
-                    <div className="mt-2">
+                    <div className="mt-4">
                         <Link to="/login" className="text-gray-400 text-sm">Bạn đã có tài khoản? <span className='text-orange-400 hover:underline'>Nhấn vào đây để đăng nhập</span> </Link>
                     </div>
                 </div>
@@ -309,7 +303,7 @@ const Register: React.FC = () => {
                     showIcon
                     closable
                     onClose={() => setAlert(null)}
-                    className="animate-slide-in text-lg" // Thêm class cho animation và tăng kích thước chữ
+                    className="animate-slide-in text-lg"
                 />
             </div>
         )}
