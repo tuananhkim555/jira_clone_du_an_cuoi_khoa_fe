@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie } from 'react-icons/fa';
 import axios from 'axios';
 import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TitleGradient from '../../components/ui/TitleGradient';
 import Reveal from '../../components/Reveal';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 
 interface Project {
@@ -60,6 +61,7 @@ const ProjectTable = () => {
   const [isSearchPopoverVisible, setIsSearchPopoverVisible] = useState(false);
   const projectsPerPage = 7;
   const navigate = useNavigate();
+  const addMemberRef = useRef<HTMLDivElement>(null);
 
   const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
   const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
@@ -172,11 +174,43 @@ const ProjectTable = () => {
   const handleAddMember = (projectId: number, event: React.MouseEvent) => {
     setSelectedProjectId(projectId);
     setIsAddingMember(true);
-    const rect = event.currentTarget.getBoundingClientRect();
-    setAddMemberPosition({
-      top: rect.bottom + window.scrollY,
-      left: rect.left + window.scrollX
-    });
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    let top = rect.bottom + scrollTop;
+    let left = rect.left + scrollLeft;
+
+    // Kiểm tra kích thước màn hình và điều chỉnh vị trí
+    if (window.innerWidth >= 1024) {
+      // Desktop: dịch sang trái 350px
+      left -= 350;
+    } else if (window.innerWidth >= 640 && window.innerWidth < 1024) {
+      // Tablet: dịch lên trên 300px
+      top += 10;
+      left -= 100;
+    }else if(window.innerWidth < 640){
+      top -= 50;
+    }
+
+    // Đảm bảo popup không vượt quá cạnh trái của màn hình
+    if (left < 0) {
+      left = 0;
+    }
+
+    // Đảm bảo popup không vượt quá cạnh phải của màn hình
+    const popupWidth = 200; // Giả sử chiều rộng của popup là 400px
+    if (left + popupWidth > window.innerWidth) {
+      left = window.innerWidth - popupWidth - 10; // 10px margin
+    }
+
+    // Đảm bảo popup không vượt quá cạnh trên của màn hình
+    if (top < 0) {
+      top = rect.top + scrollTop + rect.height + 10; // Hiển thị dưới button nếu không đủ chỗ phía trên
+    }
+
+    setAddMemberPosition({ top, left });
   };
 
   const handleMemberSelect = async (userId: number) => {
@@ -327,7 +361,7 @@ const ProjectTable = () => {
   const renderAddMemberButton = (projectId: number) => (
     <Tooltip title="Add or search members">
       <button 
-        className="text-purple-700 hover:text-blue-800 mr-2 p-1 border rounded-full" 
+        className="text-purple-700 hover:text-blue-800 mr-2 p-1 border rounded-full relative" 
         onClick={(e) => handleAddMember(projectId, e)}
       >
         <FaPlus size={12} />
@@ -681,7 +715,7 @@ const ProjectTable = () => {
   );
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading projects...</div>;
+    return <LoadingSpinner/>;
   }
 
   if (error) {
@@ -711,6 +745,7 @@ const ProjectTable = () => {
       </div>
       {isAddingMember && (
         <div
+          ref={addMemberRef}
           style={{
             position: 'absolute',
             top: `${addMemberPosition.top}px`,

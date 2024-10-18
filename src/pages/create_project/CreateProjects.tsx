@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Editor } from '@tinymce/tinymce-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface ProjectData {
   projectName: string;
@@ -22,7 +24,7 @@ const CreateProject: React.FC = () => {
     categoryId: 0,
     alias: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -47,6 +49,8 @@ const CreateProject: React.FC = () => {
     } catch (error) {
       console.error('Error fetching categories:', error);
       setError('Failed to fetch categories. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,6 +90,14 @@ const CreateProject: React.FC = () => {
     }
   };
 
+  const handleEditorChange = (content: string, editor: any) => {
+    setFormData((prev) => ({ ...prev, description: content }));
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Tạo Dự Án Mới</h1>
@@ -106,14 +118,24 @@ const CreateProject: React.FC = () => {
 
         <div className="mb-4">
           <label htmlFor="description" className="block mb-2">Mô tả</label>
-          <textarea
-            id="description"
-            name="description"
+          <Editor
+            apiKey='jkmuc93b4ohldjg0xu52nlis2f9zct68ps5nibbf0jl7q96z'
+            init={{
+              height: 300,
+              menubar: false,
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+              ],
+              toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+            }}
+            onEditorChange={handleEditorChange}
             value={formData.description}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border rounded"
-            rows={4}
           />
         </div>
 
