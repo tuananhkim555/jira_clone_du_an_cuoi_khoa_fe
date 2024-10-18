@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie } from 'react-icons/fa';
 import axios from 'axios';
 import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -505,7 +505,13 @@ const ProjectTable = () => {
 
     return (
       <Popover content={content} trigger="click" placement="bottomLeft">
-        <span className="cursor-pointer hover:text-blue-500">{column.charAt(0).toUpperCase() + column.slice(1)}</span>
+        <span className="cursor-pointer hover:text-blue-500 flex items-center">
+          {column === 'id' && <FaHashtag className="mr-2" />}
+          {column === 'projectName' && <FaProjectDiagram className="mr-2" />}
+          {column === 'categoryName' && <FaLayerGroup className="mr-2" />}
+          {column === 'creator' && <FaUserTie className="mr-2" />}
+          {column === 'projectName' ? 'Projects' : column === 'categoryName' ? 'Category' : column.charAt(0).toUpperCase() + column.slice(1)}
+        </span>
       </Popover>
     );
   };
