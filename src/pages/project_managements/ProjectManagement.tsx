@@ -236,15 +236,15 @@ const ProjectTable = () => {
     const extraMembers = project.members.length - 5;
 
     return (
-      <div className="flex items-center space-x-1">
+      <div className='flex items-center justify-center'>
         <Tooltip
           title={
-            <div className="max-h-60 overflow-y-auto scrollbar bg-white rounded-md">
+            <div className="max-h-80 max-w-60 overflow-y-auto rounded-md">
               {project.members.map((member) => (
-                <div key={member.userId} className="flex justify-between items-center mb-2 p-2 hover:bg-gray-100 rounded-md">
+                <div key={member.userId} className="flex justify-between items-center mb-2 p-2">
                   <img src={member.avatar} alt={member.name} className="w-6 h-6 rounded-full mr-2" />
-                  <span className="text-gray-700">{member.name}</span>
-                  <button onClick={() => handleRemoveMember(project.id, member.userId)} className="text-white hover:text-red-300 ml-2 border bg-red-600 rounded-full p-1.5">
+                  <span className="text-gray-200">{member.name}</span>
+                  <button onClick={() => handleRemoveMember(project.id, member.userId)} className="text-white hover:text-red-300 ml-2 bg-red-600 rounded-full p-1.5">
                     <FaTimes />
                   </button>
                 </div>
@@ -253,17 +253,17 @@ const ProjectTable = () => {
           }
           trigger="hover"
         >
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center">
             {visibleMembers.map((member, index) => (
               <img
                 key={index}
                 src={member.avatar}
                 alt={member.name}
-                className="w-8 h-8 rounded-full cursor-pointer"
+                className="w-8 h-8 rounded-full cursor-pointer border-2 border-white"
               />
             ))}
             {extraMembers > 0 && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white cursor-pointer">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white">
                 +{extraMembers}
               </div>
             )}
@@ -284,7 +284,7 @@ const ProjectTable = () => {
   const renderAddMemberButton = (projectId: number) => (
     <Tooltip title="Add or search members">
       <button 
-        className="text-blue-800 hover:text-blue-900 mr-2 p-1 border rounded-full" 
+        className="text-blue-700 hover:text-blue-800 mr-2 p-1 border rounded-full" 
         onClick={(e) => handleAddMember(projectId, e)}
       >
         <FaPlus size={12} />
@@ -341,7 +341,7 @@ const ProjectTable = () => {
   );
 
   const renderDesktopView = () => (
-    <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+    <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
       <table className="w-full divide-y divide-gray-200">
         <thead className="bg-gradient-to-r from-purple-950 via-orange-900 to-purple-700 text-white font-semibold">
           <tr>
@@ -380,7 +380,7 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+                  <button className="bg-purple-700 text-white rounded-md p-2 hover:bg-purple-800 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                   <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>
