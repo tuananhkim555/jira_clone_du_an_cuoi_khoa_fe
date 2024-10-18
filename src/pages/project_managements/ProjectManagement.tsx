@@ -423,10 +423,15 @@ const ProjectTable = () => {
       {renderMobileTabletSearchPopover()}
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-bold text-lg mb-2">{project.projectName}</h3>
+          <h3 className="font-bold text-lg mb-2 text-purple-700 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
           <p className="text-sm text-gray-600">ID: {project.id}</p>
           <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
-          <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
+          <p className="text-sm text-gray-600">
+            <span className="flex items-center">
+              <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+              <span className="text-green-600 font-semibold">{project.creator.name}</span>
+            </span>
+          </p>
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap items-center">
@@ -451,10 +456,15 @@ const ProjectTable = () => {
       <div className="grid grid-cols-2 gap-4">
         {paginatedProjects.map((project) => (
           <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="font-bold text-lg mb-2">{project.projectName}</h3>
+            <h3 className="font-bold text-lg mb-2 text-purple-700 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
             <p className="text-sm text-gray-600">ID: {project.id}</p>
             <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
-            <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
+            <p className="text-sm text-gray-600">
+              <span className="flex items-center">
+                <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+                <span className="text-green-600 font-semibold">{project.creator.name}</span>
+              </span>
+            </p>
             <div className="mt-3">
               <p className="text-sm font-semibold mb-1">Members:</p>
               <div className="flex flex-wrap items-center">
@@ -555,7 +565,8 @@ const ProjectTable = () => {
             Array.from(new Set(allProjects.map(project => project.creator.id))).map(creatorId => {
               const creator = allProjects.find(project => project.creator.id === creatorId)?.creator;
               return (
-                <div key={creatorId} style={{ marginBottom: 5 }}>
+                <div key={creatorId} style={{ marginBottom: 5 }} className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
                   <Checkbox
                     checked={selectedCreators.includes(creatorId)}
                     onChange={(e) => {
@@ -566,7 +577,7 @@ const ProjectTable = () => {
                       }
                     }}
                   >
-                    {creator?.name}
+                    <span className="text-green-600">{creator?.name}</span>
                   </Checkbox>
                 </div>
               );
@@ -639,9 +650,14 @@ const ProjectTable = () => {
           {paginatedProjects.map((project: Project) => (
             <tr key={project.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.projectName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-800 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.creator.name}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+                  <span className="text-green-600 font-semibold">{project.creator.name}</span>
+                </div>
+              </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center space-x-1">
                   {renderAddMemberButton(project.id)}
@@ -650,7 +666,7 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+                  <button className="bg-purple-700 text-white rounded-md p-2 hover:bg-purple-800 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                   <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>
