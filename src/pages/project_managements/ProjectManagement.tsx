@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FaPencilAlt, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
 import axios from 'axios';
-import { Pagination, Modal, message, Select } from 'antd';
+import { Pagination, Modal, message, Select, Tooltip, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
@@ -40,10 +40,14 @@ const ProjectTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [addMemberPosition, setAddMemberPosition] = useState({ top: 0, left: 0 });
-  const projectsPerPage = 8;
+  const [showMemberList, setShowMemberList] = useState(false);
+  const [hoveredProjectId, setHoveredProjectId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const projectsPerPage = 7;
   const navigate = useNavigate();
 
   const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
@@ -84,7 +88,9 @@ const ProjectTable = () => {
           Authorization: `Bearer ${ACCESS_TOKEN}`,
         },
       });
-      setUsers(response.data.content);
+      const typedResponse = response.data as { content: User[] };
+      setUsers(typedResponse.content);
+      setFilteredUsers(typedResponse.content);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -191,34 +197,100 @@ const ProjectTable = () => {
     setIsAddingMember(false);
   };
 
+  const handleRemoveMember = async (projectId: number, userId: number) => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/Project/removeUserFromProject`,
+        {
+          projectId: projectId,
+          userId: userId
+        },
+        {
+          headers: {
+            TokenCybersoft: TOKEN_CYBERSOFT,
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+        }
+      );
+      NotificationMessage({
+        type: 'success',
+        message: 'Member removed successfully!'
+      });
+      fetchProjects(); // Refresh projects to show updated member list
+    } catch (error) {
+      console.error('Error removing member:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to remove member. Please try again.'
+      });
+    }
+  };
+
   const paginatedProjects = projects.slice(
     (currentPage - 1) * projectsPerPage,
     currentPage * projectsPerPage
   );
 
-  const renderMembers = (members: Project['members']) => {
-    const visibleMembers = members.slice(0, 5);
-    const extraMembers = members.length - 5;
+  const renderMembers = (project: Project) => {
+    const visibleMembers = project.members.slice(0, 5);
+    const extraMembers = project.members.length - 5;
 
     return (
       <div className="flex items-center space-x-1">
-        {visibleMembers.map((member, index) => (
-          <img
-            key={index}
-            src={member.avatar}
-            alt={member.name}
-            className="w-8 h-8 rounded-full"
-            title={member.name}
-          />
-        ))}
-        {extraMembers > 0 && (
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white">
-            +{extraMembers}
+        <Tooltip
+          title={
+            <div className="max-h-60 overflow-y-auto scrollbar bg-white rounded-md">
+              {project.members.map((member) => (
+                <div key={member.userId} className="flex justify-between items-center mb-2 p-2 hover:bg-gray-100 rounded-md">
+                  <img src={member.avatar} alt={member.name} className="w-6 h-6 rounded-full mr-2" />
+                  <span className="text-gray-700">{member.name}</span>
+                  <button onClick={() => handleRemoveMember(project.id, member.userId)} className="text-white hover:text-red-300 ml-2 border bg-red-600 rounded-full p-1.5">
+                    <FaTimes />
+                  </button>
+                </div>
+              ))}
+            </div>
+          }
+          trigger="hover"
+        >
+          <div className="flex items-center space-x-1">
+            {visibleMembers.map((member, index) => (
+              <img
+                key={index}
+                src={member.avatar}
+                alt={member.name}
+                className="w-8 h-8 rounded-full cursor-pointer"
+              />
+            ))}
+            {extraMembers > 0 && (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white cursor-pointer">
+                +{extraMembers}
+              </div>
+            )}
           </div>
-        )}
+        </Tooltip>
       </div>
     );
   };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    const filtered = users.filter(user => 
+      user.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  };
+
+  const renderAddMemberButton = (projectId: number) => (
+    <Tooltip title="Add or search members">
+      <button 
+        className="text-blue-800 hover:text-blue-900 mr-2 p-1 border rounded-full" 
+        onClick={(e) => handleAddMember(projectId, e)}
+      >
+        <FaPlus size={12} />
+      </button>
+    </Tooltip>
+  );
 
   const renderMobileView = () => (
     <div className="grid grid-cols-1 gap-4">
@@ -231,8 +303,8 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap items-center">
-              <button className="text-blue-800 hover:text-blue-900 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
-              {renderMembers(project.members)}
+              {renderAddMemberButton(project.id)}
+              {renderMembers(project)}
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
@@ -255,8 +327,8 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap items-center">
-              <button className="text-blue-600 hover:text-blue-800 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
-              {renderMembers(project.members)}
+              {renderAddMemberButton(project.id)}
+              {renderMembers(project)}
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
@@ -302,8 +374,8 @@ const ProjectTable = () => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.creator.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center space-x-1">
-                  <button className="text-blue-600 hover:text-blue-800 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
-                  {renderMembers(project.members)}
+                  {renderAddMemberButton(project.id)}
+                  {renderMembers(project)}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -359,12 +431,16 @@ const ProjectTable = () => {
           }}
         >
           <Select
+            showSearch
             style={{ width: '200px' }}
-            placeholder="Select a user to add"
+            placeholder="Search and select user"
+            optionFilterProp="children"
             onChange={handleMemberSelect}
+            onSearch={handleSearchChange}
+            filterOption={false}
             onBlur={() => setIsAddingMember(false)}
           >
-            {users.map(user => (
+            {filteredUsers.map(user => (
               <Select.Option key={user.userId} value={user.userId}>
                 {user.name}
               </Select.Option>
