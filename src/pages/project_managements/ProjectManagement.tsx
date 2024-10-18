@@ -324,7 +324,7 @@ const ProjectTable = () => {
   const renderAddMemberButton = (projectId: number) => (
     <Tooltip title="Add or search members">
       <button 
-        className="text-blue-700 hover:text-blue-800 mr-2 p-1 border rounded-full" 
+        className="text-purple-700 hover:text-blue-800 mr-2 p-1 border rounded-full" 
         onClick={(e) => handleAddMember(projectId, e)}
       >
         <FaPlus size={12} />
@@ -377,10 +377,23 @@ const ProjectTable = () => {
         <Input.Search
           placeholder={`Search by ${searchColumn || 'selected category'}`}
           onChange={(e) => handleMobileTabletSearch(e.target.value, searchColumn)}
-          onSearch={() => handleMobileTabletSearch(searchTerm, searchColumn)}
-          style={{ width: '100%' }}
+          onSearch={() => {
+            handleMobileTabletSearch(searchTerm, searchColumn);
+            setIsSearchPopoverVisible(false);
+          }}
+          style={{ width: '100%'}}
           size="large"
-          enterButton
+          enterButton={
+            <Button 
+              style={{ 
+                backgroundColor: '#6b21a8', 
+                color: 'white',
+                border: 'none',
+              }}
+            >
+              OK
+            </Button>
+          }
         />
       </motion.div>
     );
@@ -396,7 +409,7 @@ const ProjectTable = () => {
         <Button 
           icon={<FaSearch />} 
           size="large" 
-          className={`mb-4 text-lg px-6 py-3 flex items-center justify-center bg-gradient-to-r from-purple-800 to-orange-700 text-white hover:from-purple-700 hover:to-orange-600 ${isTablet ? 'w-3/4' : 'w-full'} max-w-md mx-auto`}
+          className={`mb-4 text-lg px-6 py-3 flex items-center justify-center bg-gradient-to-r from-purple-950 to-orange-700 text-white hover:from-purple-800 hover:to-orange-600 ${isTablet ? 'w-2/4' : 'w-full'} max-w-md mx-auto`}
           onClick={() => setIsSearchPopoverVisible(true)}
         >
           <span className="ml-2">Search Projects</span>
@@ -423,7 +436,7 @@ const ProjectTable = () => {
           </div>
           <div className="mt-4 flex justify-end space-x-2">
             <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-            <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+            <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -451,7 +464,7 @@ const ProjectTable = () => {
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-              <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+              <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
             </div>
           </div>
         ))}
@@ -571,7 +584,7 @@ const ProjectTable = () => {
                     }
                   }}
                 >
-                  {project[column as keyof Project]}
+                  {String(project[column as keyof Project])}
                 </Checkbox>
               </div>
             ))
@@ -586,7 +599,7 @@ const ProjectTable = () => {
 
     return (
       <Popover content={content} trigger="click" placement="bottomLeft">
-        <span className="cursor-pointer hover:text-blue-500 flex items-center">
+        <span className="cursor-pointer hover:text-purple-700 flex items-center">
           {column === 'id' && <FaHashtag className="mr-2" />}
           {column === 'projectName' && <FaProjectDiagram className="mr-2" />}
           {column === 'categoryName' && <FaLayerGroup className="mr-2" />}
@@ -637,8 +650,8 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="bg-purple-700 text-white rounded-md p-2 hover:bg-purple-800 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-                  <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+                  <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>
             </tr>
