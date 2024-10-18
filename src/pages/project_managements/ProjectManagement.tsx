@@ -231,7 +231,7 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap items-center">
-              <button className="text-blue-800 hover:text-blue-900 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+              <button className="text-blue-800 hover:text-blue-900 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
               {renderMembers(project.members)}
             </div>
           </div>
@@ -255,7 +255,7 @@ const ProjectTable = () => {
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
             <div className="flex flex-wrap items-center">
-              <button className="text-blue-600 hover:text-blue-800 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+              <button className="text-blue-600 hover:text-blue-800 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
               {renderMembers(project.members)}
             </div>
           </div>
@@ -302,7 +302,7 @@ const ProjectTable = () => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.creator.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center space-x-1">
-                  <button className="text-blue-600 hover:text-blue-800 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+                  <button className="text-blue-600 hover:text-blue-800 mr-2 p-1 border rounded-full" onClick={(e) => handleAddMember(project.id, e)}><FaPlus size={12} /></button>
                   {renderMembers(project.members)}
                 </div>
               </td>
