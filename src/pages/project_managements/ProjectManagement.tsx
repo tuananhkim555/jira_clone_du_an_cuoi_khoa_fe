@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaPencilAlt, FaTrash, FaPlus } from 'react-icons/fa';
 import axios from 'axios';
-import { Pagination, Modal, message } from 'antd';
+import { Pagination, Modal, message, Select } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,12 @@ interface Project {
   }[];
 }
 
+interface User {
+  userId: number;
+  name: string;
+  avatar: string;
+}
+
 interface ApiResponse {
   content: Project[];
 }
@@ -33,6 +39,10 @@ const ProjectTable = () => {
   const [isTablet, setIsTablet] = useState(window.innerWidth >= 640 && window.innerWidth < 1024);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [addMemberPosition, setAddMemberPosition] = useState({ top: 0, left: 0 });
   const projectsPerPage = 8;
   const navigate = useNavigate();
 
@@ -42,6 +52,7 @@ const ProjectTable = () => {
 
   useEffect(() => {
     fetchProjects();
+    fetchUsers();
   }, []);
 
   const fetchProjects = async () => {
@@ -55,7 +66,6 @@ const ProjectTable = () => {
         },
       });
       const typedResponse = response.data as { content: Project[] };
-      // Reverse the order of projects here
       setProjects(typedResponse.content.reverse());
       setTotalProjects(typedResponse.content.length);
     } catch (error) {
@@ -63,6 +73,20 @@ const ProjectTable = () => {
       setError('Failed to fetch projects. Please try again later.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Users/getUser`, {
+        headers: {
+          TokenCybersoft: TOKEN_CYBERSOFT,
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
+        },
+      });
+      setUsers(response.data.content);
+    } catch (error) {
+      console.error('Error fetching users:', error);
     }
   };
 
@@ -87,7 +111,6 @@ const ProjectTable = () => {
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        // Perform the delete operation
         axios.delete(`${API_BASE_URL}/Project/deleteProject`, {
           params: { projectId },
           headers: {
@@ -96,7 +119,6 @@ const ProjectTable = () => {
           },
         })
         .then(() => {
-          // Remove the deleted project from the state
           setProjects(projects.filter(project => project.id !== projectId));
           NotificationMessage({
             type: 'success',
@@ -127,10 +149,76 @@ const ProjectTable = () => {
     navigate(`/project/edit/${projectId}`);
   };
 
+  const handleAddMember = (projectId: number, event: React.MouseEvent) => {
+    setSelectedProjectId(projectId);
+    setIsAddingMember(true);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setAddMemberPosition({
+      top: rect.bottom + window.scrollY,
+      left: rect.left + window.scrollX
+    });
+  };
+
+  const handleMemberSelect = async (userId: number) => {
+    if (selectedProjectId) {
+      try {
+        await axios.post(
+          `${API_BASE_URL}/Project/assignUserProject`,
+          {
+            projectId: selectedProjectId,
+            userId: userId
+          },
+          {
+            headers: {
+              TokenCybersoft: TOKEN_CYBERSOFT,
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+          }
+        );
+        NotificationMessage({
+          type: 'success',
+          message: 'Member added successfully!'
+        });
+        fetchProjects(); // Refresh projects to show new member
+      } catch (error) {
+        console.error('Error adding member:', error);
+        NotificationMessage({
+          type: 'error',
+          message: 'Failed to add member. Please try again.'
+        });
+      }
+    }
+    setIsAddingMember(false);
+  };
+
   const paginatedProjects = projects.slice(
     (currentPage - 1) * projectsPerPage,
     currentPage * projectsPerPage
   );
+
+  const renderMembers = (members: Project['members']) => {
+    const visibleMembers = members.slice(0, 5);
+    const extraMembers = members.length - 5;
+
+    return (
+      <div className="flex items-center space-x-1">
+        {visibleMembers.map((member, index) => (
+          <img
+            key={index}
+            src={member.avatar}
+            alt={member.name}
+            className="w-8 h-8 rounded-full"
+            title={member.name}
+          />
+        ))}
+        {extraMembers > 0 && (
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white">
+            +{extraMembers}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderMobileView = () => (
     <div className="grid grid-cols-1 gap-4">
@@ -142,17 +230,9 @@ const ProjectTable = () => {
           <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
-            <div className="flex flex-wrap">
-              <button className="text-blue-800 hover:text-blue-900"><FaPlus /></button>
-              {project.members.map((member, index) => (
-                <img
-                  key={index}
-                  src={member.avatar}
-                  alt={member.name}
-                  className="w-8 h-8 rounded-full mr-2 mb-2"
-                  title={member.name}
-                />
-              ))}
+            <div className="flex flex-wrap items-center">
+              <button className="text-blue-800 hover:text-blue-900 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+              {renderMembers(project.members)}
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
@@ -174,17 +254,9 @@ const ProjectTable = () => {
           <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
           <div className="mt-3">
             <p className="text-sm font-semibold mb-1">Members:</p>
-            <div className="flex flex-wrap">
-              <button className="text-blue-600 hover:text-blue-800"><FaPlus /></button>
-              {project.members.map((member, index) => (
-                <img
-                  key={index}
-                  src={member.avatar}
-                  alt={member.name}
-                  className="w-8 h-8 rounded-full mr-2 mb-2"
-                  title={member.name}
-                />
-              ))}
+            <div className="flex flex-wrap items-center">
+              <button className="text-blue-600 hover:text-blue-800 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+              {renderMembers(project.members)}
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
@@ -230,16 +302,8 @@ const ProjectTable = () => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.creator.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center space-x-1">
-                  <button className="text-blue-600 hover:text-blue-800"><FaPlus /></button>
-                  {project.members.map((member, index) => (
-                    <img
-                      key={index}
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-8 h-8 rounded-full"
-                      title={member.name}
-                    />
-                  ))}
+                  <button className="text-blue-600 hover:text-blue-800 mr-2" onClick={(e) => handleAddMember(project.id, e)}><FaPlus /></button>
+                  {renderMembers(project.members)}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -280,6 +344,34 @@ const ProjectTable = () => {
           />
         </div>
       </div>
+      {isAddingMember && (
+        <div
+          style={{
+            position: 'absolute',
+            top: `${addMemberPosition.top}px`,
+            left: `${addMemberPosition.left}px`,
+            zIndex: 1000,
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            padding: '10px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          <Select
+            style={{ width: '200px' }}
+            placeholder="Select a user to add"
+            onChange={handleMemberSelect}
+            onBlur={() => setIsAddingMember(false)}
+          >
+            {users.map(user => (
+              <Select.Option key={user.userId} value={user.userId}>
+                {user.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+      )}
     </div>
   );
 };
