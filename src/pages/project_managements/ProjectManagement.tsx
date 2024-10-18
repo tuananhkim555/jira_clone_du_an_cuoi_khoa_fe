@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Pagination, Modal, message } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
+import { useNavigate } from 'react-router-dom';
 
 interface Project {
   id: number;
@@ -33,6 +34,7 @@ const ProjectTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const projectsPerPage = 8;
+  const navigate = useNavigate();
 
   const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
   const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
@@ -121,6 +123,10 @@ const ProjectTable = () => {
     setCurrentPage(page);
   };
 
+  const handleEditProject = (projectId: number) => {
+    navigate(`/project/edit/${projectId}`);
+  };
+
   const paginatedProjects = projects.slice(
     (currentPage - 1) * projectsPerPage,
     currentPage * projectsPerPage
@@ -150,8 +156,8 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="bg-purple-800 text-white rounded-md p-1 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
-            <button className="bg-red-500 text-white rounded-md p-1 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+            <button className="bg-purple-800 text-white rounded-md p-1 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={18} /></button>
+            <button className="bg-red-500 text-white rounded-md p-1 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={18} /></button>
           </div>
         </div>
       ))}
@@ -182,7 +188,7 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
+            <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
             <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
@@ -238,7 +244,7 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm"><FaPencilAlt size={14} /></button>
+                  <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                   <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>
