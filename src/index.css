@@ -62,3 +62,14 @@ p {
   .loader {
     animation: spin 1s linear infinite;
   }
+
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #5b21b6 !important; /* purple-800 */
+    border-color: #5b21b6 !important; /* purple-800 */
+  }
+  
+  .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+  .ant-checkbox:hover .ant-checkbox-inner,
+  .ant-checkbox-input:focus + .ant-checkbox-inner {
+    border-color: #5b21b6 !important; /* purple-800 */
+  }

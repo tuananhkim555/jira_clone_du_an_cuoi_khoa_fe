@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import TitleGradient from '../../components/ui/TitleGradient';
 import Reveal from '../../components/Reveal';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import styled from 'styled-components';
 
 
 interface Project {
@@ -35,6 +36,18 @@ interface User {
 interface ApiResponse {
   content: Project[];
 }
+
+const StyledCheckbox = styled(Checkbox)`
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #5b21b6; /* purple-800 */
+    border-color: #5b21b6; /* purple-800 */
+  }
+
+  &:hover .ant-checkbox-inner,
+  .ant-checkbox-input:focus + .ant-checkbox-inner {
+    border-color: #5b21b6; /* purple-800 */
+  }
+`;
 
 const ProjectTable = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -584,7 +597,7 @@ const ProjectTable = () => {
           {column === 'categoryName' ? (
             ['Dự án web', 'Dự án phần mềm', 'Dự án di động'].map(category => (
               <div key={category} style={{ marginBottom: 5 }}>
-                <Checkbox
+                <StyledCheckbox
                   checked={selectedCategories.includes(category)}
                   onChange={(e) => {
                     if (e.target.checked) {
@@ -595,7 +608,7 @@ const ProjectTable = () => {
                   }}
                 >
                   {category}
-                </Checkbox>
+                </StyledCheckbox>
               </div>
             ))
           ) : column === 'creator' ? (
@@ -604,7 +617,7 @@ const ProjectTable = () => {
               return (
                 <div key={creatorId} style={{ marginBottom: 5 }} className="flex items-center">
                   <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
-                  <Checkbox
+                  <StyledCheckbox
                     checked={selectedCreators.includes(creatorId)}
                     onChange={(e) => {
                       if (e.target.checked) {
@@ -615,14 +628,14 @@ const ProjectTable = () => {
                     }}
                   >
                     <span className="text-green-600">{creator?.name}</span>
-                  </Checkbox>
+                  </StyledCheckbox>
                 </div>
               );
             })
           ) : (
             modalFilteredProjects.map(project => (
               <div key={project.id} style={{ marginBottom: 5 }}>
-                <Checkbox
+                <StyledCheckbox
                   checked={selectedProjects.includes(project.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
@@ -633,14 +646,14 @@ const ProjectTable = () => {
                   }}
                 >
                   {String(project[column as keyof Project])}
-                </Checkbox>
+                </StyledCheckbox>
               </div>
             ))
           )}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button onClick={handleReset}>Reset</Button>
-          <Button type="primary" onClick={handleSubmit}>Submit</Button>
+          <Button style={{ border: 'none', backgroundColor: '#6b21a8', color: 'white'}} onClick={handleSubmit}>Submit</Button>
         </div>
       </div>
     );
@@ -685,7 +698,7 @@ const ProjectTable = () => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {paginatedProjects.map((project: Project) => (
-            <tr key={project.id} className="hover:bg-gray-50">
+            <tr key={project.id} className="hover:bg-gray-100">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-800 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
