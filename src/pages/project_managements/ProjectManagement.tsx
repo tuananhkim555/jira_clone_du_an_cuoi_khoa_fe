@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
 import axios from 'axios';
-import { Pagination, Modal, message, Select, Tooltip, Input } from 'antd';
+import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +33,7 @@ interface ApiResponse {
 
 const ProjectTable = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
@@ -47,6 +48,9 @@ const ProjectTable = () => {
   const [showMemberList, setShowMemberList] = useState(false);
   const [hoveredProjectId, setHoveredProjectId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchColumn, setSearchColumn] = useState('');
+  const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
+  const [modalFilteredProjects, setModalFilteredProjects] = useState<Project[]>([]);
   const projectsPerPage = 7;
   const navigate = useNavigate();
 
@@ -70,8 +74,11 @@ const ProjectTable = () => {
         },
       });
       const typedResponse = response.data as { content: Project[] };
-      setProjects(typedResponse.content.reverse());
-      setTotalProjects(typedResponse.content.length);
+      const sortedProjects = typedResponse.content.reverse();
+      setProjects(sortedProjects);
+      setAllProjects(sortedProjects);
+      setModalFilteredProjects(sortedProjects);
+      setTotalProjects(sortedProjects.length);
     } catch (error) {
       console.error('Error fetching projects:', error);
       setError('Failed to fetch projects. Please try again later.');
@@ -340,22 +347,96 @@ const ProjectTable = () => {
     </div>
   );
 
+  const handleSearch = (value: string, column: string) => {
+    setSearchTerm(value);
+    setSearchColumn(column);
+    const filtered = allProjects.filter(project => {
+      switch (column) {
+        case 'id':
+          return project.id.toString().includes(value);
+        case 'projectName':
+          return project.projectName.toLowerCase().includes(value.toLowerCase());
+        case 'categoryName':
+          return project.categoryName.toLowerCase().includes(value.toLowerCase());
+        case 'creator':
+          return project.creator.name.toLowerCase().includes(value.toLowerCase());
+        default:
+          return false;
+      }
+    });
+    setModalFilteredProjects(filtered);
+  };
+
+  const handleSubmit = () => {
+    const filteredProjects = allProjects.filter(project => selectedProjects.includes(project.id));
+    setProjects(filteredProjects);
+    setSelectedProjects([]);
+    setSearchTerm('');
+  };
+
+  const handleReset = () => {
+    setSelectedProjects([]);
+    setSearchTerm('');
+    setModalFilteredProjects(allProjects);
+  };
+
+  const renderSearchPopover = (column: string) => {
+    const content = (
+      <div>
+        <Input.Search
+          placeholder={`Search by ${column}`}
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value, column)}
+          style={{ width: 200, marginBottom: 10 }}
+        />
+        <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: 10 }}>
+          {modalFilteredProjects.map(project => (
+            <div key={project.id} style={{ marginBottom: 5 }}>
+              <Checkbox
+                checked={selectedProjects.includes(project.id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedProjects([...selectedProjects, project.id]);
+                  } else {
+                    setSelectedProjects(selectedProjects.filter(id => id !== project.id));
+                  }
+                }}
+              >
+                {project[column as keyof Project]}
+              </Checkbox>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button onClick={handleReset}>Reset</Button>
+          <Button type="primary" onClick={handleSubmit}>Submit</Button>
+        </div>
+      </div>
+    );
+
+    return (
+      <Popover content={content} trigger="click" placement="bottomLeft">
+        <span className="cursor-pointer hover:text-blue-500">{column.charAt(0).toUpperCase() + column.slice(1)}</span>
+      </Popover>
+    );
+  };
+
   const renderDesktopView = () => (
     <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
       <table className="w-full divide-y divide-gray-200">
         <thead className="bg-gradient-to-r from-purple-950 via-orange-900 to-purple-700 text-white font-semibold">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              ID
+              {renderSearchPopover('id')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Project name
+              {renderSearchPopover('projectName')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Category
+              {renderSearchPopover('categoryName')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Creator
+              {renderSearchPopover('creator')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               Members
