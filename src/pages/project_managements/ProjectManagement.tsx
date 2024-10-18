@@ -5,6 +5,7 @@ import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 interface Project {
   id: number;
@@ -53,6 +54,7 @@ const ProjectTable = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedCreators, setSelectedCreators] = useState<number[]>([]);
   const [modalFilteredProjects, setModalFilteredProjects] = useState<Project[]>([]);
+  const [isSearchPopoverVisible, setIsSearchPopoverVisible] = useState(false);
   const projectsPerPage = 7;
   const navigate = useNavigate();
 
@@ -330,32 +332,82 @@ const ProjectTable = () => {
     </Tooltip>
   );
 
-  const renderMobileView = () => (
-    <div className="grid grid-cols-1 gap-4">
-      {paginatedProjects.map((project) => (
-        <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-bold text-lg mb-2">{project.projectName}</h3>
-          <p className="text-sm text-gray-600">ID: {project.id}</p>
-          <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
-          <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
-          <div className="mt-3">
-            <p className="text-sm font-semibold mb-1">Members:</p>
-            <div className="flex flex-wrap items-center">
-              {renderAddMemberButton(project.id)}
-              {renderMembers(project)}
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end space-x-2">
-            <button className="bg-purple-800 text-white rounded-md p-1 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={18} /></button>
-            <button className="bg-red-500 text-white rounded-md p-1 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={18} /></button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  const handleMobileTabletSearch = (value: string, column: string) => {
+    setSearchTerm(value);
+    setSearchColumn(column);
+    const filtered = allProjects.filter(project => {
+      switch (column) {
+        case 'id':
+          return project.id.toString().includes(value);
+        case 'projectName':
+          return project.projectName.toLowerCase().includes(value.toLowerCase());
+        case 'categoryName':
+          return project.categoryName.toLowerCase().includes(value.toLowerCase());
+        case 'creator':
+          return project.creator.name.toLowerCase().includes(value.toLowerCase());
+        default:
+          return false;
+      }
+    });
+    setProjects(filtered);
+    setTotalProjects(filtered.length);
+    setCurrentPage(1);
+  };
 
-  const renderTabletView = () => (
-    <div className="grid grid-cols-2 gap-4">
+  const renderMobileTabletSearchPopover = () => {
+    const content = (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="p-2 rounded-lg shadow-lg bg-white"
+        style={{ width: '350px' }}
+      >
+        <Select
+          style={{ width: '100%', marginBottom: 8 }}
+          placeholder="Select search category"
+          onChange={(value) => setSearchColumn(value)}
+          size="large"
+        >
+          <Select.Option value="id">ID</Select.Option>
+          <Select.Option value="projectName">Project Name</Select.Option>
+          <Select.Option value="categoryName">Category</Select.Option>
+          <Select.Option value="creator">Creator</Select.Option>
+        </Select>
+        <Input.Search
+          placeholder={`Search by ${searchColumn || 'selected category'}`}
+          onChange={(e) => handleMobileTabletSearch(e.target.value, searchColumn)}
+          onSearch={() => handleMobileTabletSearch(searchTerm, searchColumn)}
+          style={{ width: '100%' }}
+          size="large"
+          enterButton
+        />
+      </motion.div>
+    );
+
+    return (
+      <Popover 
+        content={content} 
+        trigger="click" 
+        placement="bottomLeft"
+        visible={isSearchPopoverVisible}
+        onVisibleChange={setIsSearchPopoverVisible}
+      >
+        <Button 
+          icon={<FaSearch />} 
+          size="large" 
+          className={`mb-4 text-lg px-6 py-3 flex items-center justify-center bg-gradient-to-r from-purple-800 to-orange-700 text-white hover:from-purple-700 hover:to-orange-600 ${isTablet ? 'w-3/4' : 'w-full'} max-w-md mx-auto`}
+          onClick={() => setIsSearchPopoverVisible(true)}
+        >
+          <span className="ml-2">Search Projects</span>
+        </Button>
+      </Popover>
+    );
+  };
+
+  const renderMobileView = () => (
+    <div className="grid grid-cols-1 gap-6">
+      {renderMobileTabletSearchPopover()}
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
           <h3 className="font-bold text-lg mb-2">{project.projectName}</h3>
@@ -375,6 +427,35 @@ const ProjectTable = () => {
           </div>
         </div>
       ))}
+    </div>
+  );
+
+  const renderTabletView = () => (
+    <div>
+      <div className="mb-6 flex justify-center">
+        {renderMobileTabletSearchPopover()}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        {paginatedProjects.map((project) => (
+          <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="font-bold text-lg mb-2">{project.projectName}</h3>
+            <p className="text-sm text-gray-600">ID: {project.id}</p>
+            <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
+            <p className="text-sm text-gray-600">Creator: {project.creator.name}</p>
+            <div className="mt-3">
+              <p className="text-sm font-semibold mb-1">Members:</p>
+              <div className="flex flex-wrap items-center">
+                {renderAddMemberButton(project.id)}
+                {renderMembers(project)}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+              <button className="bg-red-500 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
