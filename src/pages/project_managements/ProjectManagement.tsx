@@ -370,6 +370,8 @@ const ProjectTable = () => {
   const handleSubmit = () => {
     const filteredProjects = allProjects.filter(project => selectedProjects.includes(project.id));
     setProjects(filteredProjects);
+    setTotalProjects(filteredProjects.length);
+    setCurrentPage(1);
     setSelectedProjects([]);
     setSearchTerm('');
   };
@@ -402,7 +404,7 @@ const ProjectTable = () => {
                   }
                 }}
               >
-                {project[column as keyof Project]}
+                {column === 'creator' ? project.creator.name : project[column as keyof Project]}
               </Checkbox>
             </div>
           ))}
