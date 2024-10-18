@@ -6,6 +6,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import NotificationMessage from '../../components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import TitleGradient from '../../components/ui/TitleGradient';
+
 
 interface Project {
   id: number;
@@ -687,7 +689,10 @@ const ProjectTable = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="max-w-7xl mx-auto mt-[100px]">
+      <div className="max-w-7xl mx-auto mt-[50px]">
+        <div className="mb-[50px] flex justify-center">
+          <TitleGradient>Project Management</TitleGradient>
+        </div>
         {isMobile && renderMobileView()}
         {isTablet && renderTabletView()}
         {!isMobile && !isTablet && renderDesktopView()}
