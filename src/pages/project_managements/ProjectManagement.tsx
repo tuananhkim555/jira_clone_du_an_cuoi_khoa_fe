@@ -50,6 +50,8 @@ const ProjectTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchColumn, setSearchColumn] = useState('');
   const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCreators, setSelectedCreators] = useState<number[]>([]);
   const [modalFilteredProjects, setModalFilteredProjects] = useState<Project[]>([]);
   const projectsPerPage = 7;
   const navigate = useNavigate();
@@ -192,7 +194,25 @@ const ProjectTable = () => {
           type: 'success',
           message: 'Member added successfully!'
         });
-        fetchProjects(); // Refresh projects to show new member
+        // Update the project in the current state instead of fetching all projects
+        const updatedProjects = projects.map(project => {
+          if (project.id === selectedProjectId) {
+            const newMember = users.find(user => user.userId === userId);
+            if (newMember) {
+              return {
+                ...project,
+                members: [...project.members, {
+                  userId: newMember.userId,
+                  name: newMember.name,
+                  avatar: newMember.avatar
+                }]
+              };
+            }
+          }
+          return project;
+        });
+        setProjects(updatedProjects);
+        setAllProjects(updatedProjects);
       } catch (error) {
         console.error('Error adding member:', error);
         NotificationMessage({
@@ -223,7 +243,18 @@ const ProjectTable = () => {
         type: 'success',
         message: 'Member removed successfully!'
       });
-      fetchProjects(); // Refresh projects to show updated member list
+      // Update the project in the current state instead of fetching all projects
+      const updatedProjects = projects.map(project => {
+        if (project.id === projectId) {
+          return {
+            ...project,
+            members: project.members.filter(member => member.userId !== userId)
+          };
+        }
+        return project;
+      });
+      setProjects(updatedProjects);
+      setAllProjects(updatedProjects);
     } catch (error) {
       console.error('Error removing member:', error);
       NotificationMessage({
@@ -368,16 +399,33 @@ const ProjectTable = () => {
   };
 
   const handleSubmit = () => {
-    const filteredProjects = allProjects.filter(project => selectedProjects.includes(project.id));
+    let filteredProjects = allProjects;
+    
+    if (selectedCategories.length > 0) {
+      filteredProjects = filteredProjects.filter(project => selectedCategories.includes(project.categoryName));
+    }
+    
+    if (selectedCreators.length > 0) {
+      filteredProjects = filteredProjects.filter(project => selectedCreators.includes(project.creator.id));
+    }
+    
+    if (selectedProjects.length > 0) {
+      filteredProjects = filteredProjects.filter(project => selectedProjects.includes(project.id));
+    }
+    
     setProjects(filteredProjects);
     setTotalProjects(filteredProjects.length);
     setCurrentPage(1);
     setSelectedProjects([]);
+    setSelectedCategories([]);
+    setSelectedCreators([]);
     setSearchTerm('');
   };
 
   const handleReset = () => {
     setSelectedProjects([]);
+    setSelectedCategories([]);
+    setSelectedCreators([]);
     setSearchTerm('');
     setModalFilteredProjects(allProjects);
   };
@@ -392,22 +440,61 @@ const ProjectTable = () => {
           style={{ width: 200, marginBottom: 10 }}
         />
         <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: 10 }}>
-          {modalFilteredProjects.map(project => (
-            <div key={project.id} style={{ marginBottom: 5 }}>
-              <Checkbox
-                checked={selectedProjects.includes(project.id)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedProjects([...selectedProjects, project.id]);
-                  } else {
-                    setSelectedProjects(selectedProjects.filter(id => id !== project.id));
-                  }
-                }}
-              >
-                {column === 'creator' ? project.creator.name : project[column as keyof Project]}
-              </Checkbox>
-            </div>
-          ))}
+          {column === 'categoryName' ? (
+            ['Dự án web', 'Dự án phần mềm', 'Dự án di động'].map(category => (
+              <div key={category} style={{ marginBottom: 5 }}>
+                <Checkbox
+                  checked={selectedCategories.includes(category)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedCategories([...selectedCategories, category]);
+                    } else {
+                      setSelectedCategories(selectedCategories.filter(c => c !== category));
+                    }
+                  }}
+                >
+                  {category}
+                </Checkbox>
+              </div>
+            ))
+          ) : column === 'creator' ? (
+            Array.from(new Set(allProjects.map(project => project.creator.id))).map(creatorId => {
+              const creator = allProjects.find(project => project.creator.id === creatorId)?.creator;
+              return (
+                <div key={creatorId} style={{ marginBottom: 5 }}>
+                  <Checkbox
+                    checked={selectedCreators.includes(creatorId)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedCreators([...selectedCreators, creatorId]);
+                      } else {
+                        setSelectedCreators(selectedCreators.filter(id => id !== creatorId));
+                      }
+                    }}
+                  >
+                    {creator?.name}
+                  </Checkbox>
+                </div>
+              );
+            })
+          ) : (
+            modalFilteredProjects.map(project => (
+              <div key={project.id} style={{ marginBottom: 5 }}>
+                <Checkbox
+                  checked={selectedProjects.includes(project.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedProjects([...selectedProjects, project.id]);
+                    } else {
+                      setSelectedProjects(selectedProjects.filter(id => id !== project.id));
+                    }
+                  }}
+                >
+                  {project[column as keyof Project]}
+                </Checkbox>
+              </div>
+            ))
+          )}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button onClick={handleReset}>Reset</Button>
