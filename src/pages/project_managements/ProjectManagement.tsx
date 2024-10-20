@@ -49,6 +49,15 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
+const SearchButton = styled(Button)`
+  @media (max-width: 1023px) {
+    &:hover {
+      color: #5b21b6 !important; /* purple-800 cho text */
+      border-color: #5b21b6 !important; /* purple-800 cho border */
+    }
+  }
+`;
+
 const ProjectTable = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
@@ -164,13 +173,24 @@ const ProjectTable = () => {
           console.error('Error deleting project:', error);
           if (axios.isAxiosError(error)) {
             console.log('Error response:', error.response?.data);
+            if (error.response?.status === 403) {
+              NotificationMessage({
+                type: 'error',
+                message: 'You do not have permission to delete this project. Only the project creator can delete it.'
+              });
+            } else {
+              NotificationMessage({
+                type: 'error',
+                message: 'Failed to delete project. Please try again.'
+              });
+            }
           } else {
             console.log('Unexpected error:', error);
+            NotificationMessage({
+              type: 'error',
+              message: 'An unexpected error occurred. Please try again.'
+            });
           }
-          NotificationMessage({
-            type: 'error',
-            message: 'Failed to delete project. Please try again.'
-          });
         });
       },
     });
@@ -267,53 +287,78 @@ const ProjectTable = () => {
         setAllProjects(updatedProjects);
       } catch (error) {
         console.error('Error adding member:', error);
-        NotificationMessage({
-          type: 'error',
-          message: 'Failed to add member. Please try again.'
-        });
+        if (axios.isAxiosError(error) && error.response?.status === 403) {
+          NotificationMessage({
+            type: 'error',
+            message: 'You do not have permission to add members to this project. Only the project creator can add members.'
+          });
+        } else {
+          NotificationMessage({
+            type: 'error',
+            message: 'Failed to add member. Please try again.'
+          });
+        }
       }
     }
     setIsAddingMember(false);
   };
 
   const handleRemoveMember = async (projectId: number, userId: number) => {
-    try {
-      await axios.post(
-        `${API_BASE_URL}/Project/removeUserFromProject`,
-        {
-          projectId: projectId,
-          userId: userId
-        },
-        {
-          headers: {
-            TokenCybersoft: TOKEN_CYBERSOFT,
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
+    confirm({
+      title: 'Are you sure you want to remove this member?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        axios.post(
+          `${API_BASE_URL}/Project/removeUserFromProject`,
+          {
+            projectId: projectId,
+            userId: userId
           },
-        }
-      );
-      NotificationMessage({
-        type: 'success',
-        message: 'Member removed successfully!'
-      });
-      // Update the project in the current state instead of fetching all projects
-      const updatedProjects = projects.map(project => {
-        if (project.id === projectId) {
-          return {
-            ...project,
-            members: project.members.filter(member => member.userId !== userId)
-          };
-        }
-        return project;
-      });
-      setProjects(updatedProjects);
-      setAllProjects(updatedProjects);
-    } catch (error) {
-      console.error('Error removing member:', error);
-      NotificationMessage({
-        type: 'error',
-        message: 'Failed to remove member. Please try again.'
-      });
-    }
+          {
+            headers: {
+              TokenCybersoft: TOKEN_CYBERSOFT,
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+          }
+        )
+        .then(() => {
+          NotificationMessage({
+            type: 'success',
+            message: 'Member removed successfully!'
+          });
+          // Update the project in the current state instead of fetching all projects
+          const updatedProjects = projects.map(project => {
+            if (project.id === projectId) {
+              return {
+                ...project,
+                members: project.members.filter(member => member.userId !== userId)
+              };
+            }
+            return project;
+          });
+          setProjects(updatedProjects);
+          setAllProjects(updatedProjects);
+        })
+        .catch((error) => {
+          console.error('Error removing member:', error);
+          if (axios.isAxiosError(error) && error.response?.status === 403) {
+            NotificationMessage({
+              type: 'error',
+              message: 'You do not have permission to remove members from this project. Only the project creator can remove members.'
+            });
+          } else {
+            NotificationMessage({
+              type: 'error',
+              message: 'Failed to remove member. Please try again.'
+            });
+          }
+        });
+      },
+    });
   };
 
   const paginatedProjects = projects.slice(
@@ -329,13 +374,21 @@ const ProjectTable = () => {
       <div className='flex items-center justify-center'>
         <Tooltip
           title={
-            <div className="max-h-80 max-w-60 overflow-y-auto rounded-md">
+            <div className="max-h-60 max-w-52 overflow-y-auto rounded-md">
+              <div className="text-white font-bold mb-2 text-center">Members</div>
+              <div className="flex justify-between text-gray-300 text-xs mb-2">
+                <span>ID</span>
+                <span>Avatar</span>
+                <span>Name</span>
+                <span>Action</span>
+              </div>
               {project.members.map((member) => (
                 <div key={member.userId} className="flex justify-between items-center mb-2 p-2">
+                  <span className="text-gray-400 text-xs mr-2 w-8">{member.userId}</span>
                   <img src={member.avatar} alt={member.name} className="w-6 h-6 rounded-full mr-2" />
-                  <span className="text-gray-200">{member.name}</span>
-                  <button onClick={() => handleRemoveMember(project.id, member.userId)} className="text-white hover:text-red-300 ml-2 bg-red-600 rounded-full p-1.5">
-                    <FaTimes />
+                  <span className="text-gray-200 w-20 truncate">{member.name}</span>
+                  <button onClick={() => handleRemoveMember(project.id, member.userId)} className="text-white hover:text-red-300 ml-2 bg-red-600 rounded-full p-1">
+                    <FaTimes size={12} />
                   </button>
                 </div>
               ))}
@@ -349,11 +402,11 @@ const ProjectTable = () => {
                 key={index}
                 src={member.avatar}
                 alt={member.name}
-                className="w-8 h-8 rounded-full cursor-pointer border-2 border-white"
+                className="w-8 h-8 rounded-full cursor-pointer border-2 border-white -ml-2 first:ml-0"
               />
             ))}
             {extraMembers > 0 && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-orange-500 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-700 to-orange-700 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white -ml-2">
                 +{extraMembers}
               </div>
             )}
@@ -456,14 +509,14 @@ const ProjectTable = () => {
         visible={isSearchPopoverVisible}
         onVisibleChange={setIsSearchPopoverVisible}
       >
-        <Button 
+        <SearchButton 
           icon={<FaSearch />} 
           size="large" 
-          className={`mb-4 text-lg px-6 py-3 flex items-center justify-center bg-gradient-to-r from-purple-950 to-orange-700 text-white hover:from-purple-800 hover:to-orange-600 ${isTablet ? 'w-2/4' : 'w-full'} max-w-md mx-auto`}
+          className={`mb-4 text-lg px-6 py-3 flex items-center justify-center bg-gradient-to-r from-purple-950 to-orange-700 text-white ${isTablet ? 'w-2/4' : 'w-full'} max-w-md mx-auto`}
           onClick={() => setIsSearchPopoverVisible(true)}
         >
           <span className="ml-2">Search Projects</span>
-        </Button>
+        </SearchButton>
       </Popover>
     );
   };
@@ -473,7 +526,7 @@ const ProjectTable = () => {
       {renderMobileTabletSearchPopover()}
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-bold text-lg mb-2 text-purple-700 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
+          <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
           <p className="text-sm text-gray-600">ID: {project.id}</p>
           <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
           <p className="text-sm text-gray-600">
@@ -490,7 +543,7 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+            <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
             <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
@@ -506,7 +559,7 @@ const ProjectTable = () => {
       <div className="grid grid-cols-2 gap-4">
         {paginatedProjects.map((project) => (
           <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="font-bold text-lg mb-2 text-purple-700 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
+            <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
             <p className="text-sm text-gray-600">ID: {project.id}</p>
             <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
             <p className="text-sm text-gray-600">
@@ -523,7 +576,7 @@ const ProjectTable = () => {
               </div>
             </div>
             <div className="mt-4 flex justify-end space-x-2">
-              <button className="bg-purple-800 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+              <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
               <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
             </div>
           </div>
@@ -674,7 +727,7 @@ const ProjectTable = () => {
   const renderDesktopView = () => (
     <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
       <table className="w-full divide-y divide-gray-200">
-        <thead className="bg-gradient-to-r from-purple-950 via-orange-900 to-purple-700 text-white font-semibold">
+        <thead className="bg-gradient-to-r from-purple-950 to-purple-950 text-white font-semibold">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
               {renderSearchPopover('id')}
@@ -700,7 +753,7 @@ const ProjectTable = () => {
           {paginatedProjects.map((project: Project) => (
             <tr key={project.id} className="hover:bg-gray-100">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-800 cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <div className="flex items-center">
@@ -716,7 +769,7 @@ const ProjectTable = () => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="bg-purple-700 text-white rounded-md p-2 hover:bg-purple-800 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+                  <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                   <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
                 </div>
               </td>

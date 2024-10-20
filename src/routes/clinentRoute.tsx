@@ -11,7 +11,7 @@ import NotFound from '../components/NotFound';
 import IssuesFilters from '../pages/issues_filter/IssuesFilters';
 import Pages from '../pages/pages_jira/Pages';
 import ProjectEdit from '../pages/project_managements/ProjectEdit';
-import ProjectBoard from '../pages/project_managements/ProjectBoard';
+
 
 const ClientRoute: React.FC = () => {
   return (
@@ -24,10 +24,10 @@ const ClientRoute: React.FC = () => {
       <Route path="/components" element={<Components />} />
       <Route path="/releases" element={<Releases />} />
       <Route path="/issues" element={<IssuesFilters />} />
-      <Route path="/kanban" element={<KanbanBoard />} />
+      <Route path="/board" element={<KanbanBoard />} />
+      <Route path="/board/:id" element={<KanbanBoard />} />
       <Route path="/pages" element={<Pages />} />
       <Route path="/project/edit/:id" element={<ProjectEdit />} />
-      <Route path="/board/:id" element={<ProjectBoard />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

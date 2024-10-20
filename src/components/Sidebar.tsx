@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onMenuClick }) => {
         // Navigate to the corresponding route
         switch (menu) {
             case 'kanban':
-                navigate('/kanban');
+                navigate('/board');
                 break;
             case 'create-projects':
                 navigate('/create');

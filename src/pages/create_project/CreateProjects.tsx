@@ -3,6 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useMediaQuery } from 'react-responsive';
+import '../../index.css';
+import TitleGradient from '../../components/ui/TitleGradient';
+import NotificationMessage from '../../components/NotificationMessage';
+import Reveal from '../../components/Reveal';
 
 interface ProjectData {
   projectName: string;
@@ -29,8 +34,11 @@ const CreateProject: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
-  const TOKEN_CYBERSOFT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCBETiAxMSIsIkhldEhhblN0cmluZyI6IjE3LzAyLzIwMjUiLCJIZXRIYW5UaW1lIjoiMTczOTc1MDQwMDAwMCIsIm5iZiI6MTcwOTc0NDQwMCwiZXhwIjoxNzM5ODk4MDAwfQ.qvs2zsWDKR2CRt273FQIadSYJzZM-hCro_nsLVpa-Wg';
-  const ACCESS_TOKEN = 'eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ0dWFuYW5oa2ltNTU1QGdtYWlsLmNvbSIsIm5iZiI6MTcyODk4MDI2NSwiZXhwIjoxNzI4OTgzODY1fQ.2zwQezu0GBf-sipyGnYEE_ENCFqORJMLkqmwnYjaswA';
+  const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
+  const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
+  const isDesktop = useMediaQuery({ minWidth: 1024 });
 
   useEffect(() => {
     fetchCategories();
@@ -79,12 +87,12 @@ const CreateProject: React.FC = () => {
 
       if (response.status === 200) {
         console.log('Dự án đã được tạo thành công:', response.data);
-        alert('Dự án đã được tạo thành công!');
+        NotificationMessage({ type: 'success', message: 'Dự án đã được tạo thành công!' });
         navigate('/project', { state: { refresh: true } });
       }
     } catch (error) {
       console.error('Lỗi khi tạo dự án:', error);
-      alert('Có lỗi xảy ra khi tạo dự án. Vui lòng thử lại.');
+      NotificationMessage({ type: 'error', message: 'Có lỗi xảy ra khi tạo dự án. Vui lòng thử lại.' });
     } finally {
       setIsLoading(false);
     }
@@ -98,88 +106,109 @@ const CreateProject: React.FC = () => {
     return <LoadingSpinner />;
   }
 
+  const containerStyle = {
+    width: isMobile ? '100%' : isTablet ? '85%' : '900px',
+    margin: '0 auto',
+    padding: isMobile ? '12px' : '24px 0',
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '6px 10px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    fontSize: isMobile ? '13px' : '15px',
+  };
+
+  const sectionStyle = {
+    marginBottom: '24px',
+    color: '#4B5563',
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Tạo Dự Án Mới</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleSubmit} className="max-w-lg">
-        <div className="mb-4">
-          <label htmlFor="projectName" className="block mb-2">Tên Dự Án</label>
-          <input
-            type="text"
-            id="projectName"
-            name="projectName"
-            value={formData.projectName}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
+    <Reveal>
+      <div style={containerStyle}>
+        <div className='flex justify-center items-center mb-6' style={{ marginTop: '30px' }}>
+          <TitleGradient>Create Project</TitleGradient>
         </div>
+        {error && <p style={{ color: 'red', marginBottom: '12px' }}>{error}</p>}
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <div style={sectionStyle}>
+            <label htmlFor="projectName" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Project Name</label>
+            <input
+              type="text"
+              id="projectName"
+              name="projectName"
+              value={formData.projectName}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+          <div style={sectionStyle}>
+            <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Description</label>
+            <Editor
+              apiKey='jkmuc93b4ohldjg0xu52nlis2f9zct68ps5nibbf0jl7q96z'
+              init={{
+                height: isMobile ? 180 : 300,
+                menubar: false,
+                plugins: [
+                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                  'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                ],
+                toolbar: isMobile
+                  ? 'undo redo | bold italic | bullist numlist'
+                  : 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+              }}
+              onEditorChange={handleEditorChange}
+              value={formData.description}
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="description" className="block mb-2">Mô tả</label>
-          <Editor
-            apiKey='jkmuc93b4ohldjg0xu52nlis2f9zct68ps5nibbf0jl7q96z'
-            init={{
-              height: 300,
-              menubar: false,
-              plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-              ],
-              toolbar: 'undo redo | blocks | ' +
-                'bold italic forecolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
-              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-            }}
-            onEditorChange={handleEditorChange}
-            value={formData.description}
-          />
-        </div>
+          <div style={sectionStyle}>
+            <label htmlFor="categoryId" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Project Category</label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={formData.categoryId}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.projectCategoryName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="categoryId" className="block mb-2">Danh mục dự án</label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            value={formData.categoryId}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border rounded"
+          <div style={sectionStyle}>
+            <label htmlFor="alias" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Alias</label>
+            <input
+              type="text"
+              id="alias"
+              name="alias"
+              value={formData.alias}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+
+          <button
+            className='button-purple'
+            disabled={isLoading}
+            style={{ marginTop: '12px', padding: '8px 16px', fontSize: '16px' }}
           >
-            <option value="">Chọn danh mục</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.projectCategoryName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="alias" className="block mb-2">Alias</label>
-          <input
-            type="text"
-            id="alias"
-            name="alias"
-            value={formData.alias}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          {isLoading ? 'Tạo...' : 'Tạo Dự Án'}
-        </button>
-      </form>
-    </div>
+            {isLoading ? 'Creating...' : 'Create Project'}
+          </button>
+        </form>
+      </div>
+    </Reveal>
   );
 };
 

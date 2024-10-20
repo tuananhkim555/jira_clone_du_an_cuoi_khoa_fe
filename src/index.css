@@ -7,6 +7,7 @@ body{
     font-family: "Poppins", sans-serif;
     overflow-x: hidden;
     background-color: #eee;
+
 }
 h2{
     @apply text-xl md:text-4xl text-gray-700;
@@ -73,3 +74,21 @@ p {
   .ant-checkbox-input:focus + .ant-checkbox-inner {
     border-color: #5b21b6 !important; /* purple-800 */
   }
+
+  .button-purple{
+    @apply bg-purple-900 text-white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    opacity: 1;
+    font-size: 16px;
+    width: auto;
+    font-weight: 600;
+    width: 100%;
+  }
+
+  .button-purple:hover{
+    @apply bg-purple-950;
+  }
+  
