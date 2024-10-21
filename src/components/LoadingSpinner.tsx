@@ -9,7 +9,7 @@ interface LoadingSpinnerProps {
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 160, color = '#52096C' }) => {
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-150 overflow-hidden bg-gray-400 bg-opacity-10 backdrop-blur-sm flex flex-col items-center justify-center">
+    <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-[9999] overflow-hidden bg-gray-400 bg-opacity-10 backdrop-blur-sm flex flex-col items-center justify-center">
       <ImCompass2 size={size} color={color} className="loader" />
     </div>
   );

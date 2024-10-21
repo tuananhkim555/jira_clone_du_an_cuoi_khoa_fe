@@ -1,4 +1,4 @@
-import { MoreVertical, ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
+import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
@@ -6,7 +6,6 @@ import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFi
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../store.ts";
 import { clearUser, setUser } from "../store"; // Assuming you have a clearUser and setUser action in your store
-
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 
 interface SidebarProps {
@@ -62,6 +61,26 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
     return () => clearInterval(intervalId);
   }, [user, dispatch, navigate]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 950) {
+        setExpanded(true);
+        setIsMobileMenuOpen(false);
+      } else if (window.innerWidth <= 950 && window.innerWidth >= 750) {
+        setExpanded(true);
+        setIsMobileMenuOpen(true);
+      } else {
+        setExpanded(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call it initially
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleMenuClick = (menu: string) => {
     setActiveMenu(menu);
     onMenuClick(menu);
@@ -93,14 +112,14 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
     <>
       <button
         onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-[13px] left-16 z-50 p-2 rounded-md bg-purple-950 text-white"
+        className="lg:hidden fixed top-[13px] left-16 z-50 p-2 rounded-md bg-[#280042] text-white"
       >
         {isMobileMenuOpen ? <X /> : <Menu />}
       </button>
       <aside className={`h-screen fixed top-0 left-0 z-30 transition-all duration-300 ease-in-out ${
-        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 ${expanded ? 'w-64' : 'w-20'} lg:ml-[65px] pt-[40px] lg:pt-0 pt-[60px]`}>
-        <nav className="h-full flex flex-col bg-white border-r shadow-sm">
+        window.innerWidth >= 750 ? 'translate-x-0' : isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      } ${expanded ? 'w-64' : 'w-20'} lg:ml-[65px] pt-[60px] lg:pt-0`}>
+        <nav className="h-full flex flex-col bg-gray-100 border-r shadow-sm">
           <div className="p-4 pb-2 flex justify-between items-center">
             <img
               src={LogoAva}
@@ -111,17 +130,23 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
             />
             <button
               onClick={() => setExpanded((curr) => !curr)}
-              className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+              className="p-1.5 rounded-lg bg-[#2e004d] hover:bg-purple-900 text-white shadow-md"
             >
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
-            <ul className="flex-1 px-3">
+            <ul className="flex-1 px-3 pt-10">
               <SidebarItem icon={<FaTrello />} text="Kanban Board" active={activeMenu === "kanban"} onClick={() => handleMenuClick("kanban")} />
               <SidebarItem icon={<FaPlus />} text="Create Projects" active={activeMenu === "create-projects"} onClick={() => handleMenuClick("create-projects")} />
               <SidebarItem icon={<FaProjectDiagram />} text="Project Management" active={activeMenu === "project-management"} onClick={() => handleMenuClick("project-management")} />
+              
+              {/* Add a horizontal line with margin */}
+              <li className="my-4">
+                <hr className="border-gray-300" />
+              </li>
+              
               <SidebarItem icon={<FaRocket />} text="Releases" active={activeMenu === "releases"} onClick={() => handleMenuClick("releases")} />
               <SidebarItem icon={<FaExclamationCircle />} text="Issues and Filters" active={activeMenu === "issues"} onClick={() => handleMenuClick("issues")} />
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
@@ -145,7 +170,6 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
                 <h4 className="font-semibold">{user?.name || "Guest"}</h4>
                 <span className="text-xs text-gray-600">{user?.email || "Not logged in"}</span>
               </div>
-              <MoreVertical size={20} />
             </div>
           </div>
         </nav>
@@ -174,7 +198,7 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
         transition-colors group
         ${
           active
-            ? "bg-purple-950 text-white"
+            ? "bg-[#310051] text-white"
             : "hover:bg-gradient-to-r hover:bg-purple-950  hover:text-white text-gray-600"
         }
     `}

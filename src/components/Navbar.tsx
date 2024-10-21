@@ -82,8 +82,8 @@ const Navbar = () => {
         ${isMobileOrTablet ? 'top-0 left-0 right-0' : 'left-0 top-0'} 
         transition-all duration-300 ease-in-out
         z-50
+        bg-[#280042]
       `}
-      style={{ backgroundColor: '#3b0764' }} // Explicit purple
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={() => !isMobileOrTablet && setIsExpanded(true)}
       onMouseLeave={() => !isMobileOrTablet && setIsExpanded(false)}

@@ -787,25 +787,25 @@ const ProjectTable = () => {
         </button>
       </div>
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-        <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-gradient-to-r from-purple-950 via-purple-950 to-orange-700 text-white font-semibold">
+        <table className="w-full divide-y divide-gray-200 table-auto">
+          <thead className="bg-gradient-to-r from-[#2e004d] via-purple-950 to-orange-800 text-white font-semibold">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 {renderSearchPopover('id')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 {renderSearchPopover('projectName')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 {renderSearchPopover('categoryName')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 {renderSearchPopover('creator')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 Members
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 Action
               </th>
             </tr>
@@ -813,22 +813,26 @@ const ProjectTable = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedProjects.map((project: Project) => (
               <tr key={project.id} className="hover:bg-gray-100">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
+                <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>
+                  <div className="max-w-xs truncate">{project.projectName}</div>
+                </td>
+                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="max-w-xs truncate">{project.categoryName}</div>
+                </td>
+                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex items-center">
                     <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
-                    <span className="text-green-600 font-semibold">{project.creator.name}</span>
+                    <span className="text-green-600 font-semibold max-w-xs truncate">{project.creator.name}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-1">
                     {renderAddMemberButton(project.id)}
                     {renderMembers(project)}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
                     <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                     <button 
