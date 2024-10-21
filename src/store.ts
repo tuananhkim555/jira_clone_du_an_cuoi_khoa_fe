@@ -10,6 +10,7 @@ interface User {
   email: string;
   phoneNumber: string;
   accessToken: string;
+  tokenExpiration: number; // Thêm trường này để lưu thời gian hết hạn của token
 }
 
 // Định nghĩa kiểu dữ liệu cho state
@@ -36,6 +37,14 @@ const authSlice = createSlice({
     clearUser: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+    },
+    checkTokenExpiration: (state) => {
+      if (state.user && state.user.tokenExpiration) {
+        if (Date.now() > state.user.tokenExpiration) {
+          state.user = null;
+          state.isAuthenticated = false;
+        }
+      }
     },
   },
 });
@@ -64,7 +73,7 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 // Export các action
-export const { setUser, clearUser } = authSlice.actions;
+export const { setUser, clearUser, checkTokenExpiration } = authSlice.actions;
 
 // Export kiểu dữ liệu cho RootState và AppDispatch
 export type RootState = ReturnType<typeof store.getState>;

@@ -2,7 +2,7 @@ import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
-import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFileAlt, FaCogs } from 'react-icons/fa';
+import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFileAlt, FaCogs,    FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../store.ts";
 import { clearUser, setUser } from "../store"; // Assuming you have a clearUser and setUser action in your store
@@ -130,7 +130,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
             />
             <button
               onClick={() => setExpanded((curr) => !curr)}
-              className="p-1.5 rounded-lg bg-[#2e004d] hover:bg-purple-900 text-white shadow-md"
+              className="p-1.5 rounded-lg bg-[#310051] hover:bg-purple-900 text-white shadow-md"
             >
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
@@ -147,10 +147,10 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
                 <hr className="border-gray-300" />
               </li>
               
-              <SidebarItem icon={<FaRocket />} text="Releases" active={activeMenu === "releases"} onClick={() => handleMenuClick("releases")} />
-              <SidebarItem icon={<FaExclamationCircle />} text="Issues and Filters" active={activeMenu === "issues"} onClick={() => handleMenuClick("issues")} />
+              <SidebarItem icon={<FaUser />} text="Users" active={activeMenu === "users"} onClick={() => handleMenuClick("users")} />
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
-              <SidebarItem icon={<FaCogs />} text="Components" active={activeMenu === "components"} onClick={() => handleMenuClick("components")} />
+              <SidebarItem icon={<FaExclamationCircle />} text="Help" active={activeMenu === "help"} onClick={() => handleMenuClick("help")} />
+              <SidebarItem icon={<FaCogs />} text="Settings" active={activeMenu === "settings"} onClick={() => handleMenuClick("settings")} />
             </ul>
           </SidebarContext.Provider>
 

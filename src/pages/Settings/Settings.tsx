@@ -1,7 +1,7 @@
 const Components = () => {
   return (
     <div>
-      <h2>Components</h2>
+      <h2>Settings</h2>
     </div>
   )
 }

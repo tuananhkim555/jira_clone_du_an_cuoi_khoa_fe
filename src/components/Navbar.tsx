@@ -82,7 +82,7 @@ const Navbar = () => {
         ${isMobileOrTablet ? 'top-0 left-0 right-0' : 'left-0 top-0'} 
         transition-all duration-300 ease-in-out
         z-50
-        bg-[#280042]
+        bg-[#200035]
       `}
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={() => !isMobileOrTablet && setIsExpanded(true)}

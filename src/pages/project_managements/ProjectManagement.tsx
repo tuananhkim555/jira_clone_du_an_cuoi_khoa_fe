@@ -745,7 +745,7 @@ const ProjectTable = () => {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button onClick={handleReset}>Reset</Button>
-          <Button style={{ border: 'none', backgroundColor: '#6b21a8', color: 'white'}} onClick={handleSubmit}>Submit</Button>
+          <Button style={{ border: 'none', backgroundColor: '#310051', color: 'white'}} onClick={handleSubmit}>Submit</Button>
         </div>
       </div>
     );

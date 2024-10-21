@@ -12,19 +12,24 @@ const MainLayout = () => {
   return (
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
       {!isAuthPage && (
-        <>
+       <>
           <div className="m-7">
             <Navbar />
           </div>
           <div className="ml-[270px]">
             <Sidebar onMenuClick={(menu) => console.log(menu)} />
           </div>
+          <div className="flex-grow">    
+            <ClientRoute />
+          </div>
         </>
       )}
-      <div className="flex-grow">    
+      {isAuthPage && (
+        <div className="flex-grow">    
           <ClientRoute />
-      </div>
-      </div>
+        </div>
+      )}
+    </div>
   );
 };
 

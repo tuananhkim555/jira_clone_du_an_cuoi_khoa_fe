@@ -4,11 +4,11 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import CreateProject from '../pages/create_project/CreateProjects';
 import ProjectManagement from '../pages/project_managements/ProjectManagement';
-import Components from '../pages/components/Components';
-import Releases from '../pages/Releases/Releases';
+import Settings from '../pages/Settings/Settings';
+import Users from '../pages/Users/Users';
 import KanbanBoard from '../pages/kaban_board/KanbanBoard';
 import NotFound from '../components/NotFound';
-import IssuesFilters from '../pages/issues_filter/IssuesFilters';
+import Helps from '../pages/Help/Help';
 import Pages from '../pages/pages_jira/Pages';
 import ProjectEdit from '../pages/project_managements/ProjectEdit';
 
@@ -21,9 +21,9 @@ const ClientRoute: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/create" element={<CreateProject />} />
       <Route path="/project" element={<ProjectManagement />} />
-      <Route path="/components" element={<Components />} />
-      <Route path="/releases" element={<Releases />} />
-      <Route path="/issues" element={<IssuesFilters />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/users" element={<Users />} />
+      <Route path="/help" element={<Helps />} />
       <Route path="/board" element={<KanbanBoard />} />
       <Route path="/board/:id" element={<KanbanBoard />} />
       <Route path="/pages" element={<Pages />} />
