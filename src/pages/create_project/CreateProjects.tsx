@@ -8,6 +8,7 @@ import '../../index.css';
 import TitleGradient from '../../components/ui/TitleGradient';
 import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
+import { FaPlus } from 'react-icons/fa';
 
 interface ProjectData {
   projectName: string;
@@ -125,10 +126,20 @@ const CreateProject: React.FC = () => {
     color: '#4B5563',
   };
 
+  const buttonStyle = {
+    marginTop: '12px',
+    padding: '8px 16px',
+    fontSize: '16px',
+    borderRadius: '4px',
+    minWidth: '150px',
+    height: '40px',
+  };
+
   return (
     <Reveal>
       <div style={containerStyle}>
         <div className='flex justify-center items-center mb-6' style={{ marginTop: '30px' }}>
+          <FaPlus className="text-3xl mr-3 text-purple-800 border-2 border-purple-800 rounded-full p-1" />
           <TitleGradient>Create Project</TitleGradient>
         </div>
         {error && <p style={{ color: 'red', marginBottom: '12px' }}>{error}</p>}
@@ -148,7 +159,7 @@ const CreateProject: React.FC = () => {
           <div style={sectionStyle}>
             <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Description</label>
             <Editor
-              apiKey='jkmuc93b4ohldjg0xu52nlis2f9zct68ps5nibbf0jl7q96z'
+              apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
               init={{
                 height: isMobile ? 180 : 300,
                 menubar: false,
@@ -199,13 +210,24 @@ const CreateProject: React.FC = () => {
             />
           </div>
 
-          <button
-            className='button-purple'
-            disabled={isLoading}
-            style={{ marginTop: '12px', padding: '8px 16px', fontSize: '16px' }}
-          >
-            {isLoading ? 'Creating...' : 'Create Project'}
-          </button>
+          <div className="flex justify-between items-center">
+            <button
+              className='button-purple flex items-center justify-center hover:scale-[1.02] transition-transform duration-200'
+              disabled={isLoading}
+              style={buttonStyle}
+            >
+              <FaPlus className="mr-2" />
+              {isLoading ? 'Creating...' : 'Create Project'}
+            </button>
+            <div style={{ width: '20px' }}></div> {/* Spacer */}
+            <button
+              type="button"
+              onClick={() => navigate('/project')}
+              className="w-1/4 px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-800 text-md font-medium transition duration-150 ease-in-out mt-2 bg-gradient-to-r from-purple-950 to-orange-700 hover:scale-105"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </Reveal>

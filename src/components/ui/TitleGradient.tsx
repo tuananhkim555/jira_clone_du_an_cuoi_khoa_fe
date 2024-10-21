@@ -3,9 +3,10 @@ import './TitleGradient.css';
 
 interface TitleGradientProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-const TitleGradient: React.FC<TitleGradientProps> = ({ children }) => {
+const TitleGradient: React.FC<TitleGradientProps> = ({ children, className }) => {
   return (
     <h1 className="title-gradient">
       {children}
@@ -14,4 +15,3 @@ const TitleGradient: React.FC<TitleGradientProps> = ({ children }) => {
 };
 
 export default TitleGradient;
-

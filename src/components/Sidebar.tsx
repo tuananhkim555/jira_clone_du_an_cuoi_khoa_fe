@@ -1,127 +1,224 @@
-import { useEffect, useState } from 'react';
-import LogoAva from "../assets/Logo Jira 5.png"
-import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFileAlt, FaCogs, FaBars } from 'react-icons/fa';
+import { MoreVertical, ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
+import { useContext, createContext, useState, useEffect } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import LogoAva from "../assets/Jira_Logo.svg"
+import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFileAlt, FaCogs } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from "../store.ts";
+import { clearUser, setUser } from "../store"; // Assuming you have a clearUser and setUser action in your store
+
+const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 
 interface SidebarProps {
   onMenuClick: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onMenuClick }) => {
-    const navigate = useNavigate();
-    const [activeMenu, setActiveMenu] = useState<string | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
-    const [screenSize, setScreenSize] = useState('desktop');
+export default function Sidebar({ onMenuClick }: SidebarProps) {
+  const [expanded, setExpanded] = useState(true)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const navigate = useNavigate();
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  
+  // Lấy thông tin user từ Redux store
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 640) {
-                setScreenSize('mobile');
-            } else if (window.innerWidth < 1024) {
-                setScreenSize('tablet');
-            } else {
-                setScreenSize('desktop');
-            }
-        };
-
-        handleResize();
-        window.addEventListener('resize', handleResize);
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const handleMenuClick = (menu: string) => {
-        setActiveMenu(menu);
-        if (screenSize !== 'desktop') {
-            setIsOpen(false);
-        }
-        // Navigate to the corresponding route
-        switch (menu) {
-            case 'kanban':
-                navigate('/board');
-                break;
-            case 'create-projects':
-                navigate('/create');
-                break;
-            case 'project-management':
-                navigate('/project');
-                break;
-            case 'releases':
-                navigate('/releases');
-                break;
-            case 'issues':
-                navigate('/issues');
-                break;
-            case 'pages':
-                navigate('/pages');
-                break;
-            case 'components':
-                navigate('/components');
-                break;
-            default:
-                navigate('/');
-        }
-        onMenuClick(menu);
-    };
-
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const sidebarContent = (
-        <>
-            <div className="flex items-center justify-center mb-8">
-                <img src={LogoAva} alt="Avatar" className="w-16 h-16 rounded-full" />
-                <div className="ml-4 text-gray-700">
-                    <h2>Name</h2>
-                    <p>Jira Clone 2.0</p>
-                </div>
-            </div>
-            <nav className="space-y-2">
-                <div onClick={() => handleMenuClick("kanban")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "kanban" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaTrello className="inline mr-2" /> Kanban Board
-                </div>
-                <div onClick={() => handleMenuClick("create-projects")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "create-projects" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaPlus className="inline mr-2" /> Create Projects
-                </div>
-                <div onClick={() => handleMenuClick("project-management")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "project-management" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaProjectDiagram className="inline mr-2" /> Project Management
-                </div>
-                <div onClick={() => handleMenuClick("releases")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "releases" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaRocket className="inline mr-2" /> Releases
-                </div>
-                <div onClick={() => handleMenuClick("issues")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "issues" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaExclamationCircle className="inline mr-2" /> Issues and Filters
-                </div>
-                <div onClick={() => handleMenuClick("pages")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "pages" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaFileAlt className="inline mr-2" /> Pages
-                </div>
-                <div onClick={() => handleMenuClick("components")} className={`block text-gray-700 py-2 px-4 rounded hover:bg-purple-950 hover:text-white hover:icon-white transition duration-300 cursor-pointer ${activeMenu === "components" ? 'bg-purple-950 text-white icon-white' : ''}`}>
-                    <FaCogs className="inline mr-2" /> Components
-                </div>
-            </nav>
-        </>
-    );
-
-    if (screenSize === 'desktop') {
-        return (
-            <div className="w-64 bg-gray-200 min-h-screen p-4">
-                {sidebarContent}
-            </div>
-        );
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      dispatch(setUser(JSON.parse(storedUser)));
     }
+  }, [dispatch]);
 
-    return (
-        <>
-            <button onClick={toggleSidebar} className="fixed top-4 left-4 z-50 bg-purple-950 text-white p-2 rounded">
-                <FaBars />
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      console.log("User from Redux:", user);
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      console.log("No user data in Redux store or user is not authenticated");
+      // If user is not authenticated, redirect to login page
+    }
+  }, [user, isAuthenticated, navigate]);
+
+  useEffect(() => {
+    // Check token expiration
+    const checkTokenExpiration = () => {
+      const token = user?.accessToken;
+      if (token) {
+        // Implement your token expiration check logic here
+        // For example, you can decode the token and check its expiration time
+        // If token is expired, clear the user data
+        if (isTokenExpired(token)) {
+          dispatch(clearUser());
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+      }
+    };
+
+    const intervalId = setInterval(checkTokenExpiration, 60000); // Check every minute
+
+    return () => clearInterval(intervalId);
+  }, [user, dispatch, navigate]);
+
+  const handleMenuClick = (menu: string) => {
+    setActiveMenu(menu);
+    onMenuClick(menu);
+    let path;
+    switch (menu) {
+      case 'kanban':
+        path = '/board';
+        break;
+      case 'create-projects':
+        path = '/create';
+        break;
+      case 'project-management':
+        path = '/project';
+        break;
+      default:
+        path = `/${menu}`;
+    }
+    navigate(path);
+    if (window.innerWidth < 1024) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+  
+  return (
+    <>
+      <button
+        onClick={toggleMobileMenu}
+        className="lg:hidden fixed top-[13px] left-16 z-50 p-2 rounded-md bg-purple-950 text-white"
+      >
+        {isMobileMenuOpen ? <X /> : <Menu />}
+      </button>
+      <aside className={`h-screen fixed top-0 left-0 z-30 transition-all duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0 ${expanded ? 'w-64' : 'w-20'} lg:ml-[65px] pt-[40px] lg:pt-0 pt-[60px]`}>
+        <nav className="h-full flex flex-col bg-white border-r shadow-sm">
+          <div className="p-4 pb-2 flex justify-between items-center">
+            <img
+              src={LogoAva}
+              className={`overflow-hidden transition-all ${
+                expanded ? "w-32" : "w-0"
+              }`}
+              alt="Logo"
+            />
+            <button
+              onClick={() => setExpanded((curr) => !curr)}
+              className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+            >
+              {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
-            <div className={`fixed inset-0 bg-gray-600 bg-opacity-50 z-40 ${isOpen ? 'block' : 'hidden'}`} onClick={toggleSidebar}></div>
-            <div className={`fixed top-0 left-0 w-64 bg-gray-200 min-h-screen p-4 z-50 transition-transform duration-300 ease-in-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                {sidebarContent}
-            </div>
-        </>
-    );
-};
+          </div>
 
-export default Sidebar;
+          <SidebarContext.Provider value={{ expanded }}>
+            <ul className="flex-1 px-3">
+              <SidebarItem icon={<FaTrello />} text="Kanban Board" active={activeMenu === "kanban"} onClick={() => handleMenuClick("kanban")} />
+              <SidebarItem icon={<FaPlus />} text="Create Projects" active={activeMenu === "create-projects"} onClick={() => handleMenuClick("create-projects")} />
+              <SidebarItem icon={<FaProjectDiagram />} text="Project Management" active={activeMenu === "project-management"} onClick={() => handleMenuClick("project-management")} />
+              <SidebarItem icon={<FaRocket />} text="Releases" active={activeMenu === "releases"} onClick={() => handleMenuClick("releases")} />
+              <SidebarItem icon={<FaExclamationCircle />} text="Issues and Filters" active={activeMenu === "issues"} onClick={() => handleMenuClick("issues")} />
+              <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
+              <SidebarItem icon={<FaCogs />} text="Components" active={activeMenu === "components"} onClick={() => handleMenuClick("components")} />
+            </ul>
+          </SidebarContext.Provider>
+
+          <div className="border-t flex p-3">
+            <img
+              src={user?.avatar || "https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"}
+              alt=""
+              className="w-10 h-10 rounded-md"
+            />
+            <div
+              className={`
+                flex justify-between items-center
+                overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
+            `}
+            >
+              <div className="leading-4">
+                <h4 className="font-semibold">{user?.name || "Guest"}</h4>
+                <span className="text-xs text-gray-600">{user?.email || "Not logged in"}</span>
+              </div>
+              <MoreVertical size={20} />
+            </div>
+          </div>
+        </nav>
+      </aside>
+    </>
+  )
+}
+
+interface SidebarItemProps {
+  icon: React.ReactNode;
+  text: string;
+  active: boolean;
+  alert?: boolean;
+  onClick: () => void;
+}
+
+export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemProps) {
+  const { expanded } = useContext(SidebarContext)
+  
+  return (
+    <li
+      onClick={onClick}
+      className={`
+        relative flex items-center py-2 px-3 my-1
+        font-medium rounded-md cursor-pointer
+        transition-colors group
+        ${
+          active
+            ? "bg-purple-950 text-white"
+            : "hover:bg-gradient-to-r hover:bg-purple-950  hover:text-white text-gray-600"
+        }
+    `}
+    >
+      {icon}
+      <span
+        className={`overflow-hidden transition-all ${
+          expanded ? "w-52 ml-3" : "w-0"
+        }`}
+      >
+        {text}
+      </span>
+      {alert && (
+        <div
+          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+            expanded ? "" : "top-2"
+          }`}
+        />
+      )}
+
+      {!expanded && (
+        <div
+          className={`
+          absolute left-full rounded-md px-2 py-1 ml-6
+          bg-indigo-100 text-purple-800 text-sm
+          invisible opacity-20 -translate-x-3 transition-all
+          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+      `}
+        >
+          {text}
+        </div>
+      )}
+    </li>
+  )
+}
+
+// Helper function to check if token is expired
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expirationTime = payload.exp * 1000; // Convert to milliseconds
+    return Date.now() >= expirationTime;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true; // Assume token is expired if there's an error
+  }
+}

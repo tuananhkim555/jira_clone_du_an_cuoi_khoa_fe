@@ -78,12 +78,12 @@ const Navbar = () => {
         flex ${isMobileOrTablet ? 'flex-row' : 'flex-col'} 
         justify-between 
         ${isMobileOrTablet ? 'w-full h-16' : `h-screen ${isExpanded ? 'w-56' : 'w-16'}`} 
-        bg-purple-950
         fixed 
         ${isMobileOrTablet ? 'top-0 left-0 right-0' : 'left-0 top-0'} 
         transition-all duration-300 ease-in-out
         z-50
       `}
+      style={{ backgroundColor: '#3b0764' }} // Explicit purple
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={() => !isMobileOrTablet && setIsExpanded(true)}
       onMouseLeave={() => !isMobileOrTablet && setIsExpanded(false)}
@@ -130,7 +130,7 @@ const Navbar = () => {
               flex items-center justify-center text-white 
               px-4 h-full
               cursor-pointer 
-              ${activeItem === "Search" ? 'bg-purple-800' : 'hover:bg-purple-800'}
+              ${activeItem === "Search" ? 'bg-purple-950' : 'hover:bg-purple-800'}
               transition-colors duration-200
             `}
             onClick={() => handleItemClick("Search")}
@@ -144,7 +144,7 @@ const Navbar = () => {
                 flex items-center justify-center text-white 
                 px-4 h-full
                 cursor-pointer 
-                ${activeItem === item.label ? 'bg-purple-800' : 'hover:bg-purple-800'}
+                ${activeItem === item.label ? 'bg-purple-950' : 'hover:bg-purple-800'}
                 transition-colors duration-200
               `}
               onClick={() => handleItemClick(item.label)}
@@ -162,7 +162,7 @@ const Navbar = () => {
                 flex items-center text-white 
                 h-14 w-full
                 cursor-pointer 
-                ${activeItem === item.label ? 'bg-purple-800' : 'hover:bg-purple-800'}
+                ${activeItem === item.label ? 'bg-purple-950' : 'hover:bg-purple-800'}
                 transition-colors duration-200
               `}
               onClick={() => handleItemClick(item.label)}

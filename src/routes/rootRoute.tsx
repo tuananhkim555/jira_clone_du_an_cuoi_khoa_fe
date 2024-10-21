@@ -16,7 +16,7 @@ const MainLayout = () => {
           <div className="m-7">
             <Navbar />
           </div>
-          <div className="mr-20 sm:mr-10">
+          <div className="ml-[270px]">
             <Sidebar onMenuClick={(menu) => console.log(menu)} />
           </div>
         </>

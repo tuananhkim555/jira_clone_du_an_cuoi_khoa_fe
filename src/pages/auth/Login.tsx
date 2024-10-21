@@ -10,6 +10,8 @@ import { notification } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from "./auth.module.css"
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store'; // Đảm bảo đường dẫn đúng
 
 interface GoogleLoginResponse {
   success: boolean;
@@ -21,6 +23,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -42,31 +45,28 @@ const Login: React.FC = () => {
     onSuccess: async (tokenResponse) => {
       try {
         setIsLoading(true);
-        console.log("Google login response:", tokenResponse);
         const { access_token } = tokenResponse;
         if (!access_token) {
-          throw new Error("Không nhận được access token từ Google");
+          throw new Error("No access token received from Google");
         }
 
         // Gọi API backend để xác thực token
         const response = await axios.post<GoogleLoginResponse>('YOUR_BACKEND_API_URL/google-login', { token: access_token });
-        console.log("Backend response:", response.data);
 
         if (response.data.success) {
           notification.success({
-            message: "Đăng nhập Google thành công!",
+            message: "Google login successful!",
             placement: "topRight",
             duration: 4,
           });
           navigate("/project");
         } else {
-          throw new Error(response.data.message || "Đăng nhập thất bại");
+          throw new Error(response.data.message || "Login failed");
         }
       } catch (error) {
-        console.error("Lỗi trong quá trình đăng nhập Google:", error);
         notification.error({
-          message: "Đăng nhập Google thất bại!",
-          description: error instanceof Error ? error.message : "Có lỗi xảy ra",
+          message: "Google login failed!",
+          description: error instanceof Error ? error.message : "An error occurred",
           placement: "topRight",
           duration: 4,
         });
@@ -75,10 +75,9 @@ const Login: React.FC = () => {
       }
     },
     onError: (error) => {
-      console.error("Google Login Error:", error);
       notification.error({
-        message: "Đăng nhập Google thất bại!",
-        description: "Có lỗi xảy ra khi kết nối với Google",
+        message: "Google login failed!",
+        description: "An error occurred while connecting to Google",
         placement: "topRight",
         duration: 4,
       });
@@ -94,7 +93,7 @@ const Login: React.FC = () => {
 
     if (!email || !password) {
       notification.error({
-        message: "Vui lòng nhập email và mật khẩu!",
+        message: "Please enter email and password!",
         placement: "topRight",
         duration: 4,
       });
@@ -109,23 +108,27 @@ const Login: React.FC = () => {
         {
           headers: {
             "Content-Type": "application/json-patch+json",
-            TokenCybersoft: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCBETiAxMSIsIkhldEhhblN0cmluZyI6IjE3LzAyLzIwMjUiLCJIZXRIYW5UaW1lIjoiMTczOTc1MDQwMDAwMCIsIm5iZiI6MTcwOTc0NDQwMCwiZXhwIjoxNzM5ODk4MDAwfQ.qvs2zsWDKR2CRt273FQIadSYJzZM-hCro_nsLVpa-Wg",
+            TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
           },
         }
       );
+      
+      // Dispatch action để lưu thông tin user vào Redux store
+      dispatch(setUser(response.data.content));
+      
+      // Lưu token vào localStorage nếu cần
+      localStorage.setItem('authToken', response.data.content.accessToken);
 
-      console.log("Đăng nhập thành công:", response.data);
       notification.success({
-        message: "Đăng nhập thành công!",
+        message: "Login successful!",
         placement: "topRight",
         duration: 4,
       });
       navigate("/project");
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
       notification.error({
-        message: "Đăng nhập thất bại!",
-        description: error instanceof Error ? error.message : "Có lỗi xảy ra",
+        message: "Login failed!",
+        description: error instanceof Error ? error.message : "An error occurred",
         placement: "topRight",
         duration: 4,
       });

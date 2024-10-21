@@ -58,6 +58,26 @@ const SearchButton = styled(Button)`
   }
 `;
 
+const StyledPagination = styled(Pagination)`
+  .ant-pagination-item-active {
+    border-color: #3b0764 !important; /* purple-950 */
+    a {
+      color: #3b0764 !important; /* purple-950 */
+    }
+  }
+  .ant-pagination-item:hover {
+    border-color: #3b0764 !important; /* purple-950 */
+    a {
+      color: #3b0764 !important; /* purple-950 */
+    }
+  }
+  .ant-pagination-prev:hover .ant-pagination-item-link,
+  .ant-pagination-next:hover .ant-pagination-item-link {
+    border-color: #3b0764 !important; /* purple-950 */
+    color: #3b0764 !important; /* purple-950 */
+  }
+`;
+
 const ProjectTable = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
@@ -376,11 +396,12 @@ const ProjectTable = () => {
           title={
             <div className="max-h-60 max-w-52 overflow-y-auto rounded-md">
               <div className="text-white font-bold mb-2 text-center">Members</div>
-              <div className="flex justify-between text-gray-300 text-xs mb-2">
-                <span>ID</span>
-                <span>Avatar</span>
-                <span>Name</span>
-                <span>Action</span>
+              <div className="justify-around  text-gray-300 text-xs mb-2">
+                <span className="m-3">ID</span>
+                <span className="m-2">Avatar</span>
+                <span className="m-2">Name</span>
+          
+               
               </div>
               {project.members.map((member) => (
                 <div key={member.userId} className="flex justify-between items-center mb-2 p-2">
@@ -406,7 +427,7 @@ const ProjectTable = () => {
               />
             ))}
             {extraMembers > 0 && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-700 to-orange-700 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white -ml-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-800 to-orange-700 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white -ml-2">
                 +{extraMembers}
               </div>
             )}
@@ -427,7 +448,7 @@ const ProjectTable = () => {
   const renderAddMemberButton = (projectId: number) => (
     <Tooltip title="Add or search members">
       <button 
-        className="text-purple-700 hover:text-blue-800 mr-2 p-1 border rounded-full relative" 
+        className="text-purple-900 hover:text-orange-600 mr-2 p-1 border rounded-full relative" 
         onClick={(e) => handleAddMember(projectId, e)}
       >
         <FaPlus size={12} />
@@ -521,9 +542,21 @@ const ProjectTable = () => {
     );
   };
 
+  const handleCreateProject = () => {
+    navigate('/create');
+  };
+
   const renderMobileView = () => (
     <div className="grid grid-cols-1 gap-6">
-      {renderMobileTabletSearchPopover()}
+      <div className="flex flex-col items-center space-y-4">
+        {renderMobileTabletSearchPopover()}
+        <button
+          onClick={handleCreateProject}
+          className="bg-purple-950 hover:bg-purple-900 text-white font-bold p-3 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center w-12 h-12"
+        >
+          <FaPlus size={20} />
+        </button>
+      </div>
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
           <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
@@ -543,8 +576,8 @@ const ProjectTable = () => {
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-2">
-            <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-            <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+            <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+            <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -553,8 +586,14 @@ const ProjectTable = () => {
 
   const renderTabletView = () => (
     <div>
-      <div className="mb-6 flex justify-center">
+      <div className="flex flex-col items-center space-y-4 mb-6">
         {renderMobileTabletSearchPopover()}
+        <button
+          onClick={handleCreateProject}
+          className="bg-purple-950 hover:bg-purple-900 text-white font-bold p-3 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center w-12 h-12"
+        >
+          <FaPlus size={20} />
+        </button>
       </div>
       <div className="grid grid-cols-2 gap-4">
         {paginatedProjects.map((project) => (
@@ -576,8 +615,8 @@ const ProjectTable = () => {
               </div>
             </div>
             <div className="mt-4 flex justify-end space-x-2">
-              <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-              <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+              <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+              <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
             </div>
           </div>
         ))}
@@ -724,59 +763,88 @@ const ProjectTable = () => {
     );
   };
 
+  const renderPagination = () => (
+    <div className="mt-6 flex justify-end">
+      <StyledPagination
+        current={currentPage}
+        total={totalProjects}
+        pageSize={projectsPerPage}
+        onChange={handlePageChange}
+        showSizeChanger={false}
+      />
+    </div>
+  );
+
   const renderDesktopView = () => (
-    <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-      <table className="w-full divide-y divide-gray-200">
-        <thead className="bg-gradient-to-r from-purple-950 to-purple-950 text-white font-semibold">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              {renderSearchPopover('id')}
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              {renderSearchPopover('projectName')}
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              {renderSearchPopover('categoryName')}
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              {renderSearchPopover('creator')}
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Members
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {paginatedProjects.map((project: Project) => (
-            <tr key={project.id} className="hover:bg-gray-100">
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <div className="flex items-center">
-                  <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
-                  <span className="text-green-600 font-semibold">{project.creator.name}</span>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center space-x-1">
-                  {renderAddMemberButton(project.id)}
-                  {renderMembers(project)}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex space-x-2">
-                  <button className="bg-purple-900 text-white rounded-md p-2 hover:bg-purple-950 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-                  <button className="bg-red-600 text-white rounded-md p-2 hover:bg-red-700 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
-                </div>
-              </td>
+    <div>
+      <div className="mb-6 flex justify-end">
+        <button
+          onClick={handleCreateProject}
+          className="bg-purple-950 hover:bg-purple-900 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+        >
+          <FaPlus className="mr-2" />
+          <span>Create Project</span>
+        </button>
+      </div>
+      <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+        <table className="w-full divide-y divide-gray-200">
+          <thead className="bg-gradient-to-r from-purple-950 via-purple-950 to-orange-700 text-white font-semibold">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                {renderSearchPopover('id')}
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                {renderSearchPopover('projectName')}
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                {renderSearchPopover('categoryName')}
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                {renderSearchPopover('creator')}
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Members
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Action
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {paginatedProjects.map((project: Project) => (
+              <tr key={project.id} className="hover:bg-gray-100">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.categoryName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+                    <span className="text-green-600 font-semibold">{project.creator.name}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center space-x-1">
+                    {renderAddMemberButton(project.id)}
+                    {renderMembers(project)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex space-x-2">
+                    <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
+                    <button 
+                      className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:opacity-90 shadow-sm" 
+                      onClick={() => deleteProject(project.id)}
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {renderPagination()}
     </div>
   );
 
@@ -791,23 +859,15 @@ const ProjectTable = () => {
   return (
     <Reveal>
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="max-w-7xl mx-auto mt-[50px]">
-        <div className="mb-[50px] flex justify-center">
+      <div className="max-w-7xl mx-auto mt-[30px]">
+        <div className="mb-[30px] flex justify-center items-center">
+          <FaProjectDiagram className="text-3xl mr-3 text-purple-800" />
           <TitleGradient>Project Management</TitleGradient>
         </div>
         {isMobile && renderMobileView()}
         {isTablet && renderTabletView()}
         {!isMobile && !isTablet && renderDesktopView()}
-        <div className="mt-6 flex justify-end">
-          <Pagination
-            current={currentPage}
-            total={totalProjects}
-            pageSize={projectsPerPage}
-            onChange={handlePageChange}
-            showSizeChanger={false}
-            className="pagination-custom"
-          />
-        </div>
+        {(isMobile || isTablet) && renderPagination()}
       </div>
       {isAddingMember && (
         <div
