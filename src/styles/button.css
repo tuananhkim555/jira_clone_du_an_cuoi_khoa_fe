@@ -1,0 +1,56 @@
+.custom-button {
+  background-color: #320059 !important; /* purple-950 */
+  color: white !important;
+  border: 1px solid #320059 !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  width: 80px !important;
+  border-radius: 20px 0px 0px 20px !important;
+}
+
+.custom-button:hover {
+  background-color: #400070 !important; /* purple-900 */
+  border-color: #3d006c !important;
+}
+
+.custom-button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.4) !important; /* purple-700 with opacity */
+}
+
+.custom-button:active {
+  background-color: #4c1d95 !important; /* purple-800 */
+  border-color: #4c1d95 !important;
+}
+
+.custom-button-outline {
+  background-color: #320059!important;
+  color: #ffffff !important; /* purple-950 */
+  border: 1px solid #320059 !important;
+}
+
+.custom-button-outline:hover {
+  background-color: transparent !important;
+  color: #320059 !important;
+}
+
+.custom-button-text {
+  background-color: transparent !important;
+  color: #320059 !important; /* purple-950 */
+  border: none !important;
+  padding: 8px !important;
+}
+
+.custom-button-text:hover {
+  background-color: rgba(91, 33, 182, 0.1) !important; /* purple-700 with low opacity */
+}
+
+.custom-button:disabled,
+.custom-button-outline:disabled,
+.custom-button-text:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+

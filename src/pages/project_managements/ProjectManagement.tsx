@@ -10,7 +10,8 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import Reveal from '../../components/Reveal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styled from 'styled-components';
-
+import '../../styles/pagination.css';
+import '../../styles/modal.css';
 
 interface Project {
   id: number;
@@ -58,25 +59,7 @@ const SearchButton = styled(Button)`
   }
 `;
 
-const StyledPagination = styled(Pagination)`
-  .ant-pagination-item-active {
-    border-color: #3b0764 !important; /* purple-950 */
-    a {
-      color: #3b0764 !important; /* purple-950 */
-    }
-  }
-  .ant-pagination-item:hover {
-    border-color: #3b0764 !important; /* purple-950 */
-    a {
-      color: #3b0764 !important; /* purple-950 */
-    }
-  }
-  .ant-pagination-prev:hover .ant-pagination-item-link,
-  .ant-pagination-next:hover .ant-pagination-item-link {
-    border-color: #3b0764 !important; /* purple-950 */
-    color: #3b0764 !important; /* purple-950 */
-  }
-`;
+
 
 const ProjectTable = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -172,8 +155,9 @@ const ProjectTable = () => {
       icon: <ExclamationCircleOutlined />,
       content: 'This action cannot be undone.',
       okText: 'Yes',
-      okType: 'danger',
+      okButtonProps: { className: 'modal-button modal-button-danger' },
       cancelText: 'No',
+      cancelButtonProps: { className: 'modal-button modal-button-secondary' },
       onOk() {
         axios.delete(`${API_BASE_URL}/Project/deleteProject`, {
           params: { projectId },
@@ -765,12 +749,13 @@ const ProjectTable = () => {
 
   const renderPagination = () => (
     <div className="mt-6 flex justify-end">
-      <StyledPagination
+      <Pagination
         current={currentPage}
         total={totalProjects}
         pageSize={projectsPerPage}
         onChange={handlePageChange}
         showSizeChanger={false}
+        className="pagination-container"
       />
     </div>
   );

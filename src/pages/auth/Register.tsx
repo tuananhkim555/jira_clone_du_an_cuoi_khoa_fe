@@ -57,9 +57,9 @@ const Register: React.FC = () => {
         setIsEmailValid(isValid);
 
         if (!value) {
-            setEmailError('Email không được để trống');
+            setEmailError('Email is required'); // Email không được để trống
         } else if (!isValid) {
-            setEmailError('Email không đúng định dạng');
+            setEmailError('Invalid email format'); // Email không đúng định dạng
         } else {
             setEmailError('');
         }
@@ -67,9 +67,9 @@ const Register: React.FC = () => {
 
     const handleEmailBlur = () => {
         if (!email) {
-            setEmailError('Email không được để trống');
+            setEmailError('Email is required'); // Email không được để trống
         } else if (!validateEmail(email)) {
-            setEmailError('Email không đúng định dạng');
+            setEmailError('Invalid email format'); // Email không đúng định dạng
         } else {
             setEmailError('');
         }
@@ -81,7 +81,7 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setIsPasswordValid(false);
-            setPasswordError('Không được để trống mật khẩu');
+            setPasswordError('Password is required'); // Không được để trống mật khẩu
         } else {
             setIsPasswordValid(true);
             setPasswordError('');
@@ -91,7 +91,7 @@ const Register: React.FC = () => {
     const handlePasswordBlur = () => {
         if (password === '') {
             setIsPasswordValid(false);
-            setPasswordError('Không được để trống mật khẩu');
+            setPasswordError('Password is required'); // Không được để trống mật khẩu
         }
     };
 
@@ -105,7 +105,7 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setFullNameValid(false);
-            setFullNameError('Họ tên không được để trống');
+            setFullNameError('Full name is required'); // Họ tên không được để trống
         } else {
             setFullNameValid(true);
             setFullNameError('');
@@ -121,10 +121,10 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setPhoneNumberValid(false);
-            setPhoneNumberError('Số điện thoại không được để trống');
+            setPhoneNumberError('Phone number is required'); // Số điện thoại không được để trống
         } else if (!isValid) {
             setPhoneNumberValid(false);
-            setPhoneNumberError('Số điện thoại phải là số');
+            setPhoneNumberError('Phone number must be numeric'); // Số điện thoại phải là số
         } else {
             setPhoneNumberValid(true);
             setPhoneNumberError('');
@@ -157,14 +157,14 @@ const Register: React.FC = () => {
                 },
             });
             console.log('Signup successful:', response.data);
-            setAlert({ message: 'Đăng ký thành công!', type: 'success' });
+            setAlert({ message: 'Registration successful!', type: 'success' }); // Đăng ký thành công!
 
             setTimeout(() => {
                 navigate('/login');
             }, 800);
         } catch (error: any) {
             console.error('Signup error:', error.response?.data);
-            setAlert({ message: 'Đăng ký thất bại! Email đã tồn tại', type: 'error' });
+            setAlert({ message: 'Registration failed! Email already exists', type: 'error' }); // Đăng ký thất bại! Email đã tồn tại
         }
     };
 
@@ -186,7 +186,7 @@ const Register: React.FC = () => {
             </Reveal>
             <div className="flex flex-col w-full max-w-md p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl z-50 bg-[gray]/5">
                 <div className="flex flex-col">
-                    <h2 className="text-2xl font-semibold text-gray-200 mb-6 text-center">Đăng ký</h2>
+                    <h2 className="text-2xl font-semibold text-gray-200 mb-6 text-center">Register</h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-400">Email</label>
@@ -205,7 +205,7 @@ const Register: React.FC = () => {
                                     name="email" 
                                     id="email" 
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" 
-                                    placeholder="Nhập vào email của bạn..." 
+                                    placeholder="Enter your email..." // Nhập vào email của bạn...
                                     value={email} 
                                     onChange={handleEmailChange} 
                                     onBlur={handleEmailBlur} 
@@ -217,7 +217,7 @@ const Register: React.FC = () => {
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-400">Mật khẩu</label>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-400">Password</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
                                     {isPasswordValid === true ? (
@@ -233,7 +233,7 @@ const Register: React.FC = () => {
                                     name="password" 
                                     id="password" 
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" 
-                                    placeholder="Nhập mật khẩu của bạn" 
+                                    placeholder="Enter your password" // Nhập mật khẩu của bạn
                                     value={password}
                                     onChange={handlePasswordChange}
                                     onBlur={handlePasswordBlur}
@@ -247,7 +247,7 @@ const Register: React.FC = () => {
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-400">Họ tên</label>
+                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-400">Full Name</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
                                     {fullNameValid === true ? (
@@ -258,14 +258,14 @@ const Register: React.FC = () => {
                                         <FaUser size={16} />
                                     )}
                                 </div>
-                                <input type="text" name="fullName" id="fullName" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" placeholder="Nhập tên của bạn" value={fullName} onChange={handleFullNameChange} onBlur={handleFullNameFocus} />
+                                <input type="text" name="fullName" id="fullName" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" placeholder="Enter your name" value={fullName} onChange={handleFullNameChange} onBlur={handleFullNameFocus} />
                             </div>
                             <div className="min-h-[20px] mt-1">
                                 {fullNameError && <p className="text-orange-400 text-sm">{fullNameError}</p>}
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-400">Số điện thoại</label>
+                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-400">Phone Number</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
                                     {phoneNumberValid === true ? (
@@ -276,7 +276,7 @@ const Register: React.FC = () => {
                                         <FaPhoneAlt size={16} />
                                     )}
                                 </div>
-                                <input type="tel" name="phoneNumber" id="phoneNumber" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" placeholder="Nhập số điện thoại của bạn" value={phoneNumber} onChange={handlePhoneNumberChange} onBlur={handlePhoneNumberFocus} />
+                                <input type="tel" name="phoneNumber" id="phoneNumber" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" placeholder="Enter your phone number" value={phoneNumber} onChange={handlePhoneNumberChange} onBlur={handlePhoneNumberFocus} />
                             </div>
                             <div className="min-h-[20px] mt-1">
                                 {phoneNumberError && <p className="text-orange-400 text-sm">{phoneNumberError}</p>}
@@ -284,12 +284,12 @@ const Register: React.FC = () => {
                         </div>
                         <div>
                             <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 duration-300 hover:scale-105">
-                                Đăng ký
+                                Register
                             </button>
                         </div>
                     </form>
                     <div className="mt-4">
-                        <Link to="/login" className="text-gray-400 text-sm">Bạn đã có tài khoản? <span className='text-orange-400 hover:underline'>Nhấn vào đây để đăng nhập</span> </Link>
+                        <Link to="/login" className="text-gray-400 text-sm">Already have an account? <span className='text-orange-400 hover:underline'>Click here to login</span> </Link>
                     </div>
                 </div>
             </div>

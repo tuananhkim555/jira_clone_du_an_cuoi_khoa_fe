@@ -1,0 +1,32 @@
+.pagination-container .ant-pagination-item,
+.pagination-container .ant-pagination-prev,
+.pagination-container .ant-pagination-next {
+  border-color: #3b0764; /* purple-950 */
+}
+
+.pagination-container .ant-pagination-item a,
+.pagination-container .ant-pagination-prev .ant-pagination-item-link,
+.pagination-container .ant-pagination-next .ant-pagination-item-link {
+  color: #320057; /* purple-950 */
+}
+
+.pagination-container .ant-pagination-item-active {
+  border-color: #320058; /* purple-950 */
+  background-color: #320059; /* purple-950 */
+}
+
+.pagination-container .ant-pagination-item-active a {
+  color: white;
+}
+
+.pagination-container .ant-pagination-item:hover,
+.pagination-container .ant-pagination-prev:hover .ant-pagination-item-link,
+.pagination-container .ant-pagination-next:hover .ant-pagination-item-link {
+  border-color: #581c87; /* purple-900 */
+}
+
+.pagination-container .ant-pagination-item:hover a,
+.pagination-container .ant-pagination-prev:hover .ant-pagination-item-link,
+.pagination-container .ant-pagination-next:hover .ant-pagination-item-link {
+  color: #581c87; /* purple-900 */
+}

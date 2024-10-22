@@ -4,25 +4,28 @@ import storage from 'redux-persist/lib/storage';
 
 // Định nghĩa kiểu dữ liệu cho user
 interface User {
+  id: ReactNode;
   userId: number;
   name: string;
   avatar: string;
   email: string;
   phoneNumber: string;
   accessToken: string;
-  tokenExpiration: number; // Thêm trường này để lưu thời gian hết hạn của token
+  tokenExpiration: number;
 }
 
 // Định nghĩa kiểu dữ liệu cho state
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  token: string | null;
 }
 
 // Tạo initial state
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  token: localStorage.getItem('authToken'),
 };
 
 // Tạo auth slice
@@ -33,16 +36,28 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.token = action.payload.accessToken;
+      localStorage.setItem('authToken', action.payload.accessToken);
     },
     clearUser: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.token = null;
+      localStorage.removeItem('authToken');
+    },
+    clearToken: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.token = null;
+      localStorage.removeItem('authToken');
     },
     checkTokenExpiration: (state) => {
       if (state.user && state.user.tokenExpiration) {
         if (Date.now() > state.user.tokenExpiration) {
           state.user = null;
           state.isAuthenticated = false;
+          state.token = null;
+          localStorage.removeItem('authToken');
         }
       }
     },
@@ -53,7 +68,7 @@ const authSlice = createSlice({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'] // Chỉ lưu trữ state của auth
+  whitelist: ['auth']
 };
 
 const persistedReducer = persistReducer(persistConfig, authSlice.reducer);
@@ -62,7 +77,6 @@ const persistedReducer = persistReducer(persistConfig, authSlice.reducer);
 export const store = configureStore({
   reducer: {
     auth: persistedReducer,
-    // Thêm các reducer khác nếu cần
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -73,7 +87,7 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 // Export các action
-export const { setUser, clearUser, checkTokenExpiration } = authSlice.actions;
+export const { setUser, clearUser, clearToken, checkTokenExpiration } = authSlice.actions;
 
 // Export kiểu dữ liệu cho RootState và AppDispatch
 export type RootState = ReturnType<typeof store.getState>;

@@ -50,7 +50,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     
-    NotificationMessage({ type: 'success', message: 'Đăng xuất thành công' });
+    NotificationMessage({ type: 'success', message: 'Logged out successfully' });
     
     setTimeout(() => {
       navigate("/login");

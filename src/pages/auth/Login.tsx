@@ -11,11 +11,23 @@ import { useGoogleLogin } from "@react-oauth/google";
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from "./auth.module.css"
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../store'; // Đảm bảo đường dẫn đúng
+import { setUser } from '../../store'; 
+import { calculateTokenExpiration } from '../../utils/tokenUtils'; // Updated path
 
 interface GoogleLoginResponse {
   success: boolean;
   message?: string;
+}
+
+interface UserResponse {
+  content: {
+    id: string;
+    email: string;
+    avatar: string;
+    phoneNumber: string;
+    name: string;
+    accessToken: string;
+  };
 }
 
 const Login: React.FC = () => {
@@ -40,7 +52,7 @@ const Login: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  // Hàm xử lý đăng nhập Google
+  // Function to handle Google login
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -50,7 +62,7 @@ const Login: React.FC = () => {
           throw new Error("No access token received from Google");
         }
 
-        // Gọi API backend để xác thực token
+        // Call backend API to authenticate token
         const response = await axios.post<GoogleLoginResponse>('YOUR_BACKEND_API_URL/google-login', { token: access_token });
 
         if (response.data.success) {
@@ -102,7 +114,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(
+      const response = await axios.post<UserResponse>(
         "https://jiranew.cybersoft.edu.vn/api/Users/signin",
         { email, passWord: password },
         {
@@ -113,11 +125,19 @@ const Login: React.FC = () => {
         }
       );
       
-      // Dispatch action để lưu thông tin user vào Redux store
-      dispatch(setUser(response.data.content));
+      const userData = response.data.content;
       
-      // Lưu token vào localStorage nếu cần
-      localStorage.setItem('authToken', response.data.content.accessToken);
+      // Dispatch action to save user information in Redux store
+      dispatch(setUser({
+        ...userData,
+        userId: +userData.id,
+        tokenExpiration: calculateTokenExpiration(+userData.accessToken).getTime()
+      }));
+      // Save token to localStorage
+      localStorage.setItem('authToken', userData.accessToken);
+      
+      // Save user information to localStorage
+      localStorage.setItem('user', JSON.stringify(userData));
 
       notification.success({
         message: "Login successful!",
@@ -159,7 +179,7 @@ const Login: React.FC = () => {
         <div className={`flex flex-col p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl w-full ${isMobile ? 'max-w-md' : 'max-w-md'} z-50 bg-[gray]/5 ${isMobile ? 'mt-8' : ''}`}>
           <div className="flex flex-col">
             <h2 className="text-2xl font-semibold text-gray-200 mb-4 text-center">
-              Đăng nhập
+              Login
             </h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
@@ -178,7 +198,7 @@ const Login: React.FC = () => {
                     name="email"
                     id="email"
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm"
-                    placeholder="Nhập email của bạn"
+                    placeholder="Enter your email"
                   />
                 </div>
               </div>
@@ -187,7 +207,7 @@ const Login: React.FC = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-400"
                 >
-                  Mật khẩu
+                  Password
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -198,7 +218,7 @@ const Login: React.FC = () => {
                     name="password"
                     id="password"
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm"
-                    placeholder="Nhập mật khẩu"
+                    placeholder="Enter your password"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                     {showPassword ? (
@@ -222,7 +242,7 @@ const Login: React.FC = () => {
                   type="submit"
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 duration-300 hover:scale-105"
                 >
-                  Đăng nhập
+                  Login
                 </button>
               </div>
               <div className="text-center mt-4">
@@ -243,9 +263,11 @@ const Login: React.FC = () => {
             </form>
             <div className="mt-4 text-center">
               <Link to="/register" className="text-gray-400 text-sm">
-                Bạn chưa có tài khoản?{" "}
+                {/* Bạn chưa có tài khoản? */}
+                Don't have an account?{" "}
                 <span className="text-orange-400 hover:underline">
-                  Nhấn vào đây để đăng ký
+                  {/* Nhấn vào đây để đăng ký */}
+                  Click here to register
                 </span>
               </Link>
             </div>

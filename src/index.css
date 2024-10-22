@@ -75,7 +75,7 @@ p {
   }
 
   .button-purple{
-    @apply bg-purple-900 text-white;
+    @apply bg-[#310150] text-white;
     padding: 8px 16px;
     border-radius: 4px;
     border: none;

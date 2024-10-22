@@ -2,7 +2,7 @@ import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
-import { FaTrello, FaPlus, FaProjectDiagram, FaRocket, FaExclamationCircle, FaFileAlt, FaCogs,    FaUser } from 'react-icons/fa';
+import { FaTrello, FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../store.ts";
 import { clearUser, setUser } from "../store"; // Assuming you have a clearUser and setUser action in your store
@@ -32,7 +32,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
 
   useEffect(() => {
     if (user && isAuthenticated) {
-      console.log("User from Redux:", user);
+      console.log("User from Redux");
       localStorage.setItem('user', JSON.stringify(user));
     } else {
       console.log("No user data in Redux store or user is not authenticated");
@@ -95,6 +95,9 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
       case 'project-management':
         path = '/project';
         break;
+      case 'user-management':
+        path = '/users-managements';
+        break;
       default:
         path = `/${menu}`;
     }
@@ -147,7 +150,8 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
                 <hr className="border-gray-300" />
               </li>
               
-              <SidebarItem icon={<FaUser />} text="Users" active={activeMenu === "users"} onClick={() => handleMenuClick("users")} />
+              <SidebarItem icon={<FaUser />} text="Profile" active={activeMenu === "profile"} onClick={() => handleMenuClick("profile")} />
+              <SidebarItem icon={<FaUserFriends />} text="Users Managements" active={activeMenu === "user-management"} onClick={() => handleMenuClick("user-management")} />
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
               <SidebarItem icon={<FaExclamationCircle />} text="Help" active={activeMenu === "help"} onClick={() => handleMenuClick("help")} />
               <SidebarItem icon={<FaCogs />} text="Settings" active={activeMenu === "settings"} onClick={() => handleMenuClick("settings")} />
