@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate as useNav } from 'react-router-dom';
-import { clearToken } from '../../store';
+import { clearToken } from '../../redux/store';
 
 const Logout = () => {
   const dispatch = useDispatch();

@@ -1,5 +1,5 @@
 import React from 'react';
-import './TitleGradient.css';
+import '../../styles/TitleGradient.css';
 
 interface TitleGradientProps {
   children: React.ReactNode;

@@ -14,7 +14,20 @@ import LoadingSniper from '../../components/LoadingSpinner';
 import { Pagination, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../../styles/pagination.css';
-const projects = [
+import { Modal } from 'antd';
+import UploadProject from './UploadProject';
+
+interface Project {
+  img: string;
+  title: string;
+  description: string;
+  links: {
+    site: string;
+    github: string;
+  };
+}
+
+const initialProjects: Project[] = [
   {
     img: project1,
     title: "Project #1",
@@ -75,8 +88,11 @@ const Portfolio = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>(initialProjects);
+  const [totalProjects, setTotalProjects] = useState(initialProjects.length);
   const projectsPerPage = 4;
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -92,7 +108,7 @@ const Portfolio = () => {
     );
     setFilteredProjects(filtered);
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, projects]);
 
   if (isLoading) {
     return <LoadingSniper />;
@@ -104,6 +120,21 @@ const Portfolio = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const showUploadModal = () => {
+    setIsUploadModalVisible(true);
+  };
+
+  const handleUploadModalCancel = () => {
+    setIsUploadModalVisible(false);
+  };
+
+  const handleProjectSubmit = (newProject: Project) => {
+    setProjects([...projects, newProject]);
+    setFilteredProjects([...filteredProjects, newProject]);
+    setTotalProjects(totalProjects + 1);
+    setIsUploadModalVisible(false);
   };
 
   return (
@@ -129,7 +160,10 @@ const Portfolio = () => {
               />
             }
           />
-          <div className="ml-2 p-2 bg-[#31004c] rounded-full cursor-pointer flex items-center">
+          <div 
+            className="ml-2 p-2 bg-[#31004c] rounded-full cursor-pointer flex items-center"
+            onClick={showUploadModal}
+          >
             <FaPlus className="text-white mr-1" />
             <span className="text-white text-xs">Upload</span>
           </div>
@@ -177,6 +211,14 @@ const Portfolio = () => {
           className="pagination-container"
         />
       </div>
+      <Modal
+        title="Upload Project"
+        visible={isUploadModalVisible}
+        onCancel={handleUploadModalCancel}
+        footer={null}
+      >
+        <UploadProject onClose={handleUploadModalCancel} onSubmit={handleProjectSubmit} />
+      </Modal>
     </div>
   );
 };

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { FaPlus, FaEdit, FaSave, FaUser, FaUserCheck } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaSave } from 'react-icons/fa';
 import axios from 'axios';
 import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import avatarImage from '../../assets/anhdaidien2.jpg';
-import TitleGradient from '../../components/ui/TitleGradient';
-import { clearTempUser } from '../../redux/store/slices/userSlice';
 
 interface User {
   id: string;
@@ -18,11 +15,10 @@ interface User {
   phoneNumber?: string;
 }
 
-const Profile: React.FC = () => {
-  const authUser = useSelector((state: RootState) => state.auth.user);
-  const tempUser = useSelector((state: RootState) => state.user.tempUser);
+const User: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user) as User | null;
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<User | null>(null);
+  const [editedUser, setEditedUser] = useState<User | null>(user);
   const dispatch = useDispatch();
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,31 +34,17 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Current user:', authUser);
+    console.log('Current user:', user);
     console.log('Edited user:', editedUser);
-  }, [authUser, editedUser]);
+  }, [user, editedUser]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearTempUser());
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    console.log('tempUser:', tempUser);
-    console.log('authUser:', authUser);
-    if (tempUser) {
-      setEditedUser(tempUser);
-    } else if (authUser) {
-      setEditedUser(authUser);
-    }
-  }, [tempUser, authUser]);
-
-  if (!editedUser) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const displayUser = editedUser;
+  if (!user) {
+    return <div>No user information available</div>;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -110,20 +92,17 @@ const Profile: React.FC = () => {
 
   return (
     <Reveal>
-      <div className="max-w-[600px] mx-auto mt-20 p-8 bg-white rounded-[2.5rem] shadow-xl">
+      <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-lg shadow-xl">
         {notification && (
           <NotificationMessage type={notification.type} message={notification.message} />
         )}
-        <div className="flex items-center justify-center mb-6">
-          <FaUserCheck className="text-[22px] mr-3 text-purple-900" />
-          <TitleGradient>User Profile</TitleGradient>
-        </div>
+        <h2 className="text-3xl font-bold mb-6 text-center text-purple-800">User Profile</h2>
         <div className="flex flex-col items-center mb-6">
-          <div className="relative w-32 h-32">
+          <div className="relative">
             <img 
-              src={avatarImage}
+              src={user.avatar || "https://via.placeholder.com/150"}
               alt="User Avatar"
-              className="w-full h-full object-cover rounded-full border-4 border-purple-950"
+              className="w-32 h-32 rounded-full border-4 border-purple-950"
             />
             <button className="absolute bottom-0 right-0 bg-gradient-to-r from-purple-900 to-orange-700 text-white p-2 rounded-full hover:from-purple-800 hover:to-orange-600 transition-all duration-500 ease-in-out shadow-lg">
               <FaPlus />
@@ -136,7 +115,7 @@ const Profile: React.FC = () => {
             <input
               type="text"
               name="name"
-              value={isEditing ? editedUser?.name : displayUser?.name}
+              value={isEditing && editedUser ? editedUser.name : user.name}
               onChange={handleInputChange}
               readOnly={!isEditing}
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-950 transition-all duration-300 ease-in-out hover:border-purple-500"
@@ -147,7 +126,7 @@ const Profile: React.FC = () => {
             <input
               type="email"
               name="email"
-              value={isEditing ? editedUser?.email : displayUser?.email}
+              value={isEditing && editedUser ? editedUser.email : user.email}
               onChange={handleInputChange}
               readOnly={!isEditing}
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-950 transition-all duration-300 ease-in-out hover:border-purple-500"
@@ -157,7 +136,7 @@ const Profile: React.FC = () => {
             <label className="text-sm font-semibold text-gray-600 mb-1">User ID</label>
             <input
               type="text"
-              value={authUser.id}
+              value={user.id}
               readOnly
               className="p-2 border border-gray-300 rounded-md bg-gray-100 transition-all duration-300 ease-in-out hover:bg-gray-200"
             />
@@ -176,7 +155,7 @@ const Profile: React.FC = () => {
             <input
               type="text"
               name="phoneNumber"
-              value={isEditing ? editedUser?.phoneNumber || '' : displayUser?.phoneNumber || ''}
+              value={isEditing && editedUser ? editedUser.phoneNumber || '' : user.phoneNumber || ''}
               onChange={handleInputChange}
               readOnly={!isEditing}
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-950 transition-all duration-300 ease-in-out hover:border-purple-500"
@@ -188,24 +167,20 @@ const Profile: React.FC = () => {
             onClick={() => {
               setIsEditing(!isEditing);
               if (!isEditing) {
-                setEditedUser(authUser);
+                setEditedUser(user);
               }
             }}
-            className={`flex items-center px-4 py-2 text-white rounded-md transition-all duration-500 ease-in-out bg-gradient-to-r ${
-              isEditing
-                ? 'from-orange-800 to-purple-900 hover:from-orange-700 hover:to-purple-800'
-                : 'from-purple-900 to-orange-800 hover:from-purple-800 hover:to-orange-700'
-            } hover:shadow-lg transform hover:scale-105`}
+            className="flex items-center px-4 py-2 text-white rounded-md transition-all duration-300 ease-in-out bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-800 hover:to-orange-700 hover:shadow-lg"
           >
-            <FaEdit className={`mr-2 transition-all duration-500 ${isEditing ? 'rotate-180' : 'rotate-0'}`} />
+            <FaEdit className="mr-2" />
             {isEditing ? 'Cancel' : 'Edit'}
           </button>
           {isEditing && (
             <button 
               onClick={handleSave}
-              className="flex items-center px-4 py-2 text-white rounded-md transition-all duration-500 ease-in-out bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-800 hover:to-orange-700 hover:shadow-lg transform hover:scale-105"
+              className="flex items-center px-4 py-2 text-white rounded-md transition-all duration-300 ease-in-out bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-800 hover:to-orange-700 hover:shadow-lg"
             >
-              <FaSave className="mr-2 animate-pulse" />
+              <FaSave className="mr-2" />
               Save
             </button>
           )}
@@ -215,4 +190,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default User;

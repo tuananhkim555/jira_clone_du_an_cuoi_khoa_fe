@@ -1,8 +1,9 @@
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import authReducer from '../src/store/slices/authSlice';
-import userReducer from '../src/store/slices/userSlice';
+import authReducer from './store/slices/authSlice';
+import userReducer from './store/slices/userSlice';
+import { ReactNode } from 'react';
 
 // Định nghĩa kiểu dữ liệu cho user
 interface User {
@@ -78,7 +79,7 @@ const persistedReducer = persistReducer(persistConfig, authSlice.reducer);
 // Tạo store
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: persistedReducer,
     user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>

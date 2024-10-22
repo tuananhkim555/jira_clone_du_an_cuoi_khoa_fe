@@ -11,7 +11,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from "./auth.module.css"
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../store'; 
+import { setUser } from '../../redux/store'; 
 import { calculateTokenExpiration } from '../../utils/tokenUtils'; // Updated path
 
 interface GoogleLoginResponse {

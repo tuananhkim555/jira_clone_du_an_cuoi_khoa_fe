@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { Pagination, Modal, Input, Button, Select } from 'antd';
 import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -12,6 +12,10 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import { FaUserFriends } from 'react-icons/fa';
 import { FaCircle } from 'react-icons/fa';
 import Reveal from '../../components/Reveal';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setTempUser } from '../../store/slices/userSlice';
+
 interface User {
   id: number;
   avatar: string;
@@ -32,6 +36,8 @@ const UserManagement = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('name');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -52,17 +58,12 @@ const UserManagement = () => {
             email: user.email,
             phoneNumber: user.phoneNumber
           })));
-          console.log('Lấy dữ liệu người dùng thành công!');
         } else {
           throw new Error('Invalid data format');
         }
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error('Axios error:', error.response?.data || error.message);
-        } else {
-          console.error('Error:', error);
-        }
-        setError('Lấy dữ liệu người dùng thất bại!');
+        console.error('Error:', error);
+        setError('Failed to fetch users');
       } finally {
         setIsLoading(false);
       }
@@ -71,7 +72,8 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const showDeleteModal = (userId: number) => {
+  const showDeleteModal = (userId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
     setDeleteUserId(userId);
     setIsModalVisible(true);
   };
@@ -95,19 +97,10 @@ const UserManagement = () => {
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      if (axios.isAxiosError(error)) {
-        NotificationMessage({ 
-          type: 'error', 
-          message: 'Failed to delete user', 
-          description: error.response?.data?.message || error.message 
-        });
-      } else {
-        NotificationMessage({ 
-          type: 'error', 
-          message: 'Failed to delete user', 
-          description: 'An unexpected error occurred' 
-        });
-      }
+      NotificationMessage({ 
+        type: 'error', 
+        message: 'Failed to delete user'
+      });
     } finally {
       setIsModalVisible(false);
       setDeleteUserId(null);
@@ -161,6 +154,18 @@ const UserManagement = () => {
   // Change page
   const onPageChange = (page: number) => setCurrentPage(page);
 
+  const handleUserClick = (user: User) => {
+    console.log('Selected user in UserManagements:', user);
+    dispatch(setTempUser({
+      id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      phoneNumber: user.phoneNumber
+    }));
+    navigate('/profile');
+  };
+
   return (
     <Reveal>
     <div className="container mx-auto mt-10 px-6 py-10 flex flex-col items-center">
@@ -193,23 +198,29 @@ const UserManagement = () => {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full max-w-7xl">
             {currentUsers.map((user: User) => (
-              <div key={user.id} className="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg duration-300 ease-in-out transform hover:scale-105 cursor-pointer">
+              <div 
+                key={user.id} 
+                className="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg duration-300 ease-in-out transform hover:scale-105"
+              >
                 <img src={user.avatar || 'https://via.placeholder.com/150'} alt={user.name} className="w-full h-24 object-cover" />
                 <div className="p-2">
-                  <h2 className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center">
+                  <h2 
+                    className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center cursor-pointer"
+                    onClick={() => handleUserClick(user)}
+                  >
                     <FaCircle className="text-xs mr-1 text-green-500" />
                     {user.name}
                   </h2>
-                  <p className="text-gray-600 text-xs mb-1 truncate">
+                  <p className="text-[#36004f] text-xs mb-1 truncate">
                     <i className="fas fa-envelope mr-1"></i>{user.email}
                   </p>
                   <p className="text-gray-600 text-xs mb-1 truncate">
                     <i className="fas fa-phone mr-1"></i>{user.phoneNumber}
                   </p>
                   <div className="flex justify-between items-center mt-1">
-                    <p className="text-gray-500 text-xs">ID: {user.id}</p>
+                    <p className="text-gray-500 text-xs bg-gradient-to-r from-purple-900 to-orange-800 bg-clip-text text-transparent">ID: {user.id}</p>
                     <button
-                      onClick={() => showDeleteModal(user.id)}
+                      onClick={(e) => showDeleteModal(user.id, e)}
                       className="bg-gradient-to-r from-purple-900 to-orange-700 text-white p-[3px] py-[1px] rounded-md hover:from-purple-800 hover:to-orange-600 transition duration-300"
                     >
                       <DeleteOutlined />

@@ -1,17 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ImageNotFound from '../assets/page-not-found.svg';
 
 const NotFound: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
-      <p className="text-xl mb-8">The page you are looking for doesn't exist.</p>
-      <Link to="/kanban" className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition duration-300">
-        Go Home
-      </Link>
+    <div className="relative flex items-center justify-center h-screen">
+      <img src={ImageNotFound} alt="Page Not Found" className="w-[80%] sm:w-[80%] lg:w-[50%] object-contain" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <h1 className="text-4xl font-bold mb-4 text-white">404 - Page Not Found</h1>
+        <p className="text-xl mb-8 text-white">The page you are looking for doesn't exist.</p>
+        <Link to="/board" className="bg-[#fff] text-purple-900 px-4 py-2 rounded hover:bg-purple-950  hover:text-white transition duration-300">
+          Go Home
+        </Link>
+      </div>
     </div>
   );
 };
 
 export default NotFound;
-

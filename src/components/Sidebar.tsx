@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
 import { FaTrello, FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from "../store.ts";
-import { clearUser, setUser } from "../store"; // Assuming you have a clearUser and setUser action in your store
+import { RootState } from "../redux/store.ts";
+import { clearUser, setUser } from "../redux/store.ts"; // Assuming you have a clearUser and setUser action in your store
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 
 interface SidebarProps {
