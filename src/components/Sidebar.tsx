@@ -2,7 +2,7 @@ import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
-import { FaTrello, FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends } from 'react-icons/fa';
+import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../redux/store.ts";
 import { clearUser, setUser } from "../redux/store.ts"; // Assuming you have a clearUser and setUser action in your store
@@ -87,7 +87,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
     onMenuClick(menu);
     let path;
     switch (menu) {
-      case 'kanban':
+      case 'dashboard':
         path = '/board';
         break;
       case 'create-projects':
@@ -143,7 +143,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
           <SidebarContext.Provider value={{ expanded }}>
             
             <ul className="flex-1 px-3 pt-10">
-              <SidebarItem icon={<FaTrello />} text="Kanban Board" active={activeMenu === "kanban"} onClick={() => handleMenuClick("kanban")} />
+              <SidebarItem icon={<FaTrello />} text="Dashboard" active={activeMenu === "dashboard"} onClick={() => handleMenuClick("dashboard")} />
               <SidebarItem icon={<FaPlus />} text="Create Projects" active={activeMenu === "create-projects"} onClick={() => handleMenuClick("create-projects")} />
               <SidebarItem icon={<FaProjectDiagram />} text="Project Management" active={activeMenu === "project-management"} onClick={() => handleMenuClick("project-management")} />
               

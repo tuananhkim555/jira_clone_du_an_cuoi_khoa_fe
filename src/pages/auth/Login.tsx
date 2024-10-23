@@ -176,7 +176,9 @@ const Login: React.FC = () => {
         </Reveal>
         <div className={`flex flex-col p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl w-full ${isMobile ? 'max-w-md' : 'max-w-md'} z-50 bg-[gray]/5 ${isMobile ? 'mt-8' : ''}`}>
           <div className="flex flex-col">
-            <TextAnimation text="Login" className="text-2xl font-semibold text-gray-200 mb-4 text-center" />
+            <div className="flex justify-center">
+              <TextAnimation text="Login" className="text-2xl font-semibold text-gray-200 mb-4 text-center" />
+            </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label

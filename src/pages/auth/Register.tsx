@@ -187,7 +187,9 @@ const Register: React.FC = () => {
             </Reveal>
             <div className="flex flex-col w-full max-w-md p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl z-50 bg-[gray]/5">
                 <div className="flex flex-col">
-                    <TextAnimation text="Register" className="text-2xl font-semibold text-gray-200 mb-6 text-center" />
+                    <div className="flex justify-center">
+                      <TextAnimation text="Register" className="text-2xl font-semibold text-gray-200 mb-6 text-center" />
+                    </div>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-400">Email</label>
@@ -289,7 +291,7 @@ const Register: React.FC = () => {
                             </button>
                         </div>
                     </form>
-                    <div className="mt-4">
+                    <div className="mt-4 flex justify-center">
                         <Link to="/login" className="text-gray-400 text-sm">Already have an account? <span className='text-orange-400 hover:underline'>Click here to login</span> </Link>
                     </div>
                 </div>
