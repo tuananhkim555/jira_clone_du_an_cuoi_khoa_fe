@@ -17,74 +17,88 @@ const options = {
   }
 };
 
-interface UploadProjectProps {
-  onClose: () => void;
+interface Project {
+  img: string;
+  title: string;
+  description: string;
+  links: {
+    site: string;
+    github: string;
+  };
 }
 
-const UploadProject: React.FC<UploadProjectProps> = ({ onClose }) => {
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [uploadedFileUrl, setUploadedFileUrl] = useState('');
+interface UploadProjectProps {
+  onClose: () => void;
+  onSubmit: (project: Project) => void;
+}
 
-  const handleUpload = (files: any[]) => {
-    if (files.length > 0) {
-      setUploadedFileUrl(files[0].fileUrl);
+const UploadProject: React.FC<UploadProjectProps> = ({ onClose, onSubmit }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState<File | null>(null);
+  const [deployLink, setDeployLink] = useState('');
+  const [githubLink, setGithubLink] = useState('');
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImage(e.target.files[0]);
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (title && description && image) {
+      const newProject: Project = {
+        img: URL.createObjectURL(image),
+        title,
+        description,
+        links: {
+          site: deployLink,
+          github: githubLink,
         },
-        body: JSON.stringify({
-          title: projectName,
-          description: projectDescription,
-          image_url: uploadedFileUrl,
-          site_link: '', // You might want to add inputs for these in your form
-          github_link: '',
-        }),
-      });
-
-      if (response.ok) {
-        const newProject = await response.json();
-        // onsubmit(newProject); // This should update the project list in Pages.tsx
-        onClose();
-      } else {
-        console.error('Failed to submit project');
-      }
-    } catch (error) {
-      console.error('Error submitting project:', error);
+      };
+      onSubmit(newProject);
+      onClose();
     }
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit}>
       <Input
-        placeholder="Project Name"
-        value={projectName}
-        onChange={(e) => setProjectName(e.target.value)}
+        placeholder="Project Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="mb-3"
       />
       <Input.TextArea
         placeholder="Project Description"
-        value={projectDescription}
-        onChange={(e) => setProjectDescription(e.target.value)}
-        rows={4}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="mb-3"
       />
-      <UploadButton options={options} onComplete={handleUpload}>
-        {({onClick}) =>
-          <Button onClick={onClick} className="w-full  custom-button-outline custom-button-outline-hover">
-            Upload Image
-          </Button>
-        }
-      </UploadButton>
-      {uploadedFileUrl && <p>File uploaded successfully!</p>}
-      <Button type="primary" onClick={handleSubmit} className="w-full custom-button-outline">
-        Submit Project
+      <Input
+        placeholder="Deploy Link"
+        value={deployLink}
+        onChange={(e) => setDeployLink(e.target.value)}
+        className="mb-3"
+      />
+      <Input
+        placeholder="GitHub Link"
+        value={githubLink}
+        onChange={(e) => setGithubLink(e.target.value)}
+        className="mb-3"
+      />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleUpload}
+        className="mb-3"
+      />
+      <Button type="primary" htmlType="submit" className="mr-2 custom-button-outline">
+        Upload
       </Button>
-    </div>
+      <Button onClick={onClose}>Cancel</Button>
+    </form>
   );
 };
 

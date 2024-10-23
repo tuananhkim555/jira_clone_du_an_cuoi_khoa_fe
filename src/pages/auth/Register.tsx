@@ -8,6 +8,7 @@ import { BackgroundBeamsWithCollision } from '../../components/ui/Background-bea
 import Reveal from '../../components/Reveal';
 import axios from 'axios';
 import { Alert } from 'antd';
+import TextAnimation from '../../components/ui/TextAnimation';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -57,9 +58,9 @@ const Register: React.FC = () => {
         setIsEmailValid(isValid);
 
         if (!value) {
-            setEmailError('Email is required'); // Email không được để trống
+            setEmailError('Email is required');
         } else if (!isValid) {
-            setEmailError('Invalid email format'); // Email không đúng định dạng
+            setEmailError('Invalid email format');
         } else {
             setEmailError('');
         }
@@ -67,9 +68,9 @@ const Register: React.FC = () => {
 
     const handleEmailBlur = () => {
         if (!email) {
-            setEmailError('Email is required'); // Email không được để trống
+            setEmailError('Email is required');
         } else if (!validateEmail(email)) {
-            setEmailError('Invalid email format'); // Email không đúng định dạng
+            setEmailError('Invalid email format');
         } else {
             setEmailError('');
         }
@@ -81,7 +82,7 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setIsPasswordValid(false);
-            setPasswordError('Password is required'); // Không được để trống mật khẩu
+            setPasswordError('Password is required');
         } else {
             setIsPasswordValid(true);
             setPasswordError('');
@@ -91,7 +92,7 @@ const Register: React.FC = () => {
     const handlePasswordBlur = () => {
         if (password === '') {
             setIsPasswordValid(false);
-            setPasswordError('Password is required'); // Không được để trống mật khẩu
+            setPasswordError('Password is required');
         }
     };
 
@@ -105,7 +106,7 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setFullNameValid(false);
-            setFullNameError('Full name is required'); // Họ tên không được để trống
+            setFullNameError('Full name is required');
         } else {
             setFullNameValid(true);
             setFullNameError('');
@@ -121,10 +122,10 @@ const Register: React.FC = () => {
 
         if (value === '') {
             setPhoneNumberValid(false);
-            setPhoneNumberError('Phone number is required'); // Số điện thoại không được để trống
+            setPhoneNumberError('Phone number is required');
         } else if (!isValid) {
             setPhoneNumberValid(false);
-            setPhoneNumberError('Phone number must be numeric'); // Số điện thoại phải là số
+            setPhoneNumberError('Phone number must be numeric');
         } else {
             setPhoneNumberValid(true);
             setPhoneNumberError('');
@@ -157,14 +158,14 @@ const Register: React.FC = () => {
                 },
             });
             console.log('Signup successful:', response.data);
-            setAlert({ message: 'Registration successful!', type: 'success' }); // Đăng ký thành công!
+            setAlert({ message: 'Registration successful!', type: 'success' });
 
             setTimeout(() => {
                 navigate('/login');
             }, 800);
         } catch (error: any) {
             console.error('Signup error:', error.response?.data);
-            setAlert({ message: 'Registration failed! Email already exists', type: 'error' }); // Đăng ký thất bại! Email đã tồn tại
+            setAlert({ message: 'Registration failed! Email already exists', type: 'error' });
         }
     };
 
@@ -180,13 +181,13 @@ const Register: React.FC = () => {
             <div className="mb-8 md:mb-0 md:mr-12">
                 <div className="flex items-center justify-center flex-col lg:flex-row md:space-x-4">
                     <img src={logoLogin} alt="Logo" className="w-40 sm:w-40 md:w-52 lg:w-60 xl:w-80 h-auto object-contain mb-4 md:mb-0" />
-                    <h2 className="text-gray-200 hidden md:block text-4xl md:text-5xl lg:text-6xl text-center font-semibold">Software</h2>
+                    <TextAnimation text="Software" className="text-gray-200 hidden md:block text-4xl md:text-5xl lg:text-6xl text-center font-semibold" />
                 </div>   
             </div>
             </Reveal>
             <div className="flex flex-col w-full max-w-md p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl z-50 bg-[gray]/5">
                 <div className="flex flex-col">
-                    <h2 className="text-2xl font-semibold text-gray-200 mb-6 text-center">Register</h2>
+                    <TextAnimation text="Register" className="text-2xl font-semibold text-gray-200 mb-6 text-center" />
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-400">Email</label>
@@ -205,7 +206,7 @@ const Register: React.FC = () => {
                                     name="email" 
                                     id="email" 
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" 
-                                    placeholder="Enter your email..." // Nhập vào email của bạn...
+                                    placeholder="Enter your email..."
                                     value={email} 
                                     onChange={handleEmailChange} 
                                     onBlur={handleEmailBlur} 
@@ -233,7 +234,7 @@ const Register: React.FC = () => {
                                     name="password" 
                                     id="password" 
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500/50 focus:border-orange-500/50 sm:text-sm" 
-                                    placeholder="Enter your password" // Nhập mật khẩu của bạn
+                                    placeholder="Enter your password"
                                     value={password}
                                     onChange={handlePasswordChange}
                                     onBlur={handlePasswordBlur}

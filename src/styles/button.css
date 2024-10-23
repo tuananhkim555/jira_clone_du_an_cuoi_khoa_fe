@@ -29,6 +29,7 @@
   background-color: #320059!important;
   color: #ffffff !important; /* purple-950 */
   border: 1px solid #320059 !important;
+  z-index: 1;
 }
 
 .custom-button-outline:hover {

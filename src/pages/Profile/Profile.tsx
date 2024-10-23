@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../redux/store';
+import React from 'react';
+import { useAppSelector, useAppDispatch } from '../../redux/hooks';
+import { setTempUser, clearTempUser } from '../../redux/slices/userSlice';
 import { FaPlus, FaEdit, FaSave, FaUser, FaUserCheck } from 'react-icons/fa';
 import axios from 'axios';
 import NotificationMessage from '../../components/NotificationMessage';
@@ -8,7 +8,8 @@ import Reveal from '../../components/Reveal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import avatarImage from '../../assets/anhdaidien2.jpg';
 import TitleGradient from '../../components/ui/TitleGradient';
-import { clearTempUser } from '../../redux/store/slices/userSlice';
+import TextAnimation from '../../components/ui/TextAnimation';
+import AnimationSection from '../../components/ui/AnimationSection';
 
 interface User {
   id: string;
@@ -19,15 +20,19 @@ interface User {
 }
 
 const Profile: React.FC = () => {
-  const authUser = useSelector((state: RootState) => state.auth.user);
-  const tempUser = useSelector((state: RootState) => state.user.tempUser);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<User | null>(null);
-  const dispatch = useDispatch();
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const user = useAppSelector(state => state.auth.user);
+  const tempUser = useAppSelector(state => state.user.tempUser);
+  const dispatch = useAppDispatch();
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editedUser, setEditedUser] = React.useState<User | null>(null);
+  const [notification, setNotification] = React.useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  useEffect(() => {
+  const handleEditUser = (editedUserData: User) => {
+    dispatch(setTempUser(editedUserData));
+  };
+
+  React.useEffect(() => {
     const fetchUserData = async () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -37,26 +42,26 @@ const Profile: React.FC = () => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    console.log('Current user:', authUser);
+  React.useEffect(() => {
+    console.log('Current user:', user);
     console.log('Edited user:', editedUser);
-  }, [authUser, editedUser]);
+  }, [user, editedUser]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       dispatch(clearTempUser());
     };
   }, [dispatch]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('tempUser:', tempUser);
-    console.log('authUser:', authUser);
+    console.log('authUser:', user);
     if (tempUser) {
       setEditedUser(tempUser);
-    } else if (authUser) {
-      setEditedUser(authUser);
+    } else if (user) {
+      setEditedUser(user);
     }
-  }, [tempUser, authUser]);
+  }, [tempUser, user]);
 
   if (!editedUser) {
     return <LoadingSpinner />;
@@ -114,10 +119,12 @@ const Profile: React.FC = () => {
         {notification && (
           <NotificationMessage type={notification.type} message={notification.message} />
         )}
+        <AnimationSection>
         <div className="flex items-center justify-center mb-6">
-          <FaUserCheck className="text-[22px] mr-3 text-purple-900" />
+          <FaUserCheck className="text-[22px] mr-3 text-purple-900" />     
           <TitleGradient>User Profile</TitleGradient>
         </div>
+        </AnimationSection>
         <div className="flex flex-col items-center mb-6">
           <div className="relative w-32 h-32">
             <img 
@@ -132,7 +139,10 @@ const Profile: React.FC = () => {
         </div>
         <div className="space-y-4">
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Name</label>
+            
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <TextAnimation text="Name" />
+              </label>
             <input
               type="text"
               name="name"
@@ -143,7 +153,9 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Email</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <TextAnimation text="Email" />
+              </label>
             <input
               type="email"
               name="email"
@@ -154,16 +166,20 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">User ID</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              <TextAnimation text="User ID" />
+              </label>
             <input
               type="text"
-              value={authUser.id}
+              value={user?.id || ''}
               readOnly
               className="p-2 border border-gray-300 rounded-md bg-gray-100 transition-all duration-300 ease-in-out hover:bg-gray-200"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Password</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              <TextAnimation text="Password" />
+              </label>
             <input
               type="password"
               value="********"
@@ -172,7 +188,9 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Phone Number</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              <TextAnimation text="Phone Number" />
+              </label>
             <input
               type="text"
               name="phoneNumber"
@@ -187,8 +205,8 @@ const Profile: React.FC = () => {
           <button
             onClick={() => {
               setIsEditing(!isEditing);
-              if (!isEditing) {
-                setEditedUser(authUser);
+              if (!isEditing && user) {
+                setEditedUser(user);
               }
             }}
             className={`flex items-center px-4 py-2 text-white rounded-md transition-all duration-500 ease-in-out bg-gradient-to-r ${

@@ -10,9 +10,10 @@ import { notification } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from "./auth.module.css"
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/store'; 
 import { calculateTokenExpiration } from '../../utils/tokenUtils'; // Updated path
+import { useAppDispatch } from '../../redux/hooks';
+import { setUser as setUserSlice, setStatus } from '../../redux/slices/authSlice';
+import TextAnimation from '../../components/ui/TextAnimation';
 
 interface GoogleLoginResponse {
   success: boolean;
@@ -35,7 +36,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -99,6 +100,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    dispatch(setStatus('loading'));
 
     const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
     const password = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
@@ -110,6 +112,7 @@ const Login: React.FC = () => {
         duration: 4,
       });
       setIsLoading(false);
+      dispatch(setStatus('failed'));
       return;
     }
 
@@ -127,16 +130,12 @@ const Login: React.FC = () => {
       
       const userData = response.data.content;
       
-      // Dispatch action to save user information in Redux store
-      dispatch(setUser({
+      dispatch(setUserSlice({
         ...userData,
-        userId: +userData.id,
-        tokenExpiration: calculateTokenExpiration(+userData.accessToken).getTime()
+        userId: 0, // Add a default value for userId
+        tokenExpiration: calculateTokenExpiration(userData.accessToken)
       }));
-      // Save token to localStorage
       localStorage.setItem('authToken', userData.accessToken);
-      
-      // Save user information to localStorage
       localStorage.setItem('user', JSON.stringify(userData));
 
       notification.success({
@@ -146,6 +145,7 @@ const Login: React.FC = () => {
       });
       navigate("/project");
     } catch (error) {
+      dispatch(setStatus('failed'));
       notification.error({
         message: "Login failed!",
         description: error instanceof Error ? error.message : "An error occurred",
@@ -170,17 +170,13 @@ const Login: React.FC = () => {
                 alt="Logo"
                 className={`${isMobile ? 'w-44 mb-4' : 'w-40 sm:w-52 md:w-60 lg:w-80'} h-auto object-contain ${isMobile ? '' : 'mb-4 md:mb-0 md:mr-4'}`}
               />
-              <h2 className={`text-gray-200 ${isMobile ? 'text-3xl' : 'text-3xl md:text-5xl lg:text-6xl'} text-center font-semibold`}>
-                Software
-              </h2>
+              <TextAnimation text="Software" className={`text-gray-200 ${isMobile ? 'text-3xl' : 'text-3xl md:text-5xl lg:text-6xl'} text-center font-semibold`} />
             </div>
           </div>
         </Reveal>
         <div className={`flex flex-col p-6 bg-opacity-70 backdrop-blur-lg rounded-lg shadow-2xl w-full ${isMobile ? 'max-w-md' : 'max-w-md'} z-50 bg-[gray]/5 ${isMobile ? 'mt-8' : ''}`}>
           <div className="flex flex-col">
-            <h2 className="text-2xl font-semibold text-gray-200 mb-4 text-center">
-              Login
-            </h2>
+            <TextAnimation text="Login" className="text-2xl font-semibold text-gray-200 mb-4 text-center" />
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
@@ -263,10 +259,8 @@ const Login: React.FC = () => {
             </form>
             <div className="mt-4 text-center">
               <Link to="/register" className="text-gray-400 text-sm">
-                {/* Bạn chưa có tài khoản? */}
                 Don't have an account?{" "}
                 <span className="text-orange-400 hover:underline">
-                  {/* Nhấn vào đây để đăng ký */}
                   Click here to register
                 </span>
               </Link>

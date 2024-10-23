@@ -9,6 +9,8 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
 import { FaPlus } from 'react-icons/fa';
+import AnimationSection from '../../components/ui/AnimationSection';
+import TextAnimation from '../../components/ui/TextAnimation';
 
 interface ProjectData {
   projectName: string;
@@ -21,6 +23,7 @@ interface Category {
   id: number;
   projectCategoryName: string;
 }
+
 
 const CreateProject: React.FC = () => {
   const navigate = useNavigate();
@@ -42,7 +45,11 @@ const CreateProject: React.FC = () => {
   const isDesktop = useMediaQuery({ minWidth: 1024 });
 
   useEffect(() => {
-    fetchCategories();
+    const timer = setTimeout(() => {
+      fetchCategories();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchCategories = async () => {
@@ -136,14 +143,18 @@ const CreateProject: React.FC = () => {
   return (
     <Reveal>
       <div style={containerStyle}>
+        <AnimationSection>
         <div className='flex justify-center items-center mb-6' style={{ marginTop: '50px' }}>
           <FaPlus className="text-3xl mr-3 text-purple-800 border-2 border-purple-800 rounded-full p-1" />
           <TitleGradient>Create Project</TitleGradient>
         </div>
+        </AnimationSection>
         {error && <p style={{ color: 'red', marginBottom: '12px' }}>{error}</p>}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <div style={sectionStyle}>
-            <label htmlFor="projectName" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Project Name</label>
+            <label htmlFor="projectName" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              <TextAnimation text='Project Name' />
+            </label>
             <input
               type="text"
               id="projectName"
@@ -155,7 +166,9 @@ const CreateProject: React.FC = () => {
             />
           </div>
           <div style={sectionStyle}>
-            <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Description</label>
+            <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+            <TextAnimation text='Description' />
+            </label>
             <Editor
               apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
               init={{
@@ -177,7 +190,9 @@ const CreateProject: React.FC = () => {
           </div>
 
           <div style={sectionStyle}>
-            <label htmlFor="categoryId" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Project Category</label>
+            <label htmlFor="categoryId" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              <TextAnimation text='Project Category' />
+            </label>
             <select
               id="categoryId"
               name="categoryId"
@@ -186,7 +201,9 @@ const CreateProject: React.FC = () => {
               required
               style={inputStyle}
             >
-              <option value="">Select category</option>
+              <option value="">
+                <TextAnimation text='Select category' />
+              </option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.projectCategoryName}
@@ -196,7 +213,9 @@ const CreateProject: React.FC = () => {
           </div>
 
           <div style={sectionStyle}>
-            <label htmlFor="alias" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Alias</label>
+            <label htmlFor="alias" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              <TextAnimation text='Alias' />
+            </label>
             <input
               type="text"
               id="alias"

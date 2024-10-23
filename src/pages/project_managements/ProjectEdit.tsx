@@ -8,6 +8,8 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Reveal from '../../components/Reveal';
 import { FaEdit, FaSave } from 'react-icons/fa'; // Import the edit icon
+import AnimationSection from '../../components/ui/AnimationSection';
+import TextAnimation from '../../components/ui/TextAnimation';
 
 interface ProjectDetails {
   id: number;
@@ -151,14 +153,18 @@ const ProjectEdit: React.FC = () => {
             key={`${notification.type}_${notification.message}`} // Thêm key prop
           />
         )}
+        <AnimationSection>
         <div className="flex justify-center items-center mb-6">
           <FaEdit className="text-2xl mr-3 text-purple-800" />
           <TitleGradient>Edit Project</TitleGradient>
         </div>
+        </AnimationSection>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex space-x-4">
             <div className="w-3/4">
-              <label htmlFor="projectName" className="block text-md font-medium text-gray-700 mb-1">Project Name</label>
+              <label htmlFor="projectName" className="block text-md font-medium text-gray-700 mb-1">
+                <TextAnimation text='Project Name' />
+              </label>
               <input
                 type="text"
                 id="projectName"
@@ -169,7 +175,9 @@ const ProjectEdit: React.FC = () => {
               />
             </div>
             <div className="w-1/4">
-              <label htmlFor="projectId" className="block text-md font-medium text-gray-700 mb-1">Project ID</label>
+              <label htmlFor="projectId" className="block text-md font-medium text-gray-700 mb-1">
+                <TextAnimation text='Project ID' />
+              </label>
               <input
                 type="text"
                 id="projectId"
@@ -180,7 +188,9 @@ const ProjectEdit: React.FC = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="description" className="block text-md font-medium text-gray-700 mb-1">Description</label>
+            <label htmlFor="description" className="block text-md font-medium text-gray-700 mb-1">
+              <TextAnimation text='Description' />
+            </label>
             <Editor
               apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
               initialValue={project.description}
@@ -202,7 +212,9 @@ const ProjectEdit: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="categoryId" className="block text-md font-medium text-gray-700 mb-1">Category</label>
+            <label htmlFor="categoryId" className="block text-md font-medium text-gray-700 mb-1">
+              <TextAnimation text='Category' />
+            </label>
             <select
               id="categoryId"
               name="categoryId"

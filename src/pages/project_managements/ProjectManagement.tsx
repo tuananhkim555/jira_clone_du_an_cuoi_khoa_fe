@@ -12,6 +12,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import styled from 'styled-components';
 import '../../styles/pagination.css';
 import '../../styles/modal.css';
+import AnimationSection from '../../components/ui/AnimationSection';
 
 interface Project {
   id: number;
@@ -109,14 +110,16 @@ const ProjectTable = () => {
       });
       const typedResponse = response.data as { content: Project[] };
       const sortedProjects = typedResponse.content.reverse();
-      setProjects(sortedProjects);
-      setAllProjects(sortedProjects);
-      setModalFilteredProjects(sortedProjects);
-      setTotalProjects(sortedProjects.length);
+      setTimeout(() => {
+        setProjects(sortedProjects);
+        setAllProjects(sortedProjects);
+        setModalFilteredProjects(sortedProjects);
+        setTotalProjects(sortedProjects.length);
+        setIsLoading(false);
+      }, 500);
     } catch (error) {
       console.error('Error fetching projects:', error);
       setError('Failed to fetch projects. Please try again later.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -381,10 +384,11 @@ const ProjectTable = () => {
             <div className="max-h-60 max-w-52 overflow-y-auto rounded-md">
               <div className="text-white font-bold mb-2 text-center">Members</div>
               <div className="justify-around  text-gray-300 text-xs mb-2">
+                <AnimationSection>
                 <span className="m-3">ID</span>
                 <span className="m-2">Avatar</span>
                 <span className="m-2">Name</span>
-          
+                </AnimationSection>
                
               </div>
               {project.members.map((member) => (
@@ -849,10 +853,12 @@ const ProjectTable = () => {
     <Reveal>
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto mt-[30px]">
+      <AnimationSection>
         <div className="mb-[30px] flex justify-center items-center">
-          <FaProjectDiagram className="text-3xl mr-3 text-purple-800" />
-          <TitleGradient>Project Management</TitleGradient>
+            <FaProjectDiagram className="text-3xl mr-3 text-purple-800" />
+            <TitleGradient>Project Management</TitleGradient>
         </div>
+        </AnimationSection>
         {isMobile && renderMobileView()}
         {isTablet && renderTabletView()}
         {!isMobile && !isTablet && renderDesktopView()}

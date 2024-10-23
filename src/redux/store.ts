@@ -1,13 +1,12 @@
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import authReducer from './store/slices/authSlice';
-import userReducer from './store/slices/userSlice';
-import { ReactNode } from 'react';
+import authReducer from './slices/authSlice';
+import userReducer from './slices/userSlice';
 
 // Định nghĩa kiểu dữ liệu cho user
 interface User {
-  id: string; // Changed from ReactNode to string
+  id: string;
   userId: number;
   name: string;
   avatar: string;
@@ -71,16 +70,18 @@ const authSlice = createSlice({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth']
+  whitelist: ['auth', 'user']
 };
 
-const persistedReducer = persistReducer(persistConfig, authSlice.reducer);
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedUserReducer = persistReducer(persistConfig, userReducer);
+
 
 // Tạo store
 export const store = configureStore({
   reducer: {
-    auth: persistedReducer,
-    user: userReducer,
+    auth: persistedAuthReducer,
+    user: persistedUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -95,4 +96,3 @@ export const { setUser, clearUser, clearToken, checkTokenExpiration } = authSlic
 
 // Export kiểu dữ liệu cho RootState và AppDispatch
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;

@@ -7,7 +7,7 @@ import ProjectManagement from '../pages/project_managements/ProjectManagement';
 import Settings from '../pages/Settings/Settings';
 import Profile from '../pages/Profile/Profile';
 import KanbanBoard from '../pages/kaban_board/KanbanBoard';
-import NotFound from '../components/NotFound';
+import NotFound from '../pages/NotFound/NotFound';
 import Helps from '../pages/Help/Help';
 import Pages from '../pages/pages_jira/Pages';
 import ProjectEdit from '../pages/project_managements/ProjectEdit';

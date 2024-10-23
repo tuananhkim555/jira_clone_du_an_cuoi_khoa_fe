@@ -5,6 +5,8 @@ import axios from 'axios';
 import NotificationMessage from '../../components/NotificationMessage';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Reveal from '../../components/Reveal';
+import TextAnimation from '../../components/ui/TextAnimation';
+import AnimationSection from '../../components/ui/AnimationSection';
 
 const IssuesFilters = () => {
   const [formData, setFormData] = useState({
@@ -78,12 +80,13 @@ const IssuesFilters = () => {
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/2 bg-[#28004a] p-6 md:p-8 text-white">
-            <h2 className="text-2xl text-white md:text-3xl font-extrabold mb-4">Contact Support</h2>
+            <TextAnimation text="Contact Support" className="text-2xl text-white md:text-3xl font-extrabold mb-4" />
+            <AnimationSection>
             <p className="mb-4 text-purple-200 text-sm md:text-base">We are always ready to assist you. Please fill in your information, and we will contact you as soon as possible.</p>
             <div className="mt-6">
               <div className="flex items-center mb-4">
-                <FaEnvelope className="h-6 w-6 mr-2 text-purple-300" />
-                <span>tuananhkim555@gmail.com</span>
+                   <FaEnvelope className="h-6 w-6 mr-2 text-purple-300" />
+                <span>tuananhkim555@gmail.com</span>                 
               </div>
               <div className="flex items-center mb-4 cursor-pointer" onClick={showModal}>
                 <FaPhone className="h-6 w-6 mr-2 text-purple-300" />
@@ -100,6 +103,7 @@ const IssuesFilters = () => {
                 </a>
               </div>
             </div>
+            </AnimationSection>
           </div>
           <div className="w-full md:w-2/3 p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
@@ -155,7 +159,7 @@ const IssuesFilters = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full md:w-auto px-6 py-3 bg-[#31005b] text-white font-semibold rounded-md hover:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-300 shadow-lg hover:shadow-xl ${
+                  className={`w-full md:w-auto px-6 py-3 bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-700 hover:to-blue-800 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 delay-150 hover:scale-[1.02] shadow-lg hover:shadow-xl ${
                     isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >

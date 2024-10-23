@@ -15,6 +15,8 @@ import Reveal from '../../components/Reveal';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setTempUser } from '../../store/slices/userSlice';
+import AnimationSection from '../../components/ui/AnimationSection';
+import TextAnimation from '../../components/ui/TextAnimation';
 
 interface User {
   id: number;
@@ -168,98 +170,100 @@ const UserManagement = () => {
 
   return (
     <Reveal>
-    <div className="container mx-auto mt-10 px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-7xl flex justify-center mb-10">
-        <FaUserFriends className='text-3xl text-purple-900 mr-2 mt-[5px]' />
-        <TitleGradient>User Management</TitleGradient>
-      </div>
-      
-      <div className="w-full max-w-7xl flex justify-center mb-10">
-        <div className="flex flex-row items-center w-full max-w-xl relative">
-          <Input
-            addonBefore={selectBefore}
-            placeholder="Enter search term"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-grow rounded-smn"
-            suffix={
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-                className="absolute right-0 top-[-1px] bottom-0 bg-[#36004f] border-[#36004f] hover:bg-[#4b0070] focus:bg-[#36004f] rounded-l-md flex items-center justify-center custom-button custom-button-outline"
-              />
-            }
-          />
+      <div className="container mx-auto mt-10 px-6 py-10 flex flex-col items-center">
+        <AnimationSection>
+        <div className="w-full max-w-7xl flex justify-center mb-10">
+          <FaUserFriends className='text-2xl md:text-3xl lg:text-3xl text-purple-900 mr-2  lg:mr-3 md:mt-[5px] lg:mt-[5px]' />
+          <TitleGradient>User Management</TitleGradient>
         </div>
-      </div>
-
-      {users.length > 0 ? (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full max-w-7xl">
-            {currentUsers.map((user: User) => (
-              <div 
-                key={user.id} 
-                className="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg duration-300 ease-in-out transform hover:scale-105"
-              >
-                <img src={user.avatar || 'https://via.placeholder.com/150'} alt={user.name} className="w-full h-24 object-cover" />
-                <div className="p-2">
-                  <h2 
-                    className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center cursor-pointer"
-                    onClick={() => handleUserClick(user)}
-                  >
-                    <FaCircle className="text-xs mr-1 text-green-500" />
-                    {user.name}
-                  </h2>
-                  <p className="text-[#36004f] text-xs mb-1 truncate">
-                    <i className="fas fa-envelope mr-1"></i>{user.email}
-                  </p>
-                  <p className="text-gray-600 text-xs mb-1 truncate">
-                    <i className="fas fa-phone mr-1"></i>{user.phoneNumber}
-                  </p>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="text-gray-500 text-xs bg-gradient-to-r from-purple-900 to-orange-800 bg-clip-text text-transparent">ID: {user.id}</p>
-                    <button
-                      onClick={(e) => showDeleteModal(user.id, e)}
-                      className="bg-gradient-to-r from-purple-900 to-orange-700 text-white p-[3px] py-[1px] rounded-md hover:from-purple-800 hover:to-orange-600 transition duration-300"
-                    >
-                      <DeleteOutlined />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6">
-            <Pagination
-              current={currentPage}
-              total={users.length}
-              pageSize={usersPerPage}
-              onChange={onPageChange}
-              showSizeChanger={false}
-              className='pagination-container'
+        </AnimationSection>
+        <div className="w-full max-w-7xl flex justify-center mb-10">
+          <div className="flex flex-row items-center w-full max-w-xl relative">
+            <Input
+              addonBefore={selectBefore}
+              placeholder="Enter search term"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-grow rounded-smn"
+              suffix={
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={handleSearch}
+                  className="absolute right-0 top-[-1px] bottom-0 bg-[#36004f] border-[#36004f] hover:bg-[#4b0070] focus:bg-[#36004f] rounded-l-md flex items-center justify-center custom-button custom-button-outline"
+                />
+              }
             />
           </div>
-        </>
-      ) : (
-        <div className="text-center text-gray-600">No users found.</div>
-      )}
-      
-      <Modal
-        title="Confirm Delete"
-        visible={isModalVisible}
-        onOk={handleDeleteUser}
-        onCancel={() => setIsModalVisible(false)}
-        okText="Yes"
-        cancelText="No"
-        centered
-        okButtonProps={{ 
-          className: 'bg-purple-900 text-white hover:bg-purple-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-opacity-50 modal-button modal-button-danger modal-button-secondary' 
-        }}
-      >
-        <p>Are you sure you want to delete this user?</p>
-      </Modal>
-    </div>
+        </div>
+
+        {users.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full max-w-7xl">
+              {currentUsers.map((user: User) => (
+                <div 
+                  key={user.id} 
+                  className="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <img src={user.avatar || 'https://via.placeholder.com/150'} alt={user.name} className="w-full h-24 object-cover" />
+                  <div className="p-2">
+                    <h2 
+                      className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center cursor-pointer"
+                      onClick={() => handleUserClick(user)}
+                    >
+                      <FaCircle className="text-xs mr-1 text-green-500" />
+                      <TextAnimation text={user.name} />                
+                    </h2>
+                    <p className="text-[#36004f] text-xs mb-1 truncate">
+                      <i className="fas fa-envelope mr-1"></i>    
+                        {user.email} 
+                    </p>
+                    <p className="text-gray-600 text-xs mb-1 truncate -ml-[1px]">
+                      <i className="fas fa-phone mr-1">Phone:</i>{user.phoneNumber}
+                    </p>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-gray-500 text-xs bg-gradient-to-r from-purple-900 to-orange-800 bg-clip-text text-transparent">ID: {user.id}</p>
+                      <button
+                        onClick={(e) => showDeleteModal(user.id, e)}
+                        className="bg-gradient-to-r from-purple-900 to-orange-700 text-white p-[3px] py-[1px] rounded-md hover:from-purple-800 hover:to-orange-600 transition duration-300"
+                      >
+                        <DeleteOutlined />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6">
+              <Pagination
+                current={currentPage}
+                total={users.length}
+                pageSize={usersPerPage}
+                onChange={onPageChange}
+                showSizeChanger={false}
+                className='pagination-container'
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-gray-600">No users found.</div>
+        )}
+        
+        <Modal
+          title="Confirm Delete"
+          visible={isModalVisible}
+          onOk={handleDeleteUser}
+          onCancel={() => setIsModalVisible(false)}
+          okText="Yes"
+          cancelText="No"
+          centered
+          okButtonProps={{ 
+            className: 'bg-purple-900 text-white hover:bg-purple-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-opacity-50 modal-button modal-button-danger modal-button-secondary' 
+          }}
+        >
+          <p>Are you sure you want to delete this user?</p>
+        </Modal>
+      </div>
     </Reveal>
   );
 };

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from "../redux/store.ts";
 import { clearUser, setUser } from "../redux/store.ts"; // Assuming you have a clearUser and setUser action in your store
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
+import AvatarPage from "../assets/anhdaidien2.jpg"
 
 interface SidebarProps {
   onMenuClick: React.Dispatch<React.SetStateAction<string>>;
@@ -122,7 +123,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
       <aside className={`h-screen fixed top-0 left-0 z-30 transition-all duration-300 ease-in-out ${
         window.innerWidth >= 750 ? 'translate-x-0' : isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       } ${expanded ? 'w-64' : 'w-20'} lg:ml-[65px] pt-[60px] lg:pt-0`}>
-        <nav className="h-full flex flex-col bg-gray-100 border-r shadow-sm">
+        <nav className="h-full flex flex-col bg-gray-50 border-r shadow-xl rounded-r-3xl">
           <div className="p-4 pb-2 flex justify-between items-center">
             <img
               src={LogoAva}
@@ -140,6 +141,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
+            
             <ul className="flex-1 px-3 pt-10">
               <SidebarItem icon={<FaTrello />} text="Kanban Board" active={activeMenu === "kanban"} onClick={() => handleMenuClick("kanban")} />
               <SidebarItem icon={<FaPlus />} text="Create Projects" active={activeMenu === "create-projects"} onClick={() => handleMenuClick("create-projects")} />
@@ -152,6 +154,12 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
               
               <SidebarItem icon={<FaUser />} text="Profile" active={activeMenu === "profile"} onClick={() => handleMenuClick("profile")} />
               <SidebarItem icon={<FaUserFriends />} text="Users Managements" active={activeMenu === "user-management"} onClick={() => handleMenuClick("user-management")} />
+              
+              {/* Add a horizontal line with margin */}
+              <li className="my-4">
+                <hr className="border-gray-300" />
+              </li>
+              
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
               <SidebarItem icon={<FaExclamationCircle />} text="Help" active={activeMenu === "help"} onClick={() => handleMenuClick("help")} />
               <SidebarItem icon={<FaCogs />} text="Settings" active={activeMenu === "settings"} onClick={() => handleMenuClick("settings")} />
@@ -160,9 +168,16 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
 
           <div className="border-t flex p-3">
             <img
-              src={user?.avatar || "https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"}
+              src={AvatarPage}
               alt=""
-              className="w-10 h-10 rounded-md"
+              className="w-12 h-12 rounded-full object-cover"
+              style={{
+                border: '3px solid transparent',
+                backgroundImage: 'linear-gradient(white, white), linear-gradient(to right, #4C1D95, #9A3412)',
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'content-box, border-box',
+                borderRadius: '50%',
+              }}
             />
             <div
               className={`
@@ -217,7 +232,7 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
       </span>
       {alert && (
         <div
-          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+          className={`absolute right-2 w-3 h-2 rounded bg-purple-900 ${
             expanded ? "" : "top-2"
           }`}
         />

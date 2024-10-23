@@ -7,8 +7,8 @@ import ClientRoute from './clinentRoute';
 
 const MainLayout = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/';
+ 
   return (
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
       {!isAuthPage && (

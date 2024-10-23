@@ -6,18 +6,23 @@ import project4 from "../../assets/FigmaMovie.png";
 import project5 from "../../assets/Samarblog.png";
 import project6 from "../../assets/aiportfolio2.png";
 import { AiOutlineGithub, AiOutlineProject } from "react-icons/ai";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import Reveal from "../../components/Reveal";
 import TitleGradient from "../../components/ui/TitleGradient";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import LoadingSniper from '../../components/LoadingSpinner';
-import { Pagination, Input } from 'antd';
+import { Pagination, Input, Modal } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../../styles/pagination.css';
-import { Modal } from 'antd';
 import UploadProject from './UploadProject';
+import axios from 'axios';
+import { getAdminStatus } from '../../utils/Admin';
+import NotificationMessage from '../../components/NotificationMessage';
+import AnimationSection from '../../components/ui/AnimationSection';
+import TextAnimation from "../../components/ui/TextAnimation";
 
 interface Project {
+  id?: number;
   img: string;
   title: string;
   description: string;
@@ -29,6 +34,7 @@ interface Project {
 
 const initialProjects: Project[] = [
   {
+    id: 1,
     img: project1,
     title: "Project #1",
     description: "This is a UI project for a movie streaming website, built using React.js.",
@@ -38,6 +44,7 @@ const initialProjects: Project[] = [
     },
   },
   {
+    id: 2,
     img: project2,
     title: "Project #2",
     description: "This is an e-commerce shop interface built with a fullstack approach using Next.js.",
@@ -47,6 +54,7 @@ const initialProjects: Project[] = [
     },
   },
   {
+    id: 3,
     img: project3,
     title: "Project #3",
     description: "UI Imouz for frontend development using HTML, CSS, JS",
@@ -56,6 +64,7 @@ const initialProjects: Project[] = [
     },
   },
   {
+    id: 4,
     img: project4,
     title: "Figma #1",
     description: "UI for Figma Design Project",
@@ -65,6 +74,7 @@ const initialProjects: Project[] = [
     },
   },
   {
+    id: 5,
     img: project5,
     title: "Project #5",
     description: "UI for frontend development using HTML, CSS, JS.",
@@ -74,6 +84,7 @@ const initialProjects: Project[] = [
     },
   },
   {
+    id: 6,
     img: project6,
     title: "Project #6",
     description: "UI for frontend development using ReactJS.",
@@ -93,14 +104,26 @@ const Portfolio = () => {
   const [totalProjects, setTotalProjects] = useState(initialProjects.length);
   const projectsPerPage = 4;
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, []);
+
+  const callapi = useCallback(async () => {
+    const result = await axios.get(`http://localhost:3069/get-data`)
+    console.log(result.data);
+  }, []);
+
+  useEffect(() => {
+    callapi();
+  }, [callapi])
 
   useEffect(() => {
     const filtered = projects.filter(project =>
@@ -120,6 +143,8 @@ const Portfolio = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    // Remove the error notification when changing pages
+    setNotification(null);
   };
 
   const showUploadModal = () => {
@@ -137,13 +162,48 @@ const Portfolio = () => {
     setIsUploadModalVisible(false);
   };
 
+  const showDeleteConfirmModal = (id: number | undefined) => {
+    if (!id) return;
+    if (!getAdminStatus()) {
+      setNotification({ type: 'error', message: 'You do not have permission to delete projects.' });
+      return;
+    }
+    setProjectToDelete(id);
+    setIsDeleteModalVisible(true);
+    // Remove the error notification when showing delete modal
+    setNotification(null);
+  };
+
+  const handleDelete = async () => {
+    if (!projectToDelete) return;
+
+    try {
+      await axios.delete(`http://your-api-endpoint/projects/${projectToDelete}`);
+      const updatedProjects = projects.filter(project => project.id !== projectToDelete);
+      setProjects(updatedProjects);
+      setFilteredProjects(updatedProjects);
+      setTotalProjects(totalProjects - 1);
+      setNotification({ type: 'success', message: 'Project deleted successfully.' });
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      setNotification({ type: 'error', message: 'Unable to delete project. Please try again.' });
+    }
+    setIsDeleteModalVisible(false);
+    setProjectToDelete(undefined);
+  };
+
   return (
-    <div className="max-w-[1100px] mx-auto p-4 md:my-16 overflow-x-hidden overflow-y-hidden" id="portfolio">
+    <div className="max-w-[1000px] mx-auto p-4 md:my-16 overflow-x-hidden overflow-y-hidden" id="portfolio">
+      {notification && (
+        <NotificationMessage type={notification.type} message={notification.message} />
+      )}
       <div className="flex items-center mb-6 justify-between">
+        <AnimationSection>
         <div className="flex items-center">
-          <AiOutlineProject className="text-2xl text-purple-800 mr-2" />
-          <TitleGradient>Pages Deploy</TitleGradient>
+          <AiOutlineProject className="text-3xl text-purple-800 mr-2" />
+          <TitleGradient>Deploy</TitleGradient>
         </div>
+        </AnimationSection>
         <div className="flex items-center">
           <Input
             placeholder="Search projects"
@@ -164,29 +224,32 @@ const Portfolio = () => {
             className="ml-2 p-2 bg-[#31004c] rounded-full cursor-pointer flex items-center"
             onClick={showUploadModal}
           >
-            <FaPlus className="text-white mr-1" />
-            <span className="text-white text-xs">Upload</span>
+            <FaPlus className="text-white mr-1 text-lg" />
+            <span className="text-white text-sm">Upload</span>
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {currentProjects.map((project, index) => (
-          <Reveal key={index}>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 md:h-auto h-[400px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+        {currentProjects.map((project) => (
+          <Reveal key={project.id}>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 h-[280px] relative">
               <img
                 src={project.img}
                 alt={project.title}
-                className="w-full h-48 md:h-40 object-cover"
+                className="w-full h-40 object-cover"
               />
-              <div className="p-3">
-                <h3 className="text-lg font-semibold text-gray-600 mb-1">
-                  {project.title}
-                </h3>
-                <p className="text-gray-600 mb-2 text-xs">{project.description}</p>
+              <div className="p-3 h-[56px] flex flex-col justify-between">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-600 mb-1 truncate">
+                    <TextAnimation text={project.title} />
+                  </h3>
+                  <p className="text-gray-600 mb-1 text-sm line-clamp-2">{project.description}
+                  </p> 
+                </div>
                 <div className="flex space-x-2 items-center">
                   <a
                     href={project.links.site}
-                    className="px-2 py-1 bg-[#31004c] text-gray-200 rounded text-xs hover:bg-purple-900 transition duration-300"
+                    className="px-3 py-1 bg-[#31004c] text-gray-200 rounded text-sm hover:bg-purple-900 transition duration-300"
                   >
                     View Site
                   </a>
@@ -198,6 +261,14 @@ const Portfolio = () => {
                   </a>
                 </div>
               </div>
+              {getAdminStatus() && (
+                <button
+                  onClick={() => showDeleteConfirmModal(project.id)}
+                  className="absolute bottom-3 right-3 p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition duration-300"
+                >
+                  <FaTrash size={14} />
+                </button>
+              )}
             </div>
           </Reveal>
         ))}
@@ -218,6 +289,20 @@ const Portfolio = () => {
         footer={null}
       >
         <UploadProject onClose={handleUploadModalCancel} onSubmit={handleProjectSubmit} />
+      </Modal>
+      <Modal
+        title="Confirm Deletion"
+        visible={isDeleteModalVisible}
+        onOk={handleDelete}
+        onCancel={() => {
+          setIsDeleteModalVisible(false);
+          // Remove the error notification when canceling delete
+          setNotification(null);
+        }}
+        okButtonProps={{ className: 'custom-button-outline' }}
+        cancelButtonProps={{ className: 'custom-button-outline' }}
+      >
+        <p>Are you sure you want to delete this project?</p>
       </Modal>
     </div>
   );
