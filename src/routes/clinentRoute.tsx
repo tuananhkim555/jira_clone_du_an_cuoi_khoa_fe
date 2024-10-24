@@ -9,7 +9,7 @@ import Profile from '../pages/Profile/Profile';
 import JiraBoard from '../pages/JiraBoard/JiraBoard';
 import NotFound from '../pages/NotFound/NotFound';
 import Helps from '../pages/Help/Help';
-import Pages from '../pages/pages_jira/Pages';
+import Pages from '../pages/PagesDeploy/Pages';
 import ProjectEdit from '../pages/ProjectManagemtens/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
 
