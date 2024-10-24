@@ -159,7 +159,7 @@ const IssuesFilters = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full md:w-auto px-6 py-3 bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-700 hover:to-blue-800 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 delay-150 hover:scale-[1.02] shadow-lg hover:shadow-xl ${
+                  className={`w-full md:w-auto px-6 py-3 bg-gradient-to-r from-purple-900 to-orange-800 hover:from-purple-800 hover:to-orange-700 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 delay-150 hover:scale-[1.02] shadow-lg hover:shadow-xl ${
                     isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes } from '../../api';
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
 import { FaLeaf, FaTiktok, FaGithub, FaFacebook } from 'react-icons/fa';
 import TextGradient from '../../components/ui/TitleGradient';
@@ -10,6 +12,7 @@ import Reveal from '../../components/Reveal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
+import CustomSelect from '../../components/CustomSelect';
 
 // Hàm tạo ID đơn giản
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -31,43 +34,64 @@ interface Project {
   projectName: string;
 }
 
+interface Status {
+  statusId: string;
+  statusName: string;
+  alias: string;
+  deleted: string;
+}
+
+interface Priority {
+  priorityId: number;
+  priority: string;
+  description: string;
+  deleted: boolean;
+  alias: string;
+}
+
+interface TaskType {
+  id: number;
+  taskType: string;
+}
+
+interface User {
+  userId: string;
+  name: string;
+  avatar: string;
+  email: string;
+  phoneNumber: string;
+}
+
 const initialColumns: { [key: string]: Column } = {
   todo: {
-    id: 'todo',
-    title: 'To Do',
-    tasks: [
-      { id: generateId(), content: 'Task 1' },
-      { id: generateId(), content: 'Task 2' },
-    ],
+    id: 'backlog',
+    title: 'BACKLOG',
+    tasks: [],
     color: 'bg-[#300053]',
   },
   inProgress: {
-    id: 'inProgress',
-    title: 'In Progress',
-    tasks: [
-      { id: generateId(), content: 'Task 3' },
-    ],
+    id: 'selectedForDevelopment',
+    title: 'SELECTED FOR DEVELOPMENT',
+    tasks: [],
     color: 'from-[#320053] to-purple-950',
   },
   review: {
-    id: 'review',
-    title: 'Review',
-    tasks: [
-      { id: generateId(), content: 'Task 4' },
-    ],
+    id: 'inProgress',
+    title: 'IN PROGRESS',
+    tasks: [],
     color: 'from-purple-950 to-orange-700',
   },
   done: {
     id: 'done',
-    title: 'Done',
-    tasks: [
-      { id: generateId(), content: 'Task 5' },
-    ],
+    title: 'DONE',
+    tasks: [],
     color: 'from-orange-700 to-orange-900',
   },
 };
 
 const JiraBoard: React.FC = () => {
+  const { id: projectId } = useParams<{ id: string }>();
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [columns, setColumns] = useState(initialColumns);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -77,12 +101,28 @@ const JiraBoard: React.FC = () => {
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [projectCategories, setProjectCategories] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [statuses, setStatuses] = useState<Status[]>([]);
+  const [priorities, setPriorities] = useState<Priority[]>([]);
+  const [taskName, setTaskName] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedTaskType, setSelectedTaskType] = useState<string>('');
+  const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
+  const [originalEstimate, setOriginalEstimate] = useState(0);
+  const [taskTypes, setTaskTypes] = useState<TaskType[]>([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('https://jiranew.cybersoft.edu.vn/api/Project/getAllProject');
-        setProjects(response.data.content);
+        const response = await getAllProjects();
+        if (response.data && Array.isArray(response.data.content)) {
+          setProjects(response.data.content);
+          console.log('Fetched projects:', response.data.content);
+        } else {
+          console.error('Invalid response format for projects');
+        }
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
@@ -90,6 +130,70 @@ const JiraBoard: React.FC = () => {
 
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    const fetchProjectDetails = async () => {
+      if (projectId) {
+        try {
+          const response = await getProjectById(projectId);
+          if (response.data && response.data.content) {
+            setCurrentProject(response.data.content);
+            console.log('Fetched current project:', response.data.content);
+          } else {
+            console.error('Invalid response format for project details');
+          }
+        } catch (error) {
+          console.error('Error fetching project details:', error);
+        }
+      }
+    };
+
+    fetchProjectDetails();
+  }, [projectId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Fetching data...');
+        const [categoriesResponse, usersResponse, statusesResponse, prioritiesResponse, taskTypesResponse] = await Promise.all([
+          getProjectCategories(),
+          getAllUsers(),
+          getAllStatuses(),
+          getAllPriorities(),
+          getAllTaskTypes()
+        ]);
+        
+        if (categoriesResponse.data && Array.isArray(categoriesResponse.data.content)) {
+          setProjectCategories(categoriesResponse.data.content);
+        }
+        if (usersResponse.data && Array.isArray(usersResponse.data.content)) {
+          setAllUsers(usersResponse.data.content);
+          console.log('Users set:', usersResponse.data.content);
+        }
+        if (statusesResponse.data && Array.isArray(statusesResponse.data.content)) {
+          setStatuses(statusesResponse.data.content);
+          console.log('Statuses set:', statusesResponse.data.content);
+        }
+        if (prioritiesResponse.data && Array.isArray(prioritiesResponse.data.content)) {
+          setPriorities(prioritiesResponse.data.content);
+          console.log('Priorities set:', prioritiesResponse.data.content);
+        }
+        if (taskTypesResponse.data && Array.isArray(taskTypesResponse.data.content)) {
+          setTaskTypes(taskTypesResponse.data.content);
+          console.log('Task types set:', taskTypesResponse.data.content);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log('Current statuses:', statuses);
+    console.log('Current priorities:', priorities);
+  }, [statuses, priorities]);
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -144,6 +248,8 @@ const JiraBoard: React.FC = () => {
   };
 
   const showModal = () => {
+    console.log('Showing modal');
+    console.log('Current statuses:', statuses);
     setIsModalVisible(true);
   };
 
@@ -151,9 +257,51 @@ const JiraBoard: React.FC = () => {
     setIsModalVisible(false);
   };
 
-  const handleCreate = () => {
-    setIsModalVisible(false);
-    // Xử lý logic khi người dùng nhấn Create
+  const handleCreate = async () => {
+    if (!currentProject) return;
+
+    const taskData = {
+      listUserAsign: selectedAssignees,
+      taskName: taskName,
+      description: description,
+      statusId: selectedStatus,
+      originalEstimate: originalEstimate,
+      timeTrackingSpent: loggedHours,
+      timeTrackingRemaining: remainingHours,
+      projectId: currentProject.id,
+      typeId: parseInt(selectedTaskType),
+      priorityId: priorities.find(p => p.priority === selectedPriority)?.priorityId || 0,
+    };
+
+    try {
+      const response = await createTask(taskData);
+      if (response.data && response.data.content) {
+        const newTask = {
+          id: response.data.content.taskId,
+          content: response.data.content.taskName
+        };
+        
+        // Add the new task to the appropriate column
+        const updatedColumns = { ...columns };
+        const targetColumn = updatedColumns[selectedStatus] || updatedColumns.todo;
+        targetColumn.tasks.push(newTask);
+        
+        setColumns(updatedColumns);
+        setIsModalVisible(false);
+        // Reset form fields
+        setTaskName('');
+        setDescription('');
+        setSelectedStatus('');
+        setSelectedPriority('');
+        setSelectedTaskType('');
+        setSelectedAssignees([]);
+        setOriginalEstimate(0);
+        setLoggedHours(0);
+        setRemainingHours(0);
+      }
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
   };
 
   const handleTimeTrackingChange = (value: number) => {
@@ -186,12 +334,15 @@ const JiraBoard: React.FC = () => {
     }
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleEditorChange = (content: string, editor: any) => {
     setDescription(content);
   };
 
+  console.log('Rendering JiraBoard, statuses:', statuses);
+  console.log('Rendering JiraBoard, priorities:', priorities);
+
   return (
-    <div className="min-h-screen p-3  md:p-10 mt-16 lg:mt-28 flex flex-col overflow-y-hidden">
+    <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-24 flex flex-col">
       <div className="flex-grow">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-12 lg:mb-10 text-gray-800 flex items-center justify-center">
           <AnimationSection>
@@ -223,7 +374,7 @@ const JiraBoard: React.FC = () => {
         </div>
         <Reveal>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto h-[500px] lg:h-[350px]">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto h-[500px] lg:h-[350px] overflow-x-auto">
             {Object.values(columns).map((column) => (
               <div key={column.id} className="bg-white rounded-lg shadow-md flex flex-col">
                 <h2 className={`text-base font-semibold p-2 sm:p-3 rounded-t-lg text-white bg-gradient-to-r ${column.color}`}>
@@ -276,14 +427,21 @@ const JiraBoard: React.FC = () => {
               }}
             >
               <div className="p-3 sm:p-4 flex-grow overflow-y-auto">
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Create Task</h2>
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Create Task for {currentProject?.projectName}</h2>
                 <Form layout="vertical">
                   <div className="flex space-x-3 mb-3">
                     <Form.Item
                       label="Project Name"
                       className="flex-1"
                     >
-                      <Select placeholder="Select project name">
+                      <Select 
+                        value={currentProject?.id}
+                        onChange={(value) => {
+                          const selected = projects.find(p => p.id === value);
+                          setCurrentProject(selected || null);
+                        }}
+                        disabled={!!projectId}
+                      >
                         {projects.map((project) => (
                           <Select.Option key={project.id} value={project.id}>
                             {project.projectName}
@@ -295,7 +453,11 @@ const JiraBoard: React.FC = () => {
                       label="Task Name"
                       className="flex-1"
                     >
-                      <Input placeholder="Enter task name" />
+                      <Input 
+                        placeholder="Enter task name" 
+                        value={taskName}
+                        onChange={(e) => setTaskName(e.target.value)}
+                      />
                     </Form.Item>
                   </div>
                   <div className="flex space-x-3 mb-3">
@@ -303,43 +465,55 @@ const JiraBoard: React.FC = () => {
                       label="Priority"
                       className="flex-1"
                     >
-                      <Select placeholder="Select priority">
-                        <Select.Option value="low">Low</Select.Option>
-                        <Select.Option value="medium">Medium</Select.Option>
-                        <Select.Option value="high">High</Select.Option>
-                      </Select>
+                      <CustomSelect
+                        options={priorities.map(p => ({ value: p.priority, label: p.priority }))}
+                        value={selectedPriority}
+                        onChange={(value) => setSelectedPriority(value)}
+                        placeholder="Select priority"
+                      />
                     </Form.Item>
                     <Form.Item
                       label="Task Type"
                       className="flex-1"
                     >
-                      <Select placeholder="Select task type">
-                        <Select.Option value="feature">Feature</Select.Option>
-                        <Select.Option value="bug">Bug</Select.Option>
-                        <Select.Option value="improvement">Improvement</Select.Option>
-                      </Select>
+                      <CustomSelect
+                        options={taskTypes.map(type => ({ value: type.id.toString(), label: type.taskType }))}
+                        value={selectedTaskType}
+                        onChange={(value) => setSelectedTaskType(value)}
+                        placeholder="Select task type"
+                      />
                     </Form.Item>
                   </div>
                   <Form.Item
                     label="Status"
                     className="flex-1"
                   >
-                    <Select placeholder="Select status">
-                      <Select.Option value="todo">To Do</Select.Option>
-                      <Select.Option value="inProgress">In Progress</Select.Option>
-                      <Select.Option value="review">Review</Select.Option>
-                      <Select.Option value="done">Done</Select.Option>
-                    </Select>
+                    <CustomSelect
+                      options={statuses.map(s => ({ value: s.statusId, label: s.statusName }))}
+                      value={selectedStatus}
+                      onChange={(value) => setSelectedStatus(value)}
+                      placeholder="Select status"
+                    />
                   </Form.Item>
                   <div className="flex space-x-3 mb-3">
                     <div className="flex-1 flex flex-col space-y-3">
                       <Form.Item label="Assignees">
-                        <Select placeholder="Please select" mode="multiple">
-                          {/* Add options for assignees here */}
-                        </Select>
+                        <CustomSelect
+                          options={allUsers.map(user => ({ value: user.userId, label: user.name }))}
+                          value={selectedAssignees}
+                          onChange={(values) => setSelectedAssignees(values)}
+                          placeholder="Select assignees"
+                          mode="multiple"
+                        />
                       </Form.Item>
                       <Form.Item label="Original Estimate">
-                        <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
+                        <InputNumber 
+                          min={0} 
+                          placeholder="0" 
+                          style={{ width: '100%' }} 
+                          value={originalEstimate}
+                          onChange={(value) => setOriginalEstimate(value || 0)}
+                        />
                       </Form.Item>
                     </div>
                     <div className="flex-1 flex flex-col space-y-3">
