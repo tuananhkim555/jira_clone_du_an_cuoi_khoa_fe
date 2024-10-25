@@ -1,11 +1,10 @@
 import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
 import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../redux/store.ts";
-import { clearUser, setUser } from "../redux/store.ts"; // Assuming you have a clearUser and setUser action in your store
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 import AvatarPage from "../assets/anhdaidien2.jpg"
 
@@ -18,49 +17,9 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const dispatch = useDispatch();
-  
+
   // Lấy thông tin user từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      dispatch(setUser(JSON.parse(storedUser)));
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (user && isAuthenticated) {
-      console.log("User from Redux");
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      console.log("No user data in Redux store or user is not authenticated");
-      // If user is not authenticated, redirect to login page
-    }
-  }, [user, isAuthenticated, navigate]);
-
-  useEffect(() => {
-    // Check token expiration
-    const checkTokenExpiration = () => {
-      const token = user?.accessToken;
-      if (token) {
-        // Implement your token expiration check logic here
-        // For example, you can decode the token and check its expiration time
-        // If token is expired, clear the user data
-        if (isTokenExpired(token)) {
-          dispatch(clearUser());
-          localStorage.removeItem('user');
-          navigate('/login');
-        }
-      }
-    };
-
-    const intervalId = setInterval(checkTokenExpiration, 60000); // Check every minute
-
-    return () => clearInterval(intervalId);
-  }, [user, dispatch, navigate]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -252,16 +211,4 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
       )}
     </li>
   )
-}
-
-// Helper function to check if token is expired
-function isTokenExpired(token: string): boolean {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const expirationTime = payload.exp * 1000; // Convert to milliseconds
-    return Date.now() >= expirationTime;
-  } catch (error) {
-    console.error('Error decoding token:', error);
-    return true; // Assume token is expired if there's an error
-  }
 }

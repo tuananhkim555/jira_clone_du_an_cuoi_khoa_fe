@@ -43,12 +43,13 @@ const CreateProject: React.FC = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
   const isDesktop = useMediaQuery({ minWidth: 1024 });
+  const local_token_login = (localStorage.getItem("authToken"));
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchCategories();
     }, 300);
-
+    console.log("local_token_login: ", local_token_login)
     return () => clearTimeout(timer);
   }, []);
 
@@ -57,7 +58,8 @@ const CreateProject: React.FC = () => {
       const response = await axios.get(`${API_BASE_URL}/ProjectCategory`, {
         headers: {
           TokenCybersoft: TOKEN_CYBERSOFT,
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          // Authorization: `Bearer ${ACCESS_TOKEN}`,
+          // Authorization: `Bearer ${local_token_login}`,
         },
       });
       const data = response.data as { content: Category[] };
@@ -88,7 +90,8 @@ const CreateProject: React.FC = () => {
           headers: {
             'Content-Type': 'application/json-patch+json',
             TokenCybersoft: TOKEN_CYBERSOFT,
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
+            // Authorization: `Bearer ${ACCESS_TOKEN}`,
+            Authorization: `Bearer ${local_token_login}`,
           },
         }
       );

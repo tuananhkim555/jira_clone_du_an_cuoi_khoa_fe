@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import '../../styles/pagination.css';
 import '../../styles/modal.css';
 import AnimationSection from '../../components/ui/AnimationSection';
+import { getAllPriorities, getAllStatuses } from '../../api';
 
 interface Project {
   id: number;
@@ -88,14 +89,19 @@ const ProjectTable = () => {
   const projectsPerPage = 7;
   const navigate = useNavigate();
   const addMemberRef = useRef<HTMLDivElement>(null);
+  const [priorities, setPriorities] = useState<any[]>([]);
+  const [statuses, setStatuses] = useState<any[]>([]);
 
   const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
   const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
   const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
+  const local_token_login = (localStorage.getItem("authToken"));
 
   useEffect(() => {
     fetchProjects();
     fetchUsers();
+    fetchPriorities();
+    fetchStatuses();
   }, []);
 
   const fetchProjects = async () => {
@@ -137,6 +143,24 @@ const ProjectTable = () => {
       setFilteredUsers(typedResponse.content);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchPriorities = async () => {
+    try {
+      const response = await getAllPriorities();
+      setPriorities(response.data.content);
+    } catch (error) {
+      console.error('Error fetching priorities:', error);
+    }
+  };
+
+  const fetchStatuses = async () => {
+    try {
+      const response = await getAllStatuses();
+      setStatuses(response.data.content);
+    } catch (error) {
+      console.error('Error fetching statuses:', error);
     }
   };
 
@@ -265,7 +289,7 @@ const ProjectTable = () => {
           {
             headers: {
               TokenCybersoft: TOKEN_CYBERSOFT,
-              Authorization: `Bearer ${ACCESS_TOKEN}`,
+              Authorization: `Bearer ${local_token_login}`,
             },
           }
         );
@@ -903,3 +927,4 @@ const ProjectTable = () => {
 };
 
 export default ProjectTable;
+
