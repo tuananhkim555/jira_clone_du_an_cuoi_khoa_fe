@@ -31,6 +31,8 @@ interface Project {
   projectName: string;
 }
 
+
+
 const initialColumns: { [key: string]: Column } = {
   todo: {
     id: 'todo',
@@ -82,7 +84,7 @@ const JiraBoard: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('https://jiranew.cybersoft.edu.vn/api/Project/getAllProject');
-        setProjects(response.data.content);
+        setProjects(response.data?.content);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
@@ -90,6 +92,10 @@ const JiraBoard: React.FC = () => {
 
     fetchProjects();
   }, []);
+
+  const handleChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -303,7 +309,7 @@ const JiraBoard: React.FC = () => {
                       label="Priority"
                       className="flex-1"
                     >
-                      <Select placeholder="Select priority">
+                      <Select placeholder="Select priority" onChange={handleChange}>
                         <Select.Option value="low">Low</Select.Option>
                         <Select.Option value="medium">Medium</Select.Option>
                         <Select.Option value="high">High</Select.Option>
@@ -403,6 +409,7 @@ const JiraBoard: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        
       </div>
       <footer className='mb-8 lg:mb-40'>
         <div className="max-w-6xl mx-auto px-3">
