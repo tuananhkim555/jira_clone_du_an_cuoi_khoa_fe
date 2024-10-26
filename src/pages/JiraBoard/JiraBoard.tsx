@@ -13,6 +13,8 @@ import { Editor } from '@tinymce/tinymce-react';
 import CustomSelect from '../../components/CustomSelect';
 import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import NotificationMessage from '../../components/NotificationMessage';
 
 // Hàm tạo ID đơn giản
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -120,6 +122,7 @@ const JiraBoard: React.FC = () => {
   const [originalEstimate, setOriginalEstimate] = useState(0);
   const [taskTypes, setTaskTypes] = useState<TaskType[]>([]);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -135,6 +138,11 @@ const JiraBoard: React.FC = () => {
         const details = await fetchProjectDetails(projectId);
         if (details) {
           setProjectDetails(details);
+          // Set the current project when details are loaded
+          setCurrentProject({
+            id: details.id,
+            projectName: details.projectName
+          });
           // Update columns based on project details
           const updatedColumns = details.lstTask.reduce((acc, status) => {
             acc[status.statusId] = {
@@ -176,51 +184,50 @@ const JiraBoard: React.FC = () => {
     setIsModalVisible(false);
   };
 
-  const handleCreate = async () => {
-    if (!currentProject) return;
-
-    const taskData = {
-      listUserAsign: selectedAssignees,
-      taskName: taskName,
-      description: description,
-      statusId: selectedStatus,
-      originalEstimate: originalEstimate,
-      timeTrackingSpent: loggedHours,
-      timeTrackingRemaining: remainingHours,
-      projectId: currentProject.id,
-      typeId: parseInt(selectedTaskType),
-      priorityId: parseInt(selectedPriority),
-    };
-
+  const handleCreate = async (taskData: any) => {
+    setIsLoading(true);
     try {
       const newTaskContent = await createNewTask(taskData);
       if (newTaskContent) {
-        const newTask = {
-          id: newTaskContent.taskId,
-          taskName: newTaskContent.taskName,
-          assignees: selectedAssignees.map(userId => {
-            const user = allUsers.find(u => u.userId === userId);
-            return user ? { id: user.userId, name: user.name, avatar: user.avatar } : null;
-          }).filter(Boolean),
-          priority: selectedPriority,
-          statusId: selectedStatus
-        };
-        
-        // Add the new task to the appropriate column
-        const updatedColumns = { ...columns };
-        const targetColumn = updatedColumns[selectedStatus] || updatedColumns.todo;
-        targetColumn.tasks.push(newTask);
-        
-        setColumns(updatedColumns);
+        // Instead of creating a new task object, fetch the updated project details
+        const updatedProject = await fetchProjectDetails(currentProject.id);
+        if (updatedProject) {
+          updateColumnsFromProject(updatedProject);
+        }
         setIsModalVisible(false);
-        // Reset form fields
-        resetFormFields();
+        NotificationMessage({ type: 'success', message: 'Task created successfully!' });
       }
     } catch (error) {
       console.error('Failed to create task:', error);
-      // Show an error message to the user
-      // You might want to use a notification library or state to display this error
+      // Refresh project details to ensure UI is in sync with server
+      if (currentProject) {
+        const updatedProject = await fetchProjectDetails(currentProject.id);
+        if (updatedProject) {
+          updateColumnsFromProject(updatedProject);
+        }
+      }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const updateColumnsFromProject = (project: any) => {
+    const newColumns: { [key: string]: Column } = {};
+    project.lstTask.forEach((status: any) => {
+      newColumns[status.statusId] = {
+        id: status.statusId,
+        title: status.statusName,
+        tasks: status.lstTaskDeTail.map((task: any, index: number) => ({
+          id: task.taskId || `temp-${status.statusId}-${index}`, // Use a temporary id if taskId is not available
+          taskName: task.taskName,
+          assignees: task.assigness,
+          priority: task.priorityTask?.priority,
+          statusId: status.statusId,
+        })),
+        color: getColumnColor(status.statusName)
+      };
+    });
+    setColumns(newColumns);
   };
 
   const resetFormFields = () => {
@@ -271,12 +278,13 @@ const JiraBoard: React.FC = () => {
 
   return (
     <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-12 flex flex-col shadow-lg">
+      {isLoading && <LoadingSpinner />}
       <div className="flex-grow">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-12 lg:mb-10 text-gray-800 flex items-center justify-center">
           <AnimationSection>
             <div className='flex items-center justify-center'>
               <FaLeaf className="mr-2 text-purple-800" />
-              <TextGradient>{projectDetails?.projectName || 'Project Detail'}</TextGradient>
+              <TextGradient>Project Detail</TextGradient>
             </div>
           </AnimationSection>
         </h1>
@@ -334,14 +342,9 @@ const JiraBoard: React.FC = () => {
                       label="Project Name"
                       className="flex-1"
                     >
-                      <CustomSelect 
-                        options={projects.map(p => ({ value: p.id.toString(), label: p.projectName }))}
-                        value={currentProject?.id.toString()}
-                        onChange={(value) => {
-                          const selected = projects.find(p => p.id.toString() === value);
-                          setCurrentProject(selected || null);
-                        }}
-                        disabled={!!projectId}
+                      <Input 
+                        value={currentProject?.projectName || ''}
+                        disabled
                       />
                     </Form.Item>
                     <Form.Item

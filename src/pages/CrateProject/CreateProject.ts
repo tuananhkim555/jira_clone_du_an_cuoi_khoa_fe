@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ProjectData, Category } from './typeCreate';
+import api from '../../api';
 
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
@@ -37,5 +38,15 @@ export const createProject = async (formData: ProjectData): Promise<any> => {
   } catch (error) {
     console.error('Error creating project:', error);
     throw new Error('Failed to create project. Please try again later.');
+  }
+};
+
+export const getAllProjects = async (): Promise<any[]> => {
+  try {
+    const response = await api.get('/Project/getAllProject');
+    return response.data.content;
+  } catch (error) {
+    console.error('Error fetching all projects:', error);
+    throw new Error('Failed to fetch projects. Please try again later.');
   }
 };

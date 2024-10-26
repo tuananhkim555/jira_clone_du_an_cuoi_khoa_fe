@@ -13,7 +13,7 @@ interface Task {
   // Add other task properties here
 }
 
-export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCancel: () => void, onCreate: (taskData: Task) => void) => {
+export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCancel: () => void, onCreate: (taskData: any) => void) => {
   const [form] = Form.useForm();
   const [statuses, setStatuses] = useState<any[]>([]);
   const [priorities, setPriorities] = useState<any[]>([]);
@@ -70,7 +70,7 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
       console.log('Task data being sent:', taskData);
       const response = await createTask(taskData);
       if ('data' in response && 'content' in response.data) {
-        onCreate(response.data.content as Task);
+        onCreate(response.data.content);
         onCancel();
       }
     } catch (error) {

@@ -100,6 +100,10 @@ export const createNewTask = async (taskData: any) => {
       const axiosError = error as AxiosError;
       if (axiosError.response) {
         console.error('Error creating task:', axiosError.response.data);
+        // Check if the task was actually created despite the error
+        if (axiosError.response.status === 200 || axiosError.response.status === 201) {
+          return axiosError.response.data.content;
+        }
         throw new Error((axiosError.response.data as any).message || 'Failed to create task');
       }
     }

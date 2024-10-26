@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, InputNumber, Button, Slider } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Editor } from '@tinymce/tinymce-react';
 import CustomSelect from '../../../components/CustomSelect';
 import { useCreateTaskLogic } from './CreateTaskLogic';
+import NotificationMessage from '../../../components/NotificationMessage';
 
 interface CreateTaskModalProps {
   isVisible: boolean;
@@ -18,6 +19,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onCreate,
   currentProject,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     form,
     statuses,
@@ -31,7 +34,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     handleTimeSpentChange,
     handleTimeRemainingChange,
     handleSliderChange,
-  } = useCreateTaskLogic(isVisible, currentProject, onCancel, onCreate);
+  } = useCreateTaskLogic(isVisible, currentProject, onCancel, async (newTaskData) => {
+    setIsLoading(true);
+    try {
+      await onCreate(newTaskData);
+      NotificationMessage({ type: 'success', message: 'Task created successfully!' });
+    } catch (error) {
+      console.error('Error creating task:', error);
+      NotificationMessage({ type: 'error', message: 'Failed to create task. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  });
+
 
   return (
     <AnimatePresence>
