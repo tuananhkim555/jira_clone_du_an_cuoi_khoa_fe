@@ -1,7 +1,7 @@
 const adminEmail = import.meta.env.VITE_REACT_APP_ADMIN_EMAIL;
 const adminPassword = import.meta.env.VITE_REACT_APP_ADMIN_PASSWORD;
 
-let isAdmin = false;
+let isAdmin = true;
 
 export const setAdminStatus = (email: string, password: string) => {
   if (email === adminEmail && password === adminPassword) {

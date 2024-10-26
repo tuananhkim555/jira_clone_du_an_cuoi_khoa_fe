@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Pagination, Modal, Input, Button, Select } from 'antd';
-import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NotificationMessage from '../../components/NotificationMessage';
 import '../../styles/pagination.css';
-const { Option } = Select;
 import '../../styles/modal.css';
 import '../../styles/button.css';
 import TitleGradient from '../../components/ui/TitleGradient';
-import { FaUserFriends } from 'react-icons/fa';
-import { FaCircle } from 'react-icons/fa';
+import { FaUserFriends, FaCircle } from 'react-icons/fa';
 import Reveal from '../../components/Reveal';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setTempUser } from '../../store/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTempUser } from '../../redux/slices/userSlice';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
+import { RootState } from '../../redux/store';
+import { getAllUsers, deleteUser } from '../../api';
+
+const { Option } = Select;
 
 interface User {
   id: number;
@@ -26,10 +27,9 @@ interface User {
   phoneNumber: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://jiranew.cybersoft.edu.vn/';
-
 const UserManagement = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,26 +40,23 @@ const UserManagement = () => {
   const [searchType, setSearchType] = useState('name');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/Users/getUser`, {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`,
-            TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
-            Accept: 'application/json'
-          }
-        });
-        const data = response.data as { statusCode: number; content: any[] };
-        if (data.statusCode === 200 && Array.isArray(data.content)) {
-          setUsers(data.content.map((user: any) => ({
+        const response = await getAllUsers();
+        const data = response.data;
+        if (data && data.statusCode === 200 && Array.isArray(data.content)) {
+          const formattedUsers = data.content.map((user: any) => ({
             id: user.userId,
             avatar: user.avatar,
             name: user.name,
             email: user.email,
             phoneNumber: user.phoneNumber
-          })));
+          }));
+          setAllUsers(formattedUsers);
+          setFilteredUsers(formattedUsers);
         } else {
           throw new Error('Invalid data format');
         }
@@ -84,15 +81,10 @@ const UserManagement = () => {
     if (!deleteUserId) return;
 
     try {
-      const response = await axios.delete(`${API_URL}/api/Users/deleteUser?id=${deleteUserId}`, {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`,
-          TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
-        },
-      });
+      const response = await deleteUser(deleteUserId);
 
       if (response.status === 200) {
-        setUsers(users.filter(user => user.id !== deleteUserId));
+        setFilteredUsers(filteredUsers.filter(user => user.id !== deleteUserId));
         NotificationMessage({ type: 'success', message: 'User deleted successfully' });
       } else {
         throw new Error('Failed to delete user');
@@ -110,7 +102,7 @@ const UserManagement = () => {
   };
 
   const handleSearch = () => {
-    const filteredUsers = users.filter(user => {
+    const filtered = allUsers.filter(user => {
       switch (searchType) {
         case 'name':
           return user.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -124,7 +116,7 @@ const UserManagement = () => {
           return false;
       }
     });
-    setUsers(filteredUsers);
+    setFilteredUsers(filtered);
   };
 
   const selectBefore = (
@@ -151,12 +143,13 @@ const UserManagement = () => {
   // Get current users
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   // Change page
   const onPageChange = (page: number) => setCurrentPage(page);
 
-  const handleUserClick = (user: User) => {
+  const handleEditUser = (user: User, event: React.MouseEvent) => {
+    event.stopPropagation();
     console.log('Selected user in UserManagements:', user);
     dispatch(setTempUser({
       id: user.id.toString(),
@@ -165,41 +158,46 @@ const UserManagement = () => {
       avatar: user.avatar,
       phoneNumber: user.phoneNumber
     }));
-    navigate('/profile');
+    navigate('/profile', { 
+      state: { 
+        selectedUser: user,
+        currentUser: currentUser
+      } 
+    });
   };
 
   return (
     <Reveal>
-      <div className="container mx-auto mt-10 px-6 py-10 flex flex-col items-center">
+      <div className="container mx-auto mt-4 sm:mt-6 md:mt-8 lg:mt-10 px-4 sm:px-6 py-6 sm:py-8 md:py-10 flex flex-col items-center">
         <AnimationSection>
-        <div className="w-full max-w-7xl flex justify-center mb-10">
-          <FaUserFriends className='text-2xl md:text-3xl lg:text-3xl text-purple-900 mr-2  lg:mr-3 md:mt-[5px] lg:mt-[5px]' />
-          <TitleGradient>User Management</TitleGradient>
-        </div>
+          <div className="w-full max-w-7xl flex justify-center mb-6 sm:mb-8 md:mb-10">
+            <FaUserFriends className='text-xl sm:text-2xl md:text-3xl text-purple-900 mr-2 sm:mr-3 mt-1 sm:mt-[5px]' />
+            <TitleGradient>User Management</TitleGradient>
+          </div>
         </AnimationSection>
-        <div className="w-full max-w-7xl flex justify-center mb-10">
-          <div className="flex flex-row items-center w-full max-w-xl relative">
+        <div className="w-full max-w-7xl flex justify-center mb-6 sm:mb-8 md:mb-10">
+          <div className="flex flex-col sm:flex-row items-center w-full max-w-xl relative">
             <Input
               addonBefore={selectBefore}
               placeholder="Enter search term"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow rounded-smn"
+              className="flex-grow rounded-sm mb-2 sm:mb-0 sm:mr-2"
               suffix={
                 <Button
                   type="primary"
                   icon={<SearchOutlined />}
                   onClick={handleSearch}
-                  className="absolute right-0 top-[-1px] bottom-0 bg-[#36004f] border-[#36004f] hover:bg-[#4b0070] focus:bg-[#36004f] rounded-l-md flex items-center justify-center custom-button custom-button-outline"
+                  className="absolute right-0 top-0 bottom-0 z-10 bg-[#36004f] border-[#36004f] hover:bg-[#4b0070] focus:bg-[#36004f] rounded-r-md flex items-center justify-center custom-button custom-button-outline"
                 />
               }
             />
           </div>
         </div>
 
-        {users.length > 0 ? (
+        {filteredUsers.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full max-w-7xl">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 w-full max-w-7xl">
               {currentUsers.map((user: User) => (
                 <div 
                   key={user.id} 
@@ -208,8 +206,7 @@ const UserManagement = () => {
                   <img src={user.avatar || 'https://via.placeholder.com/150'} alt={user.name} className="w-full h-24 object-cover" />
                   <div className="p-2">
                     <h2 
-                      className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center cursor-pointer"
-                      onClick={() => handleUserClick(user)}
+                      className="text-sm font-semibold mb-1 text-green-600 truncate flex items-center"
                     >
                       <FaCircle className="text-xs mr-1 text-green-500" />
                       <TextAnimation text={user.name} />                
@@ -223,12 +220,20 @@ const UserManagement = () => {
                     </p>
                     <div className="flex justify-between items-center mt-1">
                       <p className="text-gray-500 text-xs bg-gradient-to-r from-purple-900 to-orange-800 bg-clip-text text-transparent">ID: {user.id}</p>
-                      <button
-                        onClick={(e) => showDeleteModal(user.id, e)}
-                        className="bg-gradient-to-r from-purple-900 to-orange-700 text-white p-[3px] py-[1px] rounded-md hover:from-purple-800 hover:to-orange-600 transition duration-300"
-                      >
-                        <DeleteOutlined />
-                      </button>
+                      <div>
+                        <button
+                          onClick={(e) => handleEditUser(user, e)}
+                          className="bg-purple-950 text-white p-[3px] py-[1px] rounded-md hover:bg-purple-800 transition duration-300 mr-1"
+                        >
+                          <EditOutlined />
+                        </button>
+                        <button
+                          onClick={(e) => showDeleteModal(user.id, e)}
+                          className="bg-gradient-to-r from-purple-900 to-orange-700 text-white p-[3px] py-[1px] rounded-md hover:from-purple-800 hover:to-orange-600 transition duration-300"
+                        >
+                          <DeleteOutlined />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -237,7 +242,7 @@ const UserManagement = () => {
             <div className="mt-6">
               <Pagination
                 current={currentPage}
-                total={users.length}
+                total={filteredUsers.length}
                 pageSize={usersPerPage}
                 onChange={onPageChange}
                 showSizeChanger={false}
@@ -257,8 +262,9 @@ const UserManagement = () => {
           okText="Yes"
           cancelText="No"
           centered
+          className='max-w-xs sm:max-w-sm md:max-w-md mb-52 ml-52'
           okButtonProps={{ 
-            className: 'bg-purple-900 text-white hover:bg-purple-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-opacity-50 modal-button modal-button-danger modal-button-secondary' 
+            className: 'bg-purple-900 text-white hover:bg-purple-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-opacity-50 custom-button-outline' 
           }}
         >
           <p>Are you sure you want to delete this user?</p>

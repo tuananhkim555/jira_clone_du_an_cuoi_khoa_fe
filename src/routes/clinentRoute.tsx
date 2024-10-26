@@ -25,7 +25,6 @@ const ClientRoute: React.FC = () => {
       <Route path="/settings" element={<Settings />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/help" element={<Helps />} />
-      <Route path="/board" element={<JiraBoard />} />
       <Route path="/board/:id" element={<JiraBoard />} />
       <Route path="/pages" element={<Pages />} />
       <Route path="/project/edit/:id" element={<ProjectEdit />} />

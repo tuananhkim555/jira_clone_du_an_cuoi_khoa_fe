@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 interface Option {
   value: string | number;
@@ -18,35 +18,35 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
   const [searchTerm, setSearchTerm] = useState('');
   const selectRef = useRef<HTMLDivElement>(null);
 
-  const handleToggle = () => setIsOpen(!isOpen);
+  const handleToggle = useCallback(() => setIsOpen(prev => !prev), []);
 
-  const handleSelect = (selectedValue: string | number) => {
+  const handleSelect = useCallback((selectedValue: string | number) => {
     if (mode === 'single') {
       onChange(selectedValue);
       setIsOpen(false);
       setSearchTerm('');
     } else {
       const newValue = Array.isArray(value) ? value : [];
-      if (newValue.includes(selectedValue as never)) {
+      if (newValue.includes(selectedValue)) {
         onChange(newValue.filter(v => v !== selectedValue));
       } else {
         onChange([...newValue, selectedValue]);
       }
     }
-  };
+  }, [mode, onChange, value]);
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback((event: MouseEvent) => {
     if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
       setIsOpen(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [handleClickOutside]);
 
   const filteredOptions = options.filter(option =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||

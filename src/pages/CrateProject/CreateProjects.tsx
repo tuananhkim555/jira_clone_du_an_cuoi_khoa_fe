@@ -1,29 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
+import { useMediaQuery } from '@mui/material';
+import { FaPlus } from 'react-icons/fa';
+import { fetchCategories, createProject } from './CreateProject';
+import { ProjectData, Category } from './typeCreate';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { useMediaQuery } from 'react-responsive';
 import '../../index.css';
 import TitleGradient from '../../components/ui/TitleGradient';
 import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
-import { FaPlus } from 'react-icons/fa';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
-
-interface ProjectData {
-  projectName: string;
-  description: string;
-  categoryId: number;
-  alias: string;
-}
-
-interface Category {
-  id: number;
-  projectCategoryName: string;
-}
-
 
 const CreateProject: React.FC = () => {
   const navigate = useNavigate();
@@ -36,34 +24,22 @@ const CreateProject: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
-
-  const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
-  const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
-  const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
-  const isMobile = useMediaQuery({ maxWidth: 767 });
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
-  const isDesktop = useMediaQuery({ minWidth: 1024 });
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(max-width:900px)');
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchCategories();
+      fetchCategoriesData();
     }, 300);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategoriesData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/ProjectCategory`, {
-        headers: {
-          TokenCybersoft: TOKEN_CYBERSOFT,
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-        },
-      });
-      const data = response.data as { content: Category[] };
-      setCategories(data.content);
+      const data = await fetchCategories();
+      setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
       setError('Failed to fetch categories. Please try again later.');
     } finally {
       setIsLoading(false);
@@ -81,23 +57,10 @@ const CreateProject: React.FC = () => {
     setError('');
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/Project/createProjectAuthorize`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json-patch+json',
-            TokenCybersoft: TOKEN_CYBERSOFT,
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        console.log('Dự án đã được tạo thành công:', response.data);
-        NotificationMessage({ type: 'success', message: 'Dự án đã được tạo thành công!' });
-        navigate('/project', { state: { refresh: true } });
-      }
+      const response = await createProject(formData);
+      console.log('Dự án đã được tạo thành công:', response);
+      NotificationMessage({ type: 'success', message: 'Dự án đã được tạo thành công!' });
+      navigate('/project', { state: { refresh: true } });
     } catch (error) {
       console.error('Lỗi khi tạo dự án:', error);
       NotificationMessage({ type: 'error', message: 'Có lỗi xảy ra khi tạo dự án. Vui lòng thử lại.' });
@@ -113,12 +76,6 @@ const CreateProject: React.FC = () => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-
-  const containerStyle = {
-    width: isMobile ? '100%' : isTablet ? '85%' : '900px',
-    margin: '0 auto',
-    padding: isMobile ? '12px' : '24px 0',
-  };
 
   const inputStyle = {
     width: '100%',
@@ -142,9 +99,9 @@ const CreateProject: React.FC = () => {
 
   return (
     <Reveal>
-      <div style={containerStyle}>
+      <div className={`container mx-auto ${isMobile ? 'px-4' : 'px-8'}`} style={{ maxWidth: '1000px' }}>
         <AnimationSection>
-        <div className='flex justify-center items-center mb-6' style={{ marginTop: '50px' }}>
+        <div className='flex justify-center items-center mb-6' style={{ marginTop: '80px' }}>
           <FaPlus className="text-3xl mr-3 text-purple-800 border-2 border-purple-800 rounded-full p-1" />
           <TitleGradient>Create Project</TitleGradient>
         </div>
@@ -182,7 +139,10 @@ const CreateProject: React.FC = () => {
                 toolbar: isMobile
                   ? 'undo redo | bold italic | bullist numlist'
                   : 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                width: '100%',
+                maxWidth: '100%',
+                resize: false
               }}
               onEditorChange={handleEditorChange}
               value={formData.description}

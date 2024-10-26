@@ -2,15 +2,23 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
-const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
+const local_token_login = (localStorage.getItem("authToken"));
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     TokenCybersoft: TOKEN_CYBERSOFT,
-    Authorization: `Bearer ${ACCESS_TOKEN}`,
+    Authorization: `Bearer ${local_token_login}`,
   },
 });
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API error:', error);
+    return Promise.reject(error);
+  }
+);
 
 export const getProjectById = (projectId: string) => {
   return api.get(`/Project/getProjectDetail?id=${projectId}`);
@@ -24,28 +32,52 @@ export const getProjectCategories = () => {
   return api.get('/ProjectCategory');
 };
 
-export const getAllUsers = () => {
-  return api.get('/Users/getUser');
-};
-
-export const createTask = (taskData: any) => {
-  return api.post('/Project/createTask', taskData);
-};
-
 export const getAllStatuses = () => {
-  return api.get('/Status/getAll');
+  console.log('Fetching statuses...');
+  return api.get('/Status/getAll').then(response => {
+    console.log('Statuses response:', response);
+    return response;
+  });
 };
 
 export const getAllPriorities = () => {
-  return api.get('/Priority/getAll');
+  console.log('Fetching priorities...');
+  return api.get('/Priority/getAll').then(response => {
+    console.log('Priorities response:', response);
+    return response;
+  });
 };
 
 export const getAllTaskTypes = () => {
-  return api.get('/TaskType/getAll');
+  console.log('Fetching task types...');
+  return api.get('/TaskType/getAll').then(response => {
+    console.log('Task Types response:', response);
+    return response;
+  });
 };
 
 export const assignUserTask = (taskId: number, userId: number) => {
   return api.post('/Project/assignUserTask', { taskId, userId });
+};
+
+export const deleteUser = (userId: number) => {
+  return api.delete(`/Users/deleteUser?id=${userId}`);
+};
+
+export const editUser = (userData: any) => {
+  return api.put('/Users/editUser', userData);
+};
+
+export const getAllUsers = () => {
+  console.log('Fetching users...');
+  return api.get('/Users/getUser').then(response => {
+    console.log('Users response:', response);
+    return response;
+  });
+};
+
+export const createTask = (taskData: any) => {
+  return api.post('/Project/createTask', taskData);
 };
 
 export default api;

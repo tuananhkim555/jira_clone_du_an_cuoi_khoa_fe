@@ -82,7 +82,7 @@ const Settings = () => {
             </div>
 
             <div className="mt-8">
-              <button className="w-full md:w-auto px-4 py-3 flex items-center justify-center bg-gradient-to-r from-purple-900 to-orange-800 text-white rounded-lg hover:from-purple-800 hover:to-orange-700 text-lg font-semibold transition-all duration-500 ease-in-out hover:scale-105">
+              <button className="w-full md:w-auto px-4 py-3 flex items-center justify-center bg-gradient-to-r from-purple-900 to-orange-800 text-white rounded-lg hover:from-purple-800 hover:to-orange-700 text-md font-semibold transition-all duration-500 ease-in-out hover:scale-105">
                 <FaSave className="mr-3" />
                 Save Changes
               </button>

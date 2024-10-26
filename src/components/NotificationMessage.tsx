@@ -6,7 +6,7 @@ interface NotificationProps {
   duration?: number;
 }
 
-const NotificationMessage: React.FC<NotificationProps> = ({ type, message, duration = 4 }) => {
+const NotificationMessage: React.FC<NotificationProps> = ({ type, message, duration = 2 }) => {
   notification[type]({
     message,
     placement: "topRight",

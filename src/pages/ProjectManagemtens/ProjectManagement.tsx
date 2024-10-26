@@ -181,9 +181,9 @@ const ProjectTable = () => {
       icon: <ExclamationCircleOutlined />,
       content: 'This action cannot be undone.',
       okText: 'Yes',
-      okButtonProps: { className: 'modal-button modal-button-danger' },
+      okButtonProps: { className: 'custom-button-outline' },
       cancelText: 'No',
-      cancelButtonProps: { className: 'modal-button modal-button-secondary' },
+      cancelButtonProps: { className: 'custom-button-outline' },
       onOk() {
         axios.delete(`${API_BASE_URL}/Project/deleteProject`, {
           params: { projectId },
