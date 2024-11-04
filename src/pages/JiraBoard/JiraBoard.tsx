@@ -318,7 +318,7 @@ const JiraBoard: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-12 flex flex-col">
+    <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-10 flex flex-col">
       {isLoading && <LoadingSpinner />}
       <div className="flex-grow">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-12 lg:mb-10 text-gray-800 flex items-center justify-center">
@@ -343,7 +343,7 @@ const JiraBoard: React.FC = () => {
               style={{ width: 180 }}
               className="focus:border-purple-900 focus:ring-purple-900"
             />
-            <Button type="primary" className='custom-button-outline' onClick={showModal} icon={<PlusOutlined />}>
+            <Button type="primary" className='custom-button-outline py-5 px-6 rounded-3xl text-lg font-semibold' onClick={showModal} icon={<PlusOutlined />}>
               Create Task
             </Button>
           </div>

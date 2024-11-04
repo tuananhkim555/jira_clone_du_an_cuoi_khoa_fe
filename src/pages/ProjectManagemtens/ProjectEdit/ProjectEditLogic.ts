@@ -11,7 +11,7 @@ interface ProjectDetails {
   };
   alias: string;
   creator: {
-    id: number;
+    id: number; 
     name: string;
   };
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie, FaUsers, FaCog } from 'react-icons/fa';
 import axios from 'axios';
 import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -302,7 +302,7 @@ const ProjectTable = () => {
               />
             ))}
             {extraMembers > 0 && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-800 to-orange-700 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white -ml-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-900 to-orange-700 flex items-center justify-center text-xs font-medium text-white cursor-pointer border-2 border-white -ml-2">
                 +{extraMembers}
               </div>
             )}
@@ -323,7 +323,7 @@ const ProjectTable = () => {
   const renderAddMemberButton = (projectId: number) => (
     <Tooltip title="Add or search members">
       <button 
-        className="text-purple-900 hover:text-orange-600 mr-2 p-1 border rounded-full relative" 
+        className="text-purple-950 hover:text-orange-700 mr-2 p-1 border rounded-full relative" 
         onClick={(e) => handleAddMember(projectId, e)}
       >
         <FaPlus size={12} />
@@ -434,7 +434,7 @@ const ProjectTable = () => {
       </div>
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
+          <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-900 to-orange-800 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
           <p className="text-sm text-gray-600">ID: {project.id}</p>
           <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
           <p className="text-sm text-gray-600">
@@ -452,7 +452,7 @@ const ProjectTable = () => {
           </div>
           <div className="mt-4 flex justify-end space-x-2">
             <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-            <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
+            <button className="bg-gradient-to-r from-purple-900 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -491,7 +491,7 @@ const ProjectTable = () => {
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-              <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
+              <button className="bg-gradient-to-r from-purple-900 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
             </div>
           </div>
         ))}
@@ -679,10 +679,16 @@ const ProjectTable = () => {
                 {renderSearchPopover('creator')}
               </th>
               <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-                Members
+                <span className="flex items-center">
+                  <FaUsers className="mr-2" />
+                  Members
+                </span>
               </th>
               <th scope="col" className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-                Action
+                <span className="flex items-center">
+                  <FaCog className="mr-2" />
+                  Action
+                </span>
               </th>
             </tr>
           </thead>
@@ -690,7 +696,7 @@ const ProjectTable = () => {
             {paginatedProjects.map((project: Project) => (
               <tr key={project.id} className="hover:bg-gray-100">
                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
-                <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>
+                <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-900 to-orange-800 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>
                   <div className="max-w-xs truncate">{project.projectName}</div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -712,7 +718,7 @@ const ProjectTable = () => {
                   <div className="flex space-x-2">
                     <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                     <button 
-                      className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:opacity-90 shadow-sm" 
+                      className="bg-gradient-to-r from-purple-900 to-orange-700 text-white rounded-md p-2 hover:opacity-90 shadow-sm" 
                       onClick={() => handleDeleteProject(project.id)}
                     >
                       <FaTrash size={14} />
