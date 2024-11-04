@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import '../../styles/pagination.css';
 import '../../styles/modal.css';
 import AnimationSection from '../../components/ui/AnimationSection';
-import { getAllPriorities, getAllStatuses } from '../../api';
+import { getAllPriorities, getAllStatuses } from '../../api/api';
 
 interface Project {
   id: number;
@@ -92,9 +92,13 @@ const ProjectTable = () => {
   const [priorities, setPriorities] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
 
-  const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
-  const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
-  const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
+  const api = axios.create({
+    baseURL: 'https://jiranew.cybersoft.edu.vn/api',
+    headers: {
+      TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`
+    }
+  });
 
   useEffect(() => {
     fetchProjects();
@@ -107,12 +111,7 @@ const ProjectTable = () => {
     setIsLoading(true);
     setError('');
     try {
-      const response = await axios.get(`${API_BASE_URL}/Project/getAllProject`, {
-        headers: {
-          TokenCybersoft: TOKEN_CYBERSOFT,
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-        },
-      });
+      const response = await api.get('/Project/getAllProject');
       const typedResponse = response.data as { content: Project[] };
       const sortedProjects = typedResponse.content.reverse();
       setTimeout(() => {
@@ -131,17 +130,24 @@ const ProjectTable = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/Users/getUser`, {
-        headers: {
-          TokenCybersoft: TOKEN_CYBERSOFT,
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-        },
-      });
-      const typedResponse = response.data as { content: User[] };
-      setUsers(typedResponse.content);
-      setFilteredUsers(typedResponse.content);
+      const response = await api.get('/Users/getUser');
+      if (response.data && response.data.content) {
+        const formattedUsers = response.data.content.map((user: any) => ({
+          userId: user.userId,
+          name: user.name,
+          avatar: user.avatar
+        }));
+        setUsers(formattedUsers);
+        setFilteredUsers(formattedUsers);
+      } else {
+        console.error('Invalid user data format:', response.data);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to fetch users. Please try again.'
+      });
     }
   };
 
@@ -185,12 +191,8 @@ const ProjectTable = () => {
       cancelText: 'No',
       cancelButtonProps: { className: 'custom-button-outline' },
       onOk() {
-        axios.delete(`${API_BASE_URL}/Project/deleteProject`, {
+        api.delete(`/Project/deleteProject`, {
           params: { projectId },
-          headers: {
-            TokenCybersoft: TOKEN_CYBERSOFT,
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-          },
         })
         .then(() => {
           setProjects(projects.filter(project => project.id !== projectId));
@@ -279,16 +281,15 @@ const ProjectTable = () => {
   const handleMemberSelect = async (userId: number) => {
     if (selectedProjectId) {
       try {
-        await axios.post(
-          `${API_BASE_URL}/Project/assignUserProject`,
+        await api.post(
+          `/Project/assignUserProject`,
           {
             projectId: selectedProjectId,
             userId: userId
           },
           {
             headers: {
-              TokenCybersoft: TOKEN_CYBERSOFT,
-              Authorization: `Bearer ${ACCESS_TOKEN}`,
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
         );
@@ -342,16 +343,15 @@ const ProjectTable = () => {
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        axios.post(
-          `${API_BASE_URL}/Project/removeUserFromProject`,
+        api.post(
+          `/Project/removeUserFromProject`,
           {
             projectId: projectId,
             userId: userId
           },
           {
             headers: {
-              TokenCybersoft: TOKEN_CYBERSOFT,
-              Authorization: `Bearer ${ACCESS_TOKEN}`,
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
         )
@@ -698,7 +698,7 @@ const ProjectTable = () => {
         />
         <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: 10 }}>
           {column === 'categoryName' ? (
-            ['Dự án web', 'Dự án phần mềm', 'Dự án di động'].map(category => (
+            ['Dự án web', 'Dự án phần mềm', 'Dự án di ��ộng'].map(category => (
               <div key={category} style={{ marginBottom: 5 }}>
                 <StyledCheckbox
                   checked={selectedCategories.includes(category)}
@@ -911,10 +911,19 @@ const ProjectTable = () => {
             onSearch={handleSearchChange}
             filterOption={false}
             onBlur={() => setIsAddingMember(false)}
+            notFoundContent={users.length === 0 ? "No users available" : "No matches found"}
+            loading={isLoading}
           >
             {filteredUsers.map(user => (
               <Select.Option key={user.userId} value={user.userId}>
-                {user.name}
+                <div className="flex items-center">
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name} 
+                    className="w-6 h-6 rounded-full mr-2"
+                  />
+                  {user.name}
+                </div>
               </Select.Option>
             ))}
           </Select>

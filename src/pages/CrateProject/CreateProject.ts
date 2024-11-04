@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ProjectData, Category } from './typeCreate';
-import api from '../../api';
+import api from '../../api/api';
 
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;

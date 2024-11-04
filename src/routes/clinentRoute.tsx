@@ -12,6 +12,7 @@ import Helps from '../pages/Help/Help';
 import Pages from '../pages/PagesDeploy/Pages';
 import ProjectEdit from '../pages/ProjectManagemtens/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
+import Dashboard from '../pages/JiraBoard/Dashboard';
 
 
 const ClientRoute: React.FC = () => {
@@ -26,6 +27,7 @@ const ClientRoute: React.FC = () => {
       <Route path="/profile" element={<Profile />} />
       <Route path="/help" element={<Helps />} />
       <Route path="/board/:id" element={<JiraBoard />} />
+      <Route path="/board" element={<Dashboard />} />
       <Route path="/pages" element={<Pages />} />
       <Route path="/project/edit/:id" element={<ProjectEdit />} />
       <Route path="/users-managements" element={<UserManagements />} />

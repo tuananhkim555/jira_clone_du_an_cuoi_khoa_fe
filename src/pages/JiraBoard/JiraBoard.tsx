@@ -4,7 +4,7 @@ import { fetchProjects, fetchProjectDetails, fetchAllData, createNewTask, Projec
 import { FaLeaf, FaTiktok, FaGithub, FaFacebook } from 'react-icons/fa';
 import TextGradient from '../../components/ui/TitleGradient';
 import { Input, Button, Form, InputNumber, Slider } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, UserOutlined, FolderOutlined, CrownOutlined } from '@ant-design/icons';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
 import Reveal from '../../components/Reveal';
@@ -15,13 +15,28 @@ import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NotificationMessage from '../../components/NotificationMessage';
+import EditProjectDetail from './EditProjectDetail/EditProjectDetail';
+import  Footer  from '../Footer/Footer';
 
-// Hàm tạo ID đơn giản
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 interface Task {
   id: string;
+  taskName: string;
   content: string;
+  assignees?: any[];
+  priority?: {
+    priorityId: number;
+    priority: string;
+    priorityName: string;
+  };
+  priorityTask?: any;
+  statusId: string;
+  originalEstimate?: number;
+  timeTrackingSpent?: number;
+  timeTrackingRemaining?: number;
+  description?: string;
+  typeId?: number;
 }
 
 interface Column {
@@ -56,23 +71,26 @@ interface TaskType {
   taskType: string;
 }
 
-// Add this near the top of your file, after the imports
+interface EditProjectDetailProps {
+  taskId: string;
+}
+
 const statusColors: { [key: string]: string } = {
-  '1': 'bg-[#300053]', // BACKLOG
-  '2': 'from-[#320053] to-purple-950', // SELECTED FOR DEVELOPMENT
-  '3': 'from-purple-950 to-orange-700', // IN PROGRESS
-  '4': 'from-orange-700 to-orange-900', // DONE
+  '1': 'bg-[#300053]',
+  '2': 'from-[#320053] to-purple-950',
+  '3': 'from-purple-950 to-orange-700',
+  '4': 'from-orange-700 to-orange-900',
 };
 
 const getColumnColor = (statusId: string): string => {
-  return statusColors[statusId] || 'bg-gray-200'; // Default color if status is not found
+  return statusColors[statusId] || 'bg-white';
 };
 
 const initialColumns: { [key: string]: Column } = {
   todo: {
     id: 'backlog',
     title: 'BACKLOG',
-    tasks: [{id: 'abc', content: 'abc'}],
+    tasks: [{id: 'abc', taskName: 'abc', content: 'abc', statusId: '1'}],
     color: 'bg-[#300053]',
   },
   inProgress: {
@@ -123,6 +141,7 @@ const JiraBoard: React.FC = () => {
   const [taskTypes, setTaskTypes] = useState<TaskType[]>([]);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -138,12 +157,10 @@ const JiraBoard: React.FC = () => {
         const details = await fetchProjectDetails(projectId);
         if (details) {
           setProjectDetails(details);
-          // Set the current project when details are loaded
           setCurrentProject({
             id: details.id,
             projectName: details.projectName
           });
-          // Update columns based on project details
           const updatedColumns = details.lstTask.reduce((acc, status) => {
             acc[status.statusId] = {
               id: status.statusId,
@@ -188,9 +205,8 @@ const JiraBoard: React.FC = () => {
     setIsLoading(true);
     try {
       const newTaskContent = await createNewTask(taskData);
-      if (newTaskContent) {
-        // Instead of creating a new task object, fetch the updated project details
-        const updatedProject = await fetchProjectDetails(currentProject.id);
+      if (newTaskContent && currentProject?.id) {
+        const updatedProject = await fetchProjectDetails(currentProject.id.toString());
         if (updatedProject) {
           updateColumnsFromProject(updatedProject);
         }
@@ -199,9 +215,8 @@ const JiraBoard: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to create task:', error);
-      // Refresh project details to ensure UI is in sync with server
       if (currentProject) {
-        const updatedProject = await fetchProjectDetails(currentProject.id);
+        const updatedProject = await fetchProjectDetails(currentProject.id.toString());
         if (updatedProject) {
           updateColumnsFromProject(updatedProject);
         }
@@ -217,14 +232,25 @@ const JiraBoard: React.FC = () => {
       newColumns[status.statusId] = {
         id: status.statusId,
         title: status.statusName,
-        tasks: status.lstTaskDeTail.map((task: any, index: number) => ({
-          id: task.taskId || `temp-${status.statusId}-${index}`, // Use a temporary id if taskId is not available
+        tasks: status.lstTaskDeTail.map((task: any) => ({
+          id: task.taskId || `temp-${status.statusId}-${task.taskId}`,
           taskName: task.taskName,
-          assignees: task.assigness,
-          priority: task.priorityTask?.priority,
+          content: task.taskName,
+          assignees: task.assigness || [],
+          priority: {
+            priorityId: task.priorityTask?.priorityId,
+            priority: task.priorityTask?.priority,
+            priorityName: task.priorityTask?.priority
+          },
+          priorityTask: task.priorityTask,
           statusId: status.statusId,
+          originalEstimate: task.originalEstimate,
+          timeTrackingSpent: task.timeTrackingSpent,
+          timeTrackingRemaining: task.timeTrackingRemaining,
+          description: task.description,
+          typeId: task.typeId
         })),
-        color: getColumnColor(status.statusName)
+        color: getColumnColor(status.statusId)
       };
     });
     setColumns(newColumns);
@@ -276,8 +302,13 @@ const JiraBoard: React.FC = () => {
     setDescription(content);
   };
 
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+  };
+
   return (
-    <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-12 flex flex-col shadow-lg">
+    <>
+    <div className="min-h-screen p-3 md:p-10 mt-12 lg:mt-12 flex flex-col">
       {isLoading && <LoadingSpinner />}
       <div className="flex-grow">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-12 lg:mb-10 text-gray-800 flex items-center justify-center">
@@ -310,17 +341,48 @@ const JiraBoard: React.FC = () => {
         </div>
         {projectDetails && (
           <div className="max-w-6xl mx-auto mb-6">
-            <h2 className="text-xl font-semibold mb-2">
-              <TextAnimation text={projectDetails.projectName} />
-            </h2>
-            <p className="text-gray-600 mb-2">Creator: {projectDetails.creator.name}</p>
-            <p className="text-gray-600 mb-2">Category: {projectDetails.projectCategory.name}</p>
-            <div className="text-gray-600 mb-4" dangerouslySetInnerHTML={{ __html: projectDetails.description }} />
+            <div className="flex flex-wrap items-center gap-4  p-2 ">
+              <div className="flex items-center">
+                <span className="font-semibold text-gray-600 text-sm flex items-center">
+                  <CrownOutlined className="mr-1" />
+                  Title:
+                </span>
+                <h2 className="text-lg font-semibold ml-2 text-purple-900">
+                  <TextAnimation text={projectDetails.projectName} />
+                </h2>
+              </div>
+
+              <div className="flex items-center">
+                <span className="font-semibold text-gray-600 text-sm flex items-center">
+                  <UserOutlined className="mr-1" />
+                  Creator:
+                </span>
+                <p className="ml-2 text-gray-800 text-[16px]">{projectDetails.creator.name}</p>
+              </div>
+
+              <div className="flex items-center">
+                <span className="font-semibold text-gray-600 text-sm flex items-center">
+                  <FolderOutlined className="mr-1" />
+                  Category:
+                </span>
+                <p className="ml-2 text-gray-800 text-[16px]">{projectDetails.projectCategory.name}</p>
+              </div>
+            </div>
           </div>
         )}
         <Reveal>
-          <DragAndDropBoard columns={columns} setColumns={setColumns} />
+          <DragAndDropBoard 
+            columns={columns} 
+            setColumns={setColumns}
+            onTaskClick={handleTaskClick}
+          />
         </Reveal>
+        {selectedTaskId && (
+          <EditProjectDetail 
+            taskId={selectedTaskId}
+            key={selectedTaskId}
+          />
+        )}
         <AnimatePresence>
           {isModalVisible && (
             <motion.div
@@ -476,19 +538,6 @@ const JiraBoard: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
-      <footer className='mb-8 lg:mb-20'>
-        <div className="max-w-6xl mx-auto px-3">
-          <div className="flex flex-col items-center">
-            <div className="flex space-x-4 mb-3">
-              <FaTiktok size={24} className="text-gray-600 hover:text-gray-800 transition-colors" />
-              <FaGithub size={24} className="text-gray-600 hover:text-gray-800 transition-colors" />
-              <FaFacebook size={24} className="text-gray-600 hover:text-gray-800 transition-colors" />
-            </div>
-            <p className="text-lg font-semibold text-gray-700">&copy; 2024 Jira Board</p>
-            <p className="text-lg text-gray-600">Created by BC-11 DINH TUAN ANH</p>
-          </div>
-        </div>
-      </footer>
       <CreateTaskModal
         isVisible={isModalVisible}
         onCancel={handleCancel}
@@ -496,6 +545,8 @@ const JiraBoard: React.FC = () => {
         currentProject={currentProject}
       />
     </div>
+    <Footer />
+    </>
   );
 };
 

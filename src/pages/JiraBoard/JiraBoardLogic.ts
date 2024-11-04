@@ -1,4 +1,4 @@
-import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes } from '../../api';
+import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes } from '../../api/api';
 import axios, { AxiosError } from 'axios';
 
 interface ApiResponse<T> {
@@ -7,7 +7,7 @@ interface ApiResponse<T> {
   };
 }
 
-interface ProjectDetails {
+export interface ProjectDetails {
   lstTask: {
     lstTaskDeTail: any[];
     statusId: string;
@@ -48,11 +48,28 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectDet
   try {
     const response = await getProjectById(projectId) as ApiResponse<ProjectDetails>;
     if (response.data && response.data.content) {
-      return response.data.content;
-    } else {
-      console.error('Invalid response format for project details');
-      return null;
+      // Normalize task data structure
+      const normalizedContent = {
+        ...response.data.content,
+        lstTask: response.data.content.lstTask.map(status => ({
+          ...status,
+          lstTaskDeTail: status.lstTaskDeTail.map(task => ({
+            id: task.taskId,
+            taskName: task.taskName,
+            priority: task.priorityTask || task.priority,
+            assignees: task.assigness ? task.assigness.map((assignee: any) => ({
+              id: assignee.id,
+              name: assignee.name,
+              avatar: assignee.avatar
+            })) : [],
+            statusId: status.statusId
+          }))
+        }))
+      };
+      return normalizedContent;
     }
+    console.error('Invalid response format for project details');
+    return null;
   } catch (error) {
     console.error('Error fetching project details:', error);
     return null;

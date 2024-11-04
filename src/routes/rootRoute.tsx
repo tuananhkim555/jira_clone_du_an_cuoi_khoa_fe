@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { LoadingProvider } from '../context/LoadingContext';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
+
 import ClientRoute from './clinentRoute';
 
 const MainLayout = () => {
@@ -13,10 +13,7 @@ const MainLayout = () => {
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
       {!isAuthPage && (
        <>
-          <div className="m-7">
-            <Navbar />
-          </div>
-          <div className="ml-[270px]">
+          <div className="ml-[250px]">
             <Sidebar onMenuClick={(menu) => console.log(menu)} />
           </div>
           <div className="flex-grow">    

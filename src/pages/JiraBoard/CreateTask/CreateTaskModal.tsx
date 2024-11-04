@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Form, Input, InputNumber, Button, Slider } from 'antd';
+import { Form, Input, InputNumber, Button, Slider, notification } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Editor } from '@tinymce/tinymce-react';
 import CustomSelect from '../../../components/CustomSelect';
 import { useCreateTaskLogic } from './CreateTaskLogic';
-import NotificationMessage from '../../../components/NotificationMessage';
 
 interface CreateTaskModalProps {
   isVisible: boolean;
@@ -20,6 +19,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   currentProject,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmitError = (error: any) => {
+    let errorMessage = 'Failed to create task';
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    notification.error({
+      message: 'Error',
+      description: errorMessage,
+    });
+  };
 
   const {
     form,
@@ -38,15 +50,16 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     setIsLoading(true);
     try {
       await onCreate(newTaskData);
-      NotificationMessage({ type: 'success', message: 'Task created successfully!' });
+      notification.success({
+        message: 'Success',
+        description: 'Task created successfully!',
+      });
     } catch (error) {
-      console.error('Error creating task:', error);
-      NotificationMessage({ type: 'error', message: 'Failed to create task. Please try again.' });
+      handleSubmitError(error);
     } finally {
       setIsLoading(false);
     }
   });
-
 
   return (
     <AnimatePresence>
@@ -149,14 +162,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                     height: 300,
                     menubar: false,
                     plugins: [
-                      'advlist autolink lists link image charmap print preview anchor',
-                      'searchreplace visualblocks code fullscreen',
-                      'insertdatetime media table paste code help wordcount'
+                      'lists', 'link', 'image', 'charmap', 'preview',
+                      'searchreplace', 'code', 'fullscreen',
+                      'media', 'table', 'code', 'help', 'wordcount'
                     ],
                     toolbar:
-                      'undo redo | formatselect | bold italic backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help'
+                      'undo redo | formatselect | ' +
+                      'bold italic backcolor | alignleft aligncenter ' +
+                      'alignright alignjustify | bullist numlist outdent indent | ' +
+                      'removeformat | help'
                   }}
                   onEditorChange={handleEditorChange}
                 />

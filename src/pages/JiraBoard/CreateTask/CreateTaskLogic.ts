@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form } from 'antd';
-import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../api';
+import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../api/api';
+import axios from 'axios';
 
 interface ApiResponse<T> {
   data: {
@@ -61,20 +62,41 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
 
   const handleCreate = async (values: any) => {
     try {
+      // Format dữ liệu theo đúng yêu cầu của API
       const taskData = {
-        ...values,
-        description,
-        projectId: currentProject.id,
-        priorityId: priorities.find(p => p.priorityId === values.priorityId)?.priorityId,
+        listUserAsign: values.listUserAsign || [], // Mảng ID của người được assign
+        taskName: values.taskName,
+        description: description,
+        statusId: values.statusId,
+        originalEstimate: Number(values.originalEstimate) || 0,
+        timeTrackingSpent: Number(values.timeTrackingSpent) || 0,
+        timeTrackingRemaining: Number(values.timeTrackingRemaining) || 0,
+        projectId: Number(currentProject.id),
+        typeId: Number(values.typeId),
+        priorityId: Number(values.priorityId)
       };
-      console.log('Task data being sent:', taskData);
+
+      // Log dữ liệu trước khi gửi để kiểm tra
+      console.log('Task data before sending:', taskData);
+
       const response = await createTask(taskData);
-      if ('data' in response && 'content' in response.data) {
+      
+      // Log response để debug
+      console.log('API Response:', response);
+
+      if (response && response.data && response.data.content) {
         onCreate(response.data.content);
         onCancel();
+      } else {
+        throw new Error('Invalid response format');
       }
-    } catch (error) {
-      console.error('Error creating task:', error);
+    } catch (error: any) {
+      console.error('API error:', error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || 'Failed to create task';
+        throw new Error(errorMessage);
+      }
+      throw error;
     }
   };
 

@@ -31,6 +31,16 @@ interface UserResponse {
   };
 }
 
+interface User {
+  id: string;
+  email: string;
+  avatar: string;
+  phoneNumber: string;
+  name: string;
+  accessToken: string;
+  userId: number;
+}
+
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -132,8 +142,7 @@ const Login: React.FC = () => {
       
       dispatch(setUserSlice({
         ...userData,
-        userId: 0, // Add a default value for userId
-        tokenExpiration: calculateTokenExpiration(userData.accessToken)
+        tokenExpiration: calculateTokenExpiration(Number(userData.accessToken)).getTime()
       }));
       localStorage.setItem('authToken', userData.accessToken);
       localStorage.setItem('user', JSON.stringify(userData));

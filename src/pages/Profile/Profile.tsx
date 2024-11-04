@@ -12,7 +12,7 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import TextAnimation from '../../components/ui/TextAnimation';
 import AnimationSection from '../../components/ui/AnimationSection';
 import { useLocation } from 'react-router-dom';
-import { editUser } from '../../api';
+import { editUser } from '../../api/api';
 import AvatarUpload from '../../components/AvatarUpload';
 
 interface User {

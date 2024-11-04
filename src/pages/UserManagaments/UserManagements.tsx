@@ -15,7 +15,7 @@ import { setTempUser } from '../../redux/slices/userSlice';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
 import { RootState } from '../../redux/store';
-import { getAllUsers, deleteUser } from '../../api';
+import { getAllUsers, deleteUser } from '../../api/api';
 
 const { Option } = Select;
 

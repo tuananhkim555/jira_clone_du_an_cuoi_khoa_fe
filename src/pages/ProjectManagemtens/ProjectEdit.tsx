@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getHeaders } from '../../config/env';
 import { Editor } from '@tinymce/tinymce-react';
+import { getProjectDetails, getProjectCategories, updateProjectDetails } from '../../api/api';
 import NotificationMessage from '../../components/NotificationMessage';
 import TitleGradient from '../../components/ui/TitleGradient';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Reveal from '../../components/Reveal';
-import { FaEdit, FaSave } from 'react-icons/fa'; // Import the edit icon
+import { FaEdit, FaSave } from 'react-icons/fa';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
 
@@ -24,10 +23,6 @@ interface ProjectDetails {
     id: number;
     name: string;
   };
-}
-
-interface ApiResponse {
-  content: ProjectDetails;
 }
 
 interface Category {
@@ -48,19 +43,17 @@ const ProjectEdit: React.FC = () => {
     const fetchProjectAndCategories = async () => {
       try {
         const [projectResponse, categoriesResponse] = await Promise.all([
-          axios.get<ApiResponse>(
-            `https://jiranew.cybersoft.edu.vn/api/Project/getProjectDetail?id=${id}`,
-            { headers: getHeaders() }
-          ),
-          axios.get<{ content: Category[] }>(
-            'https://jiranew.cybersoft.edu.vn/api/ProjectCategory',
-            { headers: getHeaders() }
-          )
+          getProjectDetails(id!),
+          getProjectCategories()
         ]);
 
-        setProject(projectResponse.data.content);
-        setCategories(categoriesResponse.data.content);
+        const projectData = projectResponse.data as any;
+        const categoriesData = categoriesResponse.data as any;
+
+        setProject(projectData.content);
+        setCategories(categoriesData.content);
       } catch (error) {
+        console.error('Error fetching data:', error);
         setNotification({ type: 'error', message: 'Failed to fetch project details or categories.' });
       } finally {
         setLoading(false);
@@ -103,7 +96,7 @@ const ProjectEdit: React.FC = () => {
     });
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleEditorChange = (content: string, editor: any) => {
     setProject(prev => prev ? { ...prev, description: content } : null);
   };
 
@@ -120,18 +113,14 @@ const ProjectEdit: React.FC = () => {
         categoryId: project.projectCategory.id.toString()
       };
 
-      await axios.put(
-        `https://jiranew.cybersoft.edu.vn/api/Project/updateProject?projectId=${project.id}`,
-        updateData,
-        { headers: getHeaders() }
-      );
+      await updateProjectDetails(updateData);
       setNotification({ type: 'success', message: 'Project updated successfully' });
       setTimeout(() => navigate('/project'), 2000);
     } catch (error) {
       console.error('Error updating project:', error);
-      setNotification({ type: 'error', message: 'Failed to update project, this is not a project created by you' });
+      setNotification({ type: 'error', message: 'Failed to update project. You can only update projects you created.' });
     }
-  }, [project, navigate]); // Thêm các dependencies cần thiết
+  }, [project, navigate]);
 
   // Add this function to handle the cancel action
   const handleCancel = () => {
@@ -193,14 +182,14 @@ const ProjectEdit: React.FC = () => {
             </label>
             <Editor
               apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-              initialValue={project.description}
+              value={project.description}
               init={{
                 height: 300,
                 menubar: false,
                 plugins: [
-                  'advlist autolink lists link image charmap print preview anchor',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media table paste code help wordcount'
+                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                  'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
                 ],
                 toolbar: 'undo redo | formatselect | ' +
                 'bold italic backcolor | alignleft aligncenter ' +

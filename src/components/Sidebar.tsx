@@ -2,7 +2,7 @@ import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import LogoAva from "../assets/Jira_Logo.svg"
-import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello } from 'react-icons/fa';
+import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../redux/store.ts";
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
@@ -58,6 +58,10 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
       case 'user-management':
         path = '/users-managements';
         break;
+      case 'logout':
+        // Handle logout logic here
+        path = '/login';
+        break;
       default:
         path = `/${menu}`;
     }
@@ -73,16 +77,17 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
   
   return (
     <>
-      <button
-        onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-[13px] left-16 z-50 p-2 rounded-md bg-[#280042] text-white"
-      >
-        {isMobileMenuOpen ? <X /> : <Menu />}
-      </button>
       <aside className={`h-screen fixed top-0 left-0 z-30 transition-all duration-300 ease-in-out ${
         window.innerWidth >= 750 ? 'translate-x-0' : isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      } ${expanded ? 'w-64' : 'w-20'} lg:ml-[65px] pt-[60px] lg:pt-0`}>
-        <nav className="h-full flex flex-col bg-gray-50 border-r shadow-xl rounded-r-3xl">
+      } ${expanded ? 'w-64' : 'w-20'}`}>
+        <button
+          onClick={toggleMobileMenu}
+          className="lg:hidden absolute -right-12 top-4 p-2 rounded-md bg-[#1f002d] text-white"
+        >
+          {isMobileMenuOpen ? <X /> : <Menu />}
+        </button>
+
+        <nav className="h-full flex flex-col bg-gradient-to-b from-[#1f002d] via-purple-950 to-[#1f002d] text-white border-r shadow-xl rounded-r-3xl">
           <div className="p-4 pb-2 flex justify-between items-center">
             <img
               src={LogoAva}
@@ -93,7 +98,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
             />
             <button
               onClick={() => setExpanded((curr) => !curr)}
-              className="p-1.5 rounded-lg bg-[#310051] hover:bg-purple-900 text-white shadow-md"
+              className="p-1.5 rounded-lg bg-gray-100 hover:bg-purple-200 text-gray-800 shadow-md"
             >
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
@@ -108,7 +113,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
               
               {/* Add a horizontal line with margin */}
               <li className="my-4">
-                <hr className="border-gray-300" />
+                <hr className="border-purple-800" />
               </li>
               
               <SidebarItem icon={<FaUser />} text="Profile" active={activeMenu === "profile"} onClick={() => handleMenuClick("profile")} />
@@ -116,23 +121,24 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
               
               {/* Add a horizontal line with margin */}
               <li className="my-4">
-                <hr className="border-gray-300" />
+                <hr className="border-purple-800" />
               </li>
               
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
               <SidebarItem icon={<FaExclamationCircle />} text="Help" active={activeMenu === "help"} onClick={() => handleMenuClick("help")} />
               <SidebarItem icon={<FaCogs />} text="Settings" active={activeMenu === "settings"} onClick={() => handleMenuClick("settings")} />
+              <SidebarItem icon={<FaSignOutAlt />} text="Logout" active={activeMenu === "logout"} onClick={() => handleMenuClick("logout")} />
             </ul>
           </SidebarContext.Provider>
 
-          <div className="border-t flex p-3">
+          <div className="border-t border-purple-800 flex p-3">
             <img
               src={AvatarPage}
               alt=""
               className="w-12 h-12 rounded-full object-cover"
               style={{
                 border: '3px solid transparent',
-                backgroundImage: 'linear-gradient(white, white), linear-gradient(to right, #4C1D95, #9A3412)',
+                backgroundImage: 'linear-gradient(#1f002d, purple), linear-gradient(to right, #4C1D95, #9A3412)',
                 backgroundOrigin: 'border-box',
                 backgroundClip: 'content-box, border-box',
                 borderRadius: '50%',
@@ -145,8 +151,8 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
             `}
             >
               <div className="leading-4">
-                <h4 className="font-semibold">{user?.name || "Guest"}</h4>
-                <span className="text-xs text-gray-600">{user?.email || "Not logged in"}</span>
+                <h4 className="font-semibold text-white">{user?.name || "Guest"}</h4>
+                <span className="text-xs text-gray-300">{user?.email || "Not logged in"}</span>
               </div>
             </div>
           </div>
@@ -176,8 +182,8 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
         transition-colors group
         ${
           active
-            ? "bg-[#310051] text-white"
-            : "hover:bg-gradient-to-r hover:bg-purple-950  hover:text-white text-gray-600"
+            ? "bg-gradient-to-r from-[#1f002d] to-purple-950 text-white"
+            : "hover:bg-gradient-to-r hover:from-[#1f002d] hover:to-purple-950 text-gray-200"
         }
     `}
     >
@@ -191,7 +197,7 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
       </span>
       {alert && (
         <div
-          className={`absolute right-2 w-3 h-2 rounded bg-purple-900 ${
+          className={`absolute right-2 w-3 h-2 rounded bg-[#1f002d] ${
             expanded ? "" : "top-2"
           }`}
         />
@@ -201,7 +207,7 @@ export function SidebarItem({ icon, text, active, alert, onClick }: SidebarItemP
         <div
           className={`
           absolute left-full rounded-md px-2 py-1 ml-6
-          bg-indigo-100 text-purple-800 text-sm
+          bg-gradient-to-r from-[#1f002d] to-purple-950 text-white text-sm
           invisible opacity-20 -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
       `}
