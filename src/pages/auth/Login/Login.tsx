@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
-import logoLogin from "../../assets/Logo Jira 5.png";
+import logoLogin from "../../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from "react-router-dom";
-import ShinyEffect from "../../components/ShinyEffect";
-import { BackgroundBeamsWithCollision } from "../../components/ui/Background-beams-with-collision";
-import Reveal from "../../components/Reveal";
+import ShinyEffect from "../../../components/ShinyEffect";
+import { BackgroundBeamsWithCollision } from "../../../components/ui/Background-beams-with-collision";
+import Reveal from "../../../components/Reveal";
 import axios from "axios";
 import { notification } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
-import LoadingSpinner from '../../components/LoadingSpinner';
-import styles from "./auth.module.css"
-import { calculateTokenExpiration } from '../../utils/tokenUtils'; // Updated path
-import { useAppDispatch } from '../../redux/hooks';
-import { setUser as setUserSlice, setStatus } from '../../redux/slices/authSlice';
-import TextAnimation from '../../components/ui/TextAnimation';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import styles from "../auth.module.css"
+import { calculateTokenExpiration } from '../../../utils/tokenUtils'; // Updated path
+import { useAppDispatch } from '../../../redux/hooks';
+import { setUser as setUserSlice, setStatus } from '../../../redux/slices/authSlice';
+import TextAnimation from '../../../components/ui/TextAnimation';
+import { handleGoogleLogin, handleUserLogin } from './LoginLogic';
 
 interface GoogleLoginResponse {
   success: boolean;
@@ -73,18 +74,17 @@ const Login: React.FC = () => {
           throw new Error("No access token received from Google");
         }
 
-        // Call backend API to authenticate token
-        const response = await axios.post<GoogleLoginResponse>('YOUR_BACKEND_API_URL/google-login', { token: access_token });
+        const data = await handleGoogleLogin(access_token);
 
-        if (response.data.success) {
+        if (data.success) {
           notification.success({
             message: "Google login successful!",
             placement: "topRight",
             duration: 4,
           });
-          navigate("/project");
+          navigate("/board");
         } else {
-          throw new Error(response.data.message || "Login failed");
+          throw new Error(data.message || "Login failed");
         }
       } catch (error) {
         notification.error({
@@ -127,18 +127,8 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response = await axios.post<UserResponse>(
-        "https://jiranew.cybersoft.edu.vn/api/Users/signin",
-        { email, passWord: password },
-        {
-          headers: {
-            "Content-Type": "application/json-patch+json",
-            TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
-          },
-        }
-      );
-      
-      const userData = response.data.content;
+      const response = await handleUserLogin(email, password);
+      const userData = response.content;
       
       dispatch(setUserSlice({
         ...userData,
@@ -152,7 +142,7 @@ const Login: React.FC = () => {
         placement: "topRight",
         duration: 4,
       });
-      navigate("/project");
+      navigate("/board");
     } catch (error) {
       dispatch(setStatus('failed'));
       notification.error({

@@ -50,25 +50,19 @@ export const getProjectCategories = () => {
 };
 
 export const getAllStatuses = () => {
-  console.log('Fetching statuses...');
   return api.get('/Status/getAll').then(response => {
-    console.log('Statuses response:', response);
     return response;
   });
 };
 
 export const getAllPriorities = () => {
-  console.log('Fetching priorities...');
   return api.get('/Priority/getAll').then(response => {
-    console.log('Priorities response:', response);
     return response;
   });
 };
 
 export const getAllTaskTypes = () => {
-  console.log('Fetching task types...');
   return api.get('/TaskType/getAll').then(response => {
-    console.log('Task Types response:', response);
     return response;
   });
 };
@@ -86,9 +80,7 @@ export const editUser = (userData: any) => {
 };
 
 export const getAllUsers = () => {
-  console.log('Fetching users...');
   return api.get('/Users/getUser').then(response => {
-    console.log('Users response:', response);
     return response;
   });
 };

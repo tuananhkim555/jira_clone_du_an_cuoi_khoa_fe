@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Progress, List, Avatar, Timeline } from 'antd';
-import { UserOutlined, ProjectOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { UserOutlined, ProjectOutlined, CheckCircleOutlined, ClockCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { getAllUsers } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   return (
     <motion.div 
-      className="p-4 bg-gray-100 min-h-screen max-w-[1400px] mx-auto mt-12"
+      className="p-4 bg-gray-100 min-h-screen max-w-[1400px] mx-auto mt-14"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -59,48 +59,48 @@ const Dashboard = () => {
       <Row gutter={[12, 12]}>
         <Col xs={24} sm={12} lg={6}>
           <motion.div variants={itemVariants}>
-            <Card hoverable className="shadow-sm cursor-pointer" onClick={handleProjectClick}>
+            <Card hoverable className="shadow-md cursor-pointer bg-gradient-to-r from-[#1c0035] to-[#330067]" onClick={handleProjectClick}>
               <Statistic
-                title={<span className="text-[#3f8600]">Total Projects</span>}
+                title={<span className="text-white">Total Projects</span>}
                 value={12}
-                prefix={<ProjectOutlined />}
-                valueStyle={{ color: '#3f8600', fontSize: '1.2rem' }}
+                prefix={<ProjectOutlined className="text-white" />}
+                valueStyle={{ color: 'white', fontSize: '1.2rem' }}
               />
             </Card>
           </motion.div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <motion.div variants={itemVariants}>
-            <Card hoverable className="shadow-sm">
+            <Card hoverable className="shadow-md bg-gradient-to-r from-[#2b0054] to-purple-950">
               <Statistic
-                title={<span className="text-[#1890ff]">Active Users</span>}
-                value={users.length}
-                prefix={<UserOutlined />}
-                valueStyle={{ color: '#1890ff', fontSize: '1.2rem' }}
+                title={<span className="text-white">Active Users</span>}
+                value={808}
+                prefix={<UserOutlined className="text-white" />}
+                valueStyle={{ color: 'white', fontSize: '1.2rem' }}
               />
             </Card>
           </motion.div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <motion.div variants={itemVariants}>
-            <Card hoverable className="shadow-sm">
+            <Card hoverable className="shadow-md bg-gradient-to-r from-[#350067] to-orange-800">
               <Statistic
-                title={<span className="text-[#52c41a]">Completed Tasks</span>}
+                title={<span className="text-white">Completed Tasks</span>}
                 value={45}
-                prefix={<CheckCircleOutlined />}
-                valueStyle={{ color: '#52c41a', fontSize: '1.2rem' }}
+                prefix={<CheckCircleOutlined className="text-white" />}
+                valueStyle={{ color: 'white', fontSize: '1.2rem' }}
               />
             </Card>
           </motion.div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <motion.div variants={itemVariants}>
-            <Card hoverable className="shadow-sm">
+            <Card hoverable className="shadow-md bg-gradient-to-r from-orange-800 to-orange-950">
               <Statistic
-                title={<span className="text-[#d79803]">Pending Tasks</span>}
+                title={<span className="text-white">Pending Tasks</span>}
                 value={8}
-                prefix={<ClockCircleOutlined />}
-                valueStyle={{ color: '#d79803', fontSize: '1.2rem' }}
+                prefix={<ClockCircleOutlined className="text-white" />}
+                valueStyle={{ color: 'white', fontSize: '1.2rem' }}
               />
             </Card>
           </motion.div>
@@ -108,9 +108,13 @@ const Dashboard = () => {
       </Row>
 
       <Row gutter={[12, 12]} className="mt-4">
-        <Col xs={24} lg={16}>
+        <Col xs={24} lg={14}>
           <motion.div variants={itemVariants}>
-            <Card title="Recent Activities" className="shadow-sm" size="small">
+            <Card 
+              title={<span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Recent Activities</span>} 
+              className="shadow-md" 
+              size="small"
+            >
               <Timeline>
                 <Timeline.Item color="green">Project A created</Timeline.Item>
                 <Timeline.Item color="blue">New task assigned to John</Timeline.Item>
@@ -120,19 +124,34 @@ const Dashboard = () => {
             </Card>
           </motion.div>
         </Col>
-        <Col xs={24} lg={8}>
-          <motion.div variants={itemVariants}>
-            <Card title="Team Members" className="shadow-sm" size="small">
+        <Col xs={24} lg={10}>
+          <motion.div  variants={itemVariants}>
+            <Card 
+              title={
+                <div className="flex justify-between items-center">
+                  <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Team Members</span>
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-950 cursor-pointer hover:bg-purple-800">
+                    <PlusOutlined className="text-white text-sm" />
+                  </div>
+                </div>
+              } 
+              className="shadow-md" 
+              size="small"
+            >
               <List
                 itemLayout="horizontal"
                 dataSource={users.slice(0, 5)}
                 renderItem={(user: User) => (
-                  <List.Item>
-                    <List.Item.Meta
+                  <List.Item className="flex justify-between items-center">
+                    <List.Item.Meta 
                       avatar={<Avatar size="small" icon={<UserOutlined />} />}
-                      title={user.name}
-                      description={user.email}
+                      title={<div className="mr-8">{user.name}</div>}
+                      description={<div className="mr-8 text-orange-800">{user.email}</div>}
+                      className="min-w-0"
                     />
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-purple-900 to-orange-700 cursor-pointer hover:opacity-80">
+                      <DeleteOutlined className="text-white text-sm" />
+                    </div>
                   </List.Item>
                 )}
               />
@@ -144,7 +163,11 @@ const Dashboard = () => {
       <Row gutter={[12, 12]} className="mt-4">
         <Col xs={24}>
           <motion.div variants={itemVariants}>
-            <Card title="Project Progress" className="shadow-sm" size="small">
+            <Card 
+              title={<span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Project Progress</span>} 
+              className="shadow-md" 
+              size="small"
+            >
               <Row gutter={[12, 12]}>
                 <Col xs={24} sm={8}>
                   <Progress type="circle" percent={75} size={80} />

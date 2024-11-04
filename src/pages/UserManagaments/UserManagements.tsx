@@ -15,23 +15,20 @@ import { setTempUser } from '../../redux/slices/userSlice';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
 import { RootState } from '../../redux/store';
-import { getAllUsers, deleteUser } from '../../api/api';
+import { useUserManagementLogic } from './UserManagementsLogic';
 
 const { Option } = Select;
 
-interface User {
-  id: number;
-  avatar: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-}
-
 const UserManagement = () => {
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    filteredUsers,
+    isLoading,
+    error,
+    fetchUsers,
+    handleDeleteUser,
+    handleSearch
+  } = useUserManagementLogic();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(12);
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
@@ -43,31 +40,6 @@ const UserManagement = () => {
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await getAllUsers();
-        const data = response.data;
-        if (data && data.statusCode === 200 && Array.isArray(data.content)) {
-          const formattedUsers = data.content.map((user: any) => ({
-            id: user.userId,
-            avatar: user.avatar,
-            name: user.name,
-            email: user.email,
-            phoneNumber: user.phoneNumber
-          }));
-          setAllUsers(formattedUsers);
-          setFilteredUsers(formattedUsers);
-        } else {
-          throw new Error('Invalid data format');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        setError('Failed to fetch users');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
 
@@ -77,46 +49,17 @@ const UserManagement = () => {
     setIsModalVisible(true);
   };
 
-  const handleDeleteUser = async () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteUserId) return;
-
-    try {
-      const response = await deleteUser(deleteUserId);
-
-      if (response.status === 200) {
-        setFilteredUsers(filteredUsers.filter(user => user.id !== deleteUserId));
-        NotificationMessage({ type: 'success', message: 'User deleted successfully' });
-      } else {
-        throw new Error('Failed to delete user');
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      NotificationMessage({ 
-        type: 'error', 
-        message: 'Failed to delete user'
-      });
-    } finally {
+    const success = await handleDeleteUser(deleteUserId);
+    if (success) {
       setIsModalVisible(false);
       setDeleteUserId(null);
     }
   };
 
-  const handleSearch = () => {
-    const filtered = allUsers.filter(user => {
-      switch (searchType) {
-        case 'name':
-          return user.name.toLowerCase().includes(searchTerm.toLowerCase());
-        case 'id':
-          return user.id.toString().includes(searchTerm);
-        case 'phone':
-          return user.phoneNumber.includes(searchTerm);
-        case 'email':
-          return user.email.toLowerCase().includes(searchTerm.toLowerCase());
-        default:
-          return false;
-      }
-    });
-    setFilteredUsers(filtered);
+  const handleSearchClick = () => {
+    handleSearch(searchTerm, searchType);
   };
 
   const selectBefore = (
@@ -148,7 +91,7 @@ const UserManagement = () => {
   // Change page
   const onPageChange = (page: number) => setCurrentPage(page);
 
-  const handleEditUser = (user: User, event: React.MouseEvent) => {
+  const handleEditUser = (user: any, event: React.MouseEvent) => {
     event.stopPropagation();
     console.log('Selected user in UserManagements:', user);
     dispatch(setTempUser({
@@ -187,7 +130,7 @@ const UserManagement = () => {
                 <Button
                   type="primary"
                   icon={<SearchOutlined />}
-                  onClick={handleSearch}
+                  onClick={handleSearchClick}
                   className="absolute right-0 top-0 bottom-0 z-10 bg-[#36004f] border-[#36004f] hover:bg-[#4b0070] focus:bg-[#36004f] rounded-r-md flex items-center justify-center custom-button custom-button-outline"
                 />
               }
@@ -198,7 +141,7 @@ const UserManagement = () => {
         {filteredUsers.length > 0 ? (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 w-full max-w-7xl">
-              {currentUsers.map((user: User) => (
+              {currentUsers.map((user: any) => (
                 <div 
                   key={user.id} 
                   className="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg duration-300 ease-in-out transform hover:scale-105"
@@ -257,7 +200,7 @@ const UserManagement = () => {
         <Modal
           title="Confirm Delete"
           visible={isModalVisible}
-          onOk={handleDeleteUser}
+          onOk={handleDeleteConfirm}
           onCancel={() => setIsModalVisible(false)}
           okText="Yes"
           cancelText="No"

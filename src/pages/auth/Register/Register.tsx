@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaCheckCircle, FaTimesCircle, FaLock, FaEye, FaEyeSlash, FaUser, FaPhoneAlt} from 'react-icons/fa'; 
-import logoLogin from "../../assets/Logo Jira 5.png";
+import logoLogin from "../../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from 'react-router-dom';
-import styles from "./auth.module.css";
-import ShinyEffect from '../../components/ShinyEffect';
-import { BackgroundBeamsWithCollision } from '../../components/ui/Background-beams-with-collision';
-import Reveal from '../../components/Reveal';
-import axios from 'axios';
+import styles from "../auth.module.css";
+import ShinyEffect from '../../../components/ShinyEffect';
+import { BackgroundBeamsWithCollision } from '../../../components/ui/Background-beams-with-collision';
+import Reveal from '../../../components/Reveal';
+import { validateEmail, validatePhoneNumber, registerUser } from './RegisterLogic';
 import { Alert } from 'antd';
-import TextAnimation from '../../components/ui/TextAnimation';
+import TextAnimation from '../../../components/ui/TextAnimation';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -39,16 +39,6 @@ const Register: React.FC = () => {
 
     const togglePassword = () => {
         setShowPassword(!showPassword);
-    };
-
-    const validateEmail = (email: string): boolean => {
-        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        return regex.test(email);
-    };
-
-    const validatePhoneNumber = (phoneNumber: string): boolean => {
-        const regex = /^\d+$/;
-        return regex.test(phoneNumber);
     };
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,20 +141,17 @@ const Register: React.FC = () => {
         };
 
         try {
-            const response = await axios.post('https://jiranew.cybersoft.edu.vn/api/Users/signup', model, {
-                headers: {
-                    'Content-Type': 'application/json-patch+json',
-                    'TokenCybersoft': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCBETiAxMSIsIkhldEhhblN0cmluZyI6IjE3LzAyLzIwMjUiLCJIZXRIYW5UaW1lIjoiMTczOTc1MDQwMDAwMCIsIm5iZiI6MTcwOTc0NDQwMCwiZXhwIjoxNzM5ODk4MDAwfQ.qvs2zsWDKR2CRt273FQIadSYJzZM-hCro_nsLVpa-Wg',
-                },
-            });
-            console.log('Signup successful:', response.data);
-            setAlert({ message: 'Registration successful!', type: 'success' });
-
-            setTimeout(() => {
-                navigate('/login');
-            }, 800);
-        } catch (error: any) {
-            console.error('Signup error:', error.response?.data);
+            const result = await registerUser(model);
+            if (result.success) {
+                setAlert({ message: 'Registration successful!', type: 'success' });
+                setTimeout(() => {
+                    navigate('/login');
+                }, 800);
+            } else {
+                setAlert({ message: 'Registration failed! Email already exists', type: 'error' });
+            }
+        } catch (error) {
+            console.error('Signup error:', error);
             setAlert({ message: 'Registration failed! Email already exists', type: 'error' });
         }
     };

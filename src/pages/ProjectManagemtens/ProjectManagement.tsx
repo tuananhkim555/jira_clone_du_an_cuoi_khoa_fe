@@ -14,27 +14,16 @@ import '../../styles/pagination.css';
 import '../../styles/modal.css';
 import AnimationSection from '../../components/ui/AnimationSection';
 import { getAllPriorities, getAllStatuses } from '../../api/api';
-
-interface Project {
-  id: number;
-  projectName: string;
-  categoryName: string;
-  creator: {
-    id: number;
-    name: string;
-  };
-  members: {
-    userId: number;
-    name: string;
-    avatar: string;
-  }[];
-}
-
-interface User {
-  userId: number;
-  name: string;
-  avatar: string;
-}
+import { 
+  fetchProjects, 
+  fetchUsers, 
+  deleteProject, 
+  addMemberToProject,
+  removeMemberFromProject,
+  handleApiError,
+  type Project,
+  type User
+} from './ProjectMangagementsLogic';
 
 interface ApiResponse {
   content: Project[];
@@ -92,82 +81,30 @@ const ProjectTable = () => {
   const [priorities, setPriorities] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
 
-  const api = axios.create({
-    baseURL: 'https://jiranew.cybersoft.edu.vn/api',
-    headers: {
-      TokenCybersoft: import.meta.env.VITE_CYBERSOFT_TOKEN,
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`
-    }
-  });
-
   useEffect(() => {
-    fetchProjects();
-    fetchUsers();
-    fetchPriorities();
-    fetchStatuses();
-  }, []);
-
-  const fetchProjects = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await api.get('/Project/getAllProject');
-      const typedResponse = response.data as { content: Project[] };
-      const sortedProjects = typedResponse.content.reverse();
-      setTimeout(() => {
-        setProjects(sortedProjects);
-        setAllProjects(sortedProjects);
-        setModalFilteredProjects(sortedProjects);
-        setTotalProjects(sortedProjects.length);
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      try {
+        const [projectsData, usersData] = await Promise.all([
+          fetchProjects(),
+          fetchUsers()
+        ]);
+        setProjects(projectsData);
+        setAllProjects(projectsData);
+        setModalFilteredProjects(projectsData);
+        setTotalProjects(projectsData.length);
+        setUsers(usersData);
+        setFilteredUsers(usersData);
+      } catch (error) {
+        handleApiError(error, 'Failed to load initial data');
+        setError('Failed to load data. Please try again later.');
+      } finally {
         setIsLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setError('Failed to fetch projects. Please try again later.');
-      setIsLoading(false);
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const response = await api.get('/Users/getUser');
-      if (response.data && response.data.content) {
-        const formattedUsers = response.data.content.map((user: any) => ({
-          userId: user.userId,
-          name: user.name,
-          avatar: user.avatar
-        }));
-        setUsers(formattedUsers);
-        setFilteredUsers(formattedUsers);
-      } else {
-        console.error('Invalid user data format:', response.data);
       }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      NotificationMessage({
-        type: 'error',
-        message: 'Failed to fetch users. Please try again.'
-      });
-    }
-  };
+    };
 
-  const fetchPriorities = async () => {
-    try {
-      const response = await getAllPriorities();
-      setPriorities(response.data.content);
-    } catch (error) {
-      console.error('Error fetching priorities:', error);
-    }
-  };
-
-  const fetchStatuses = async () => {
-    try {
-      const response = await getAllStatuses();
-      setStatuses(response.data.content);
-    } catch (error) {
-      console.error('Error fetching statuses:', error);
-    }
-  };
+    loadInitialData();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -181,49 +118,25 @@ const ProjectTable = () => {
 
   const { confirm } = Modal;
 
-  const deleteProject = (projectId: number) => {
+  const handleDeleteProject = async (projectId: number) => {
     confirm({
       title: 'Are you sure you want to delete this project?',
       icon: <ExclamationCircleOutlined />,
       content: 'This action cannot be undone.',
       okText: 'Yes',
-      okButtonProps: { className: 'custom-button-outline' },
+      okType: 'danger',
       cancelText: 'No',
-      cancelButtonProps: { className: 'custom-button-outline' },
-      onOk() {
-        api.delete(`/Project/deleteProject`, {
-          params: { projectId },
-        })
-        .then(() => {
+      async onOk() {
+        try {
+          await deleteProject(projectId);
           setProjects(projects.filter(project => project.id !== projectId));
           NotificationMessage({
             type: 'success',
             message: 'Project deleted successfully!'
           });
-        })
-        .catch((error) => {
-          console.error('Error deleting project:', error);
-          if (axios.isAxiosError(error)) {
-            console.log('Error response:', error.response?.data);
-            if (error.response?.status === 403) {
-              NotificationMessage({
-                type: 'error',
-                message: 'You do not have permission to delete this project. Only the project creator can delete it.'
-              });
-            } else {
-              NotificationMessage({
-                type: 'error',
-                message: 'Failed to delete project. Please try again.'
-              });
-            }
-          } else {
-            console.log('Unexpected error:', error);
-            NotificationMessage({
-              type: 'error',
-              message: 'An unexpected error occurred. Please try again.'
-            });
-          }
-        });
+        } catch (error) {
+          handleApiError(error, 'Failed to delete project');
+        }
       },
     });
   };
@@ -281,18 +194,7 @@ const ProjectTable = () => {
   const handleMemberSelect = async (userId: number) => {
     if (selectedProjectId) {
       try {
-        await api.post(
-          `/Project/assignUserProject`,
-          {
-            projectId: selectedProjectId,
-            userId: userId
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        await addMemberToProject(selectedProjectId, userId);
         NotificationMessage({
           type: 'success',
           message: 'Member added successfully!'
@@ -317,18 +219,7 @@ const ProjectTable = () => {
         setProjects(updatedProjects);
         setAllProjects(updatedProjects);
       } catch (error) {
-        console.error('Error adding member:', error);
-        if (axios.isAxiosError(error) && error.response?.status === 403) {
-          NotificationMessage({
-            type: 'error',
-            message: 'You do not have permission to add members to this project. Only the project creator can add members.'
-          });
-        } else {
-          NotificationMessage({
-            type: 'error',
-            message: 'Failed to add member. Please try again.'
-          });
-        }
+        handleApiError(error, 'Failed to add member');
       }
     }
     setIsAddingMember(false);
@@ -343,50 +234,23 @@ const ProjectTable = () => {
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        api.post(
-          `/Project/removeUserFromProject`,
-          {
-            projectId: projectId,
-            userId: userId
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        )
-        .then(() => {
-          NotificationMessage({
-            type: 'success',
-            message: 'Member removed successfully!'
-          });
-          // Update the project in the current state instead of fetching all projects
-          const updatedProjects = projects.map(project => {
-            if (project.id === projectId) {
-              return {
-                ...project,
-                members: project.members.filter(member => member.userId !== userId)
-              };
-            }
-            return project;
-          });
-          setProjects(updatedProjects);
-          setAllProjects(updatedProjects);
-        })
-        .catch((error) => {
-          console.error('Error removing member:', error);
-          if (axios.isAxiosError(error) && error.response?.status === 403) {
-            NotificationMessage({
-              type: 'error',
-              message: 'You do not have permission to remove members from this project. Only the project creator can remove members.'
-            });
-          } else {
-            NotificationMessage({
-              type: 'error',
-              message: 'Failed to remove member. Please try again.'
-            });
-          }
+        removeMemberFromProject(projectId, userId);
+        NotificationMessage({
+          type: 'success',
+          message: 'Member removed successfully!'
         });
+        // Update the project in the current state instead of fetching all projects
+        const updatedProjects = projects.map(project => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              members: project.members.filter(member => member.userId !== userId)
+            };
+          }
+          return project;
+        });
+        setProjects(updatedProjects);
+        setAllProjects(updatedProjects);
       },
     });
   };
@@ -588,7 +452,7 @@ const ProjectTable = () => {
           </div>
           <div className="mt-4 flex justify-end space-x-2">
             <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-            <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+            <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
           </div>
         </div>
       ))}
@@ -627,7 +491,7 @@ const ProjectTable = () => {
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
-              <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => deleteProject(project.id)}><FaTrash size={14} /></button>
+              <button className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:from-purple-900 hover:to-orange-800 shadow-sm" onClick={() => handleDeleteProject(project.id)}><FaTrash size={14} /></button>
             </div>
           </div>
         ))}
@@ -698,7 +562,7 @@ const ProjectTable = () => {
         />
         <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: 10 }}>
           {column === 'categoryName' ? (
-            ['Dự án web', 'Dự án phần mềm', 'Dự án di ��ộng'].map(category => (
+            ['Dự án web', 'Dự án phần mềm', 'Dự án di ộng'].map(category => (
               <div key={category} style={{ marginBottom: 5 }}>
                 <StyledCheckbox
                   checked={selectedCategories.includes(category)}
@@ -849,7 +713,7 @@ const ProjectTable = () => {
                     <button className="bg-purple-950 text-white rounded-md p-2 hover:bg-purple-900 shadow-sm" onClick={() => handleEditProject(project.id)}><FaPencilAlt size={14} /></button>
                     <button 
                       className="bg-gradient-to-r from-purple-800 to-orange-700 text-white rounded-md p-2 hover:opacity-90 shadow-sm" 
-                      onClick={() => deleteProject(project.id)}
+                      onClick={() => handleDeleteProject(project.id)}
                     >
                       <FaTrash size={14} />
                     </button>

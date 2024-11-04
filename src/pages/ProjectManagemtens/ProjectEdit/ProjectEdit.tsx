@@ -1,65 +1,31 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
-import { getProjectDetails, getProjectCategories, updateProjectDetails } from '../../api/api';
-import NotificationMessage from '../../components/NotificationMessage';
-import TitleGradient from '../../components/ui/TitleGradient';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import Reveal from '../../components/Reveal';
+import NotificationMessage from '../../../components/NotificationMessage';
+import TitleGradient from '../../../components/ui/TitleGradient';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import Reveal from '../../../components/Reveal';
 import { FaEdit, FaSave } from 'react-icons/fa';
-import AnimationSection from '../../components/ui/AnimationSection';
-import TextAnimation from '../../components/ui/TextAnimation';
-
-interface ProjectDetails {
-  id: number;
-  projectName: string;
-  description: string;
-  projectCategory: {
-    id: number;
-    name: string;
-  };
-  alias: string;
-  creator: {
-    id: number;
-    name: string;
-  };
-}
-
-interface Category {
-  id: number;
-  projectCategoryName: string;
-}
+import AnimationSection from '../../../components/ui/AnimationSection';
+import TextAnimation from '../../../components/ui/TextAnimation';
+import { useProjectEditLogic } from './ProjectEditLogic';
 
 const ProjectEdit: React.FC = () => {
-  const [project, setProject] = useState<ProjectDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const notificationShownRef = useRef(false);
+  
+  const {
+    project,
+    setProject,
+    loading,
+    notification,
+    categories,
+    fetchProjectAndCategories,
+    handleSubmit
+  } = useProjectEditLogic(id, navigate);
 
   useEffect(() => {
-    const fetchProjectAndCategories = async () => {
-      try {
-        const [projectResponse, categoriesResponse] = await Promise.all([
-          getProjectDetails(id!),
-          getProjectCategories()
-        ]);
-
-        const projectData = projectResponse.data as any;
-        const categoriesData = categoriesResponse.data as any;
-
-        setProject(projectData.content);
-        setCategories(categoriesData.content);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setNotification({ type: 'error', message: 'Failed to fetch project details or categories.' });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (id) {
       fetchProjectAndCategories();
     }
@@ -99,28 +65,6 @@ const ProjectEdit: React.FC = () => {
   const handleEditorChange = (content: string, editor: any) => {
     setProject(prev => prev ? { ...prev, description: content } : null);
   };
-
-  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!project) return;
-
-    try {
-      const updateData = {
-        id: project.id,
-        projectName: project.projectName,
-        creator: project.creator.id,
-        description: project.description,
-        categoryId: project.projectCategory.id.toString()
-      };
-
-      await updateProjectDetails(updateData);
-      setNotification({ type: 'success', message: 'Project updated successfully' });
-      setTimeout(() => navigate('/project'), 2000);
-    } catch (error) {
-      console.error('Error updating project:', error);
-      setNotification({ type: 'error', message: 'Failed to update project. You can only update projects you created.' });
-    }
-  }, [project, navigate]);
 
   // Add this function to handle the cancel action
   const handleCancel = () => {

@@ -5,6 +5,7 @@ import LogoAva from "../assets/Jira_Logo.svg"
 import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from "../redux/store.ts";
+import NotificationMessage from "./NotificationMessage";
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 import AvatarPage from "../assets/anhdaidien2.jpg"
 
@@ -17,6 +18,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{type: "success" | "error" | "info" | "warning", message: string} | null>(null);
 
   // Lấy thông tin user từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
@@ -59,9 +61,17 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
         path = '/users-managements';
         break;
       case 'logout':
-        // Handle logout logic here
-        path = '/login';
-        break;
+        if (!notification) { // Only show notification if there isn't one already
+          setNotification({
+            type: "success",
+            message: 'Logout successful!'
+          });
+          setTimeout(() => {
+            setNotification(null);
+            navigate('/login');
+          }, 1500);
+        }
+        return;
       default:
         path = `/${menu}`;
     }
@@ -77,6 +87,12 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
   
   return (
     <>
+      {notification && (
+        <NotificationMessage
+          type={notification.type}
+          message={notification.message}
+        />
+      )}
       <aside className={`h-screen fixed top-0 left-0 z-30 transition-all duration-300 ease-in-out ${
         window.innerWidth >= 750 ? 'translate-x-0' : isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       } ${expanded ? 'w-64' : 'w-20'}`}>
@@ -126,6 +142,12 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
               
               <SidebarItem icon={<FaFileAlt />} text="Pages" active={activeMenu === "pages"} onClick={() => handleMenuClick("pages")} />
               <SidebarItem icon={<FaExclamationCircle />} text="Help" active={activeMenu === "help"} onClick={() => handleMenuClick("help")} />
+              
+              {/* Add a horizontal line with margin */}
+              <li className="my-4">
+                <hr className="border-purple-800" />
+              </li>
+              
               <SidebarItem icon={<FaCogs />} text="Settings" active={activeMenu === "settings"} onClick={() => handleMenuClick("settings")} />
               <SidebarItem icon={<FaSignOutAlt />} text="Logout" active={activeMenu === "logout"} onClick={() => handleMenuClick("logout")} />
             </ul>

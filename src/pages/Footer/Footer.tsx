@@ -1,7 +1,6 @@
-import React from 'react'
 import { FaFacebook, FaGithub, FaTiktok } from 'react-icons/fa'
 
-const footer = () => {
+const Footer = () => {
   return (
     <>
         <div className="lg:mt-[-150px] mt-[250px] md:mt-[300px]">
@@ -23,4 +22,4 @@ const footer = () => {
   )
 }
 
-export default footer
+export default Footer;

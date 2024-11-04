@@ -15,7 +15,7 @@ import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NotificationMessage from '../../components/NotificationMessage';
-import EditProjectDetail from './EditProjectDetail/EditProjectDetail';
+import EditProjectDetail from './EditTaskDetail/EditTaskDetail';
 import  Footer  from '../Footer/Footer';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -232,27 +232,37 @@ const JiraBoard: React.FC = () => {
       newColumns[status.statusId] = {
         id: status.statusId,
         title: status.statusName,
-        tasks: status.lstTaskDeTail.map((task: any) => ({
-          id: task.taskId || `temp-${status.statusId}-${task.taskId}`,
-          taskName: task.taskName,
-          content: task.taskName,
-          assignees: task.assigness || [],
-          priority: {
-            priorityId: task.priorityTask?.priorityId,
-            priority: task.priorityTask?.priority,
-            priorityName: task.priorityTask?.priority
-          },
-          priorityTask: task.priorityTask,
-          statusId: status.statusId,
-          originalEstimate: task.originalEstimate,
-          timeTrackingSpent: task.timeTrackingSpent,
-          timeTrackingRemaining: task.timeTrackingRemaining,
-          description: task.description,
-          typeId: task.typeId
-        })),
+        tasks: status.lstTaskDeTail.map((task: any) => {
+          console.log('Processing task:', task);
+          
+          return {
+            id: task.taskId || task.id,
+            taskId: task.taskId || task.id,
+            taskName: task.taskName,
+            content: task.taskName,
+            assignees: Array.isArray(task.assigness) ? task.assigness.map((assignee: any) => ({
+              userId: assignee.id,
+              name: assignee.name,
+              avatar: assignee.avatar
+            })) : [],
+            priority: {
+              priorityId: task.priorityTask?.priorityId || task.priority?.priorityId,
+              priority: task.priorityTask?.priority || task.priority?.priority,
+              description: task.priorityTask?.description || task.priority?.description
+            },
+            statusId: status.statusId,
+            originalEstimate: task.originalEstimate,
+            timeTrackingSpent: task.timeTrackingSpent,
+            timeTrackingRemaining: task.timeTrackingRemaining,
+            description: task.description,
+            typeId: task.typeId
+          };
+        }),
         color: getColumnColor(status.statusId)
       };
     });
+    
+    console.log('Updated columns:', newColumns);
     setColumns(newColumns);
   };
 

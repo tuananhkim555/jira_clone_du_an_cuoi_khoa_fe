@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Login from '../pages/Auth/Login';
-import Register from '../pages/Auth/Register';
+import Login from '../pages/Auth/Login/Login';
+import Register from '../pages/Auth/Register/Register';
 import CreateProject from '../pages/CrateProject/CreateProjects';
 import ProjectManagement from '../pages/ProjectManagemtens/ProjectManagement';
 import Settings from '../pages/Settings/Settings';
@@ -10,7 +10,7 @@ import JiraBoard from '../pages/JiraBoard/JiraBoard';
 import NotFound from '../pages/NotFound/NotFound';
 import Helps from '../pages/Help/Help';
 import Pages from '../pages/PagesDeploy/Pages';
-import ProjectEdit from '../pages/ProjectManagemtens/ProjectEdit';
+import ProjectEdit from '../pages/ProjectManagemtens/ProjectEdit/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
 import Dashboard from '../pages/JiraBoard/Dashboard';
 

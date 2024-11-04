@@ -49,7 +49,6 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
   }, []);
 
   useEffect(() => {
-    console.log('Columns updated:', columns);
   }, [columns]);
 
   const onDragEnd = (result: DropResult) => {
@@ -108,9 +107,10 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
 
   const renderProjectCard = (tasks: Task[]) => {
     return tasks.map((task, index) => {
-      const taskId = task.taskId || task.id || `task-${index}`;
+      const uniqueKey = `${task.taskId || task.id || index}-${task.statusId}-${index}`;
+      
       return (
-        <Draggable key={taskId.toString()} draggableId={taskId.toString()} index={index}>
+        <Draggable key={uniqueKey} draggableId={uniqueKey} index={index}>
           {(provided) => (
             <li
               ref={provided.innerRef}
@@ -129,8 +129,11 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex -space-x-2 overflow-hidden">
-                  {task.assignees && task.assignees.map((assignee) => (
-                    <Tooltip key={assignee.userId} title={assignee.name}>
+                  {task.assignees?.map((assignee, assigneeIndex) => (
+                    <Tooltip 
+                      key={`${uniqueKey}-assignee-${assignee.userId || assigneeIndex}`} 
+                      title={assignee.name}
+                    >
                       <Avatar 
                         src={assignee.avatar} 
                         size="small"

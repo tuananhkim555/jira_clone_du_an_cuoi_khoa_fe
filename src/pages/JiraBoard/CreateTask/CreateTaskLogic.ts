@@ -62,9 +62,8 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
 
   const handleCreate = async (values: any) => {
     try {
-      // Format dữ liệu theo đúng yêu cầu của API
       const taskData = {
-        listUserAsign: values.listUserAsign || [], // Mảng ID của người được assign
+        listUserAsign: values.listUserAsign || [],
         taskName: values.taskName,
         description: description,
         statusId: values.statusId,
@@ -76,26 +75,34 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
         priorityId: Number(values.priorityId)
       };
 
-      // Log dữ liệu trước khi gửi để kiểm tra
-      console.log('Task data before sending:', taskData);
-
       const response = await createTask(taskData);
       
-      // Log response để debug
-      console.log('API Response:', response);
-
-      if (response && response.data && response.data.content) {
-        onCreate(response.data.content);
+      if (response?.data?.content) {
+        const normalizedTask = {
+          id: response.data.content.taskId,
+          taskId: response.data.content.taskId,
+          taskName: response.data.content.taskName,
+          content: response.data.content.taskName,
+          assignees: response.data.content.assigness?.map((assignee: any) => ({
+            userId: assignee.id,
+            name: assignee.name,
+            avatar: assignee.avatar
+          })) || [],
+          priority: {
+            priorityId: response.data.content.priorityTask?.priorityId,
+            priority: response.data.content.priorityTask?.priority
+          },
+          statusId: response.data.content.statusId,
+          originalEstimate: response.data.content.originalEstimate,
+          timeTrackingSpent: response.data.content.timeTrackingSpent,
+          timeTrackingRemaining: response.data.content.timeTrackingRemaining
+        };
+        
+        console.log('Normalized task data:', normalizedTask);
+        onCreate(normalizedTask);
         onCancel();
-      } else {
-        throw new Error('Invalid response format');
       }
-    } catch (error: any) {
-      console.error('API error:', error);
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || 'Failed to create task';
-        throw new Error(errorMessage);
-      }
+    } catch (error) {
       throw error;
     }
   };
