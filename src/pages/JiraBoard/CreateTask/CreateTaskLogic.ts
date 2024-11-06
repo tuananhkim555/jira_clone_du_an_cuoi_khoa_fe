@@ -96,6 +96,8 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
       const response = await createTask(taskData) as ApiResponse<TaskResponse>;
       
       if (response?.data?.content) {
+        console.log('API Response:', response.data.content);
+        
         const normalizedTask = {
           id: response.data.content.taskId,
           taskId: response.data.content.taskId,
@@ -106,9 +108,9 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
             name: assignee.name,
             avatar: assignee.avatar
           })) || [],
-          priority: {
-            priorityId: response.data.content.priorityTask?.priorityId,
-            priority: response.data.content.priorityTask?.priority
+          priority: response.data.content.priorityTask || {
+            priorityId: values.priorityId,
+            priority: priorities.find(p => p.priorityId === values.priorityId)?.priority
           },
           statusId: response.data.content.statusId,
           originalEstimate: response.data.content.originalEstimate,

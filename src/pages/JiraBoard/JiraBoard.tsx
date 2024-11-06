@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchProjects, fetchProjectDetails, fetchAllData, createNewTask, ProjectDetails } from './JiraBoardLogic';
-import { FaLeaf, FaTiktok, FaGithub, FaFacebook } from 'react-icons/fa';
+import { FaLeaf } from 'react-icons/fa';
 import TextGradient from '../../components/ui/TitleGradient';
-import { Input, Button, Form, InputNumber, Slider } from 'antd';
+import { Input, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, UserOutlined, FolderOutlined, CrownOutlined } from '@ant-design/icons';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
 import Reveal from '../../components/Reveal';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Editor } from '@tinymce/tinymce-react';
-import CustomSelect from '../../components/CustomSelect';
 import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NotificationMessage from '../../components/NotificationMessage';
 import EditTaskDetail from './EditTaskDetail/EditTaskDetail';
 import  Footer  from '../Footer/Footer';
-import { getProjectById, updateTaskStatus } from '../../api/api';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -437,173 +433,18 @@ const JiraBoard: React.FC = () => {
         </Reveal>
         {selectedTaskForEdit && (
           <EditTaskDetail
-            taskId={selectedTaskForEdit.id?.toString() || ''}
-            projectId={currentProject?.id.toString() || ''}
-            isVisible={isEditModalVisible}
-            onClose={() => {
-              setIsEditModalVisible(false);
-              setSelectedTaskForEdit(null);
-            }}
-            onUpdate={handleTaskUpdate}
-            taskTitle={selectedTaskForEdit.taskName}
-            taskDescription={selectedTaskForEdit.description || ''}
-            taskStatus={selectedTaskForEdit.statusId || ''}
-          />
+              taskId={selectedTaskForEdit.id?.toString() || ''}
+              projectId={currentProject?.id.toString() || ''}
+              isVisible={isEditModalVisible}
+              onClose={() => {
+                setIsEditModalVisible(false);
+                setSelectedTaskForEdit(null);
+              } }
+              onUpdate={handleTaskUpdate}
+              taskTitle={selectedTaskForEdit.taskName}
+              taskDescription={selectedTaskForEdit.description || ''}
+              taskStatus={selectedTaskForEdit.statusId || ''} taskPriority={''}          />
         )}
-        <AnimatePresence>
-          {isModalVisible && (
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-full bg-white shadow-lg z-[9999] flex flex-col"
-              style={{
-                width: 'min(90vw, 600px)',
-                height: '100vh'
-              }}
-            >
-              <div className="p-3 sm:p-4 flex-grow overflow-y-auto">
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Create Task for {currentProject?.projectName}</h2>
-                <Form layout="vertical">
-                  <div className="flex space-x-3 mb-3">
-                    <Form.Item
-                      label="Project Name"
-                      className="flex-1"
-                    >
-                      <Input 
-                        value={currentProject?.projectName || ''}
-                        disabled
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label="Task Name"
-                      className="flex-1"
-                    >
-                      <Input 
-                        placeholder="Enter task name" 
-                        value={taskName}
-                        onChange={(e) => setTaskName(e.target.value)}
-                      />
-                    </Form.Item>
-                  </div>
-                  <div className="flex space-x-3 mb-3">
-                    <Form.Item
-                      label="Priority"
-                      className="flex-1"
-                    >
-                      <CustomSelect
-                        options={priorities.map(p => ({ value: p.priorityId.toString(), label: p.priority }))}
-                        value={selectedPriority}
-                        onChange={(value) => setSelectedPriority(value as string)}
-                        placeholder="Select priority"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label="Task Type"
-                      className="flex-1"
-                    >
-                      <CustomSelect
-                        options={taskTypes.map(type => ({ value: type.id.toString(), label: type.taskType }))}
-                        value={selectedTaskType}
-                        onChange={(value) => setSelectedTaskType(value as string)}
-                        placeholder="Select task type"
-                      />
-                    </Form.Item>
-                  </div>
-                  <Form.Item
-                    label="Status"
-                    className="flex-1"
-                  >
-                    <CustomSelect
-                      options={statuses.map(s => ({ value: s.statusId, label: s.statusName }))}
-                      value={selectedStatus}
-                      onChange={(value) => setSelectedStatus(value as string)}
-                      placeholder="Select status"
-                    />
-                  </Form.Item>
-                  <div className="flex space-x-3 mb-3">
-                    <div className="flex-1 flex flex-col space-y-3">
-                      <Form.Item label="Assignees">
-                        <CustomSelect 
-                          options={allUsers.map((user: any) => ({ value: user.userId, label: user.name }))}
-                          value={selectedAssignees}
-                          onChange={(values) => setSelectedAssignees(values as string[])}
-                          placeholder="Select assignees"
-                          mode="multiple"
-                        />
-                      </Form.Item>
-                      <Form.Item label="Original Estimate">
-                        <InputNumber 
-                          min={0} 
-                          placeholder="0" 
-                          style={{ width: '100%' }} 
-                          value={originalEstimate}
-                          onChange={(value) => setOriginalEstimate(value || 0)}
-                        />
-                      </Form.Item>
-                    </div>
-                    <div className="flex-1 flex flex-col space-y-3">
-                      <Form.Item label="Time Tracking">
-                        <div className="flex items-center">
-                          <Slider
-                            min={0}
-                            max={100}
-                            onChange={handleTimeTrackingChange}
-                            value={sliderValue}
-                            style={{ flex: 1, marginRight: 16 }}
-                          />
-                          <span>{sliderValue.toFixed(0)}%</span>
-                        </div>
-                      </Form.Item>
-                      <div className="flex space-x-3">
-                        <Form.Item label="H logged" className="flex-1">
-                          <InputNumber
-                            min={0}
-                            value={loggedHours}
-                            onChange={handleLoggedHoursChange}
-                            style={{ width: '100%' }}
-                          />
-                        </Form.Item>
-                        <Form.Item label="H remaining" className="flex-1">
-                          <InputNumber
-                            min={0}
-                            value={remainingHours}
-                            onChange={handleRemainingHoursChange}
-                            style={{ width: '100%' }}
-                          />
-                        </Form.Item>
-                      </div>
-                    </div>
-                  </div>
-                  <Form.Item label="Description">
-                    <Editor
-                      apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-                      init={{
-                        height: 250,
-                        menubar: false,
-                        plugins: [
-                          'advlist autolink lists link image charmap print preview anchor',
-                          'searchreplace visualblocks code fullscreen',
-                          'insertdatetime media table paste code help wordcount'
-                        ],
-                        toolbar:
-                          'undo redo | formatselect | bold italic backcolor | \
-                          alignleft aligncenter alignright alignjustify | \
-                          bullist numlist outdent indent | removeformat | help'
-                      }}
-                      onEditorChange={handleEditorChange}
-                    />
-                  </Form.Item>
-                </Form>
-              </div>
-              <div className="p-3 sm:p-4 border-t flex justify-start space-x-3">
-                <Button type="primary" className='custom-button-outline' onClick={handleCreate}>Create</Button>
-                <Button onClick={handleCancel}>Cancel</Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
       <CreateTaskModal
         isVisible={isModalVisible}

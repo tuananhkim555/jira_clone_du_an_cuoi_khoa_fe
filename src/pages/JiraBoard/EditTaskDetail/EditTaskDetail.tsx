@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { updateTaskStatus, deleteTask } from '../../../api/api';
+import { updateTask } from '../JiraBoardLogic';
 import TinyMCE from '../../../components/Tinymce/Tinymce';
 import { Avatar, Slider } from 'antd';
 import { useMediaQuery } from '@mui/material';
@@ -10,15 +11,21 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 import  NotificationMessage  from '../../../components/NotificationMessage';
 
 interface EditTaskDetailProps {
-  taskId: string;
-  projectId: string;
+  taskId?: string;
+  projectId?: string;
   isVisible: boolean;
   onClose: () => void;
   onUpdate: () => void;
-  taskTitle: string;
-  taskDescription: string;
-  taskStatus: string;
-  taskPriority: string;
+  taskTitle?: string;
+  taskDescription?: string;
+  taskStatus?: string;
+  taskPriority?: string;
+  alias?: string;
+  reporterId?: number;
+  timeTrackingRemaining?: number;
+  timeTrackingSpent?: number;
+  originalEstimate?: number;
+  typeId?: number;
 }
 
 type StatusOption = {
@@ -55,16 +62,34 @@ const PRIORITY_OPTIONS: PriorityOption[] = [
   { priorityId: "4", priority: "Lowest" }
 ];
 
-const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVisible, onClose, onUpdate, taskTitle, taskDescription, taskStatus, taskPriority }) => {
+const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
+  taskId = '',
+  projectId = '',
+  isVisible,
+  onClose,
+  onUpdate,
+  taskTitle = '',
+  taskDescription = '',
+  taskStatus = '1',
+  taskPriority = '2',
+  alias = '',
+  reporterId = 0,
+  timeTrackingRemaining = 0,
+  timeTrackingSpent = 0,
+  originalEstimate = 0,
+  typeId = 1
+}) => {
   const [status, setStatus] = useState(taskStatus);
   const [priority, setPriority] = useState(taskPriority);
   const [title, setTitle] = useState(taskTitle);
   const [description, setDescription] = useState(taskDescription);
-  const [taskType, setTaskType] = useState("2");
+  const [taskType, setTaskType] = useState(typeId?.toString() || '1');
+  const [taskAlias, setTaskAlias] = useState(alias);
+  const [reporter, setReporter] = useState(reporterId?.toString() || '0');
+  const [timeLogged, setTimeLogged] = useState(timeTrackingSpent?.toString() || '0');
+  const [timeEstimated, setTimeEstimated] = useState(timeTrackingRemaining?.toString() || '0');
+  const [originalEstimateValue, setOriginalEstimateValue] = useState(originalEstimate?.toString() || '0');
   const [comment, setComment] = useState("");
-  const [originalEstimate, setOriginalEstimate] = useState("0");
-  const [timeLogged, setTimeLogged] = useState("0");
-  const [timeEstimated, setTimeEstimated] = useState("0");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const isMobile = useMediaQuery('(max-width:640px)');
@@ -124,6 +149,46 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
       NotificationMessage({
         type: 'error',
         message: 'Failed to delete task. Please try again.'
+      });
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const taskData = {
+        alias: taskAlias,
+        description: description,
+        originalEstimate: Number(originalEstimateValue) || 0,
+        priorityId: Number(priority) || 2,
+        projectId: Number(projectId) || 0,
+        reporterId: Number(reporter) || 0,
+        statusId: status,
+        taskId: Number(taskId) || 0,
+        taskName: title,
+        timeTrackingRemaining: Number(timeEstimated) || 0,
+        timeTrackingSpent: Number(timeLogged) || 0,
+        typeId: Number(taskType) || 1,
+        listUserAsign: []
+      };
+
+      const response = await updateTask(taskData);
+      
+      if (response?.statusCode === 200) {
+        NotificationMessage({
+          type: 'success',
+          message: 'Task updated successfully'
+        });
+        
+        onUpdate(); // Refresh the board
+        onClose(); // Close the modal
+      } else {
+        throw new Error(response?.message || 'Failed to update task');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to update task. Please try again.'
       });
     }
   };
@@ -297,8 +362,8 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
               </label>
               <input
                 type="number"
-                value={originalEstimate}
-                onChange={(e) => setOriginalEstimate(e.target.value)}
+                value={originalEstimateValue}
+                onChange={(e) => setOriginalEstimateValue(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
             </div>
@@ -385,8 +450,8 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
             Cancel
           </button>
           <button
-            onClick={onUpdate}
-            className="px-3 py-1.5 custom-button-outline text-white rounded hover:bg-blue-600 text-sm flex items-center"
+            onClick={handleUpdate}
+            className="px-3 py-1.5 custom-button-outline text-white rounded  text-sm flex items-center"
           >
             <FaSave className="mr-1" />
             Save Changes

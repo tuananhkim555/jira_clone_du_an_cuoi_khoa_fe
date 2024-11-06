@@ -17,6 +17,7 @@ api.interceptors.request.use(
     const token = localStorage.getItem("authToken");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Content-Type'] = 'application/json';
     }
     return config;
   },
@@ -85,18 +86,40 @@ export const getAllUsers = () => {
   });
 };
 
-export const createTask = async (taskData: any) => {
+// Define the interface for task data structure
+interface TaskData {
+  alias: string;
+  description: string;
+  originalEstimate: number;
+  priorityId: number;
+  projectId: number;
+  reporterId: number;
+  statusId: string;
+  taskId?: number; // Optional for creation
+  taskName: string;
+  timeTrackingRemaining: number;
+  timeTrackingSpent: number;
+  typeId: number;
+  listUserAsign?: number[]; // Optional user assignments
+}
+
+export const createTask = async (taskData: TaskData) => {
   try {
     const response = await api.post('/Project/createTask', {
-      ...taskData,
-      // Đảm bảo các trường bắt buộc có giá trị hợp lệ
-      projectId: Number(taskData.projectId),
-      statusId: taskData.statusId,
-      typeId: Number(taskData.typeId),
+      alias: taskData.alias,
+      description: taskData.description,
+      originalEstimate: Number(taskData.originalEstimate),
       priorityId: Number(taskData.priorityId),
-      listUserAsign: Array.isArray(taskData.listUserAsign) ? taskData.listUserAsign : []
+      projectId: Number(taskData.projectId),
+      reporterId: Number(taskData.reporterId),
+      statusId: taskData.statusId,
+      taskName: taskData.taskName,
+      timeTrackingRemaining: Number(taskData.timeTrackingRemaining),
+      timeTrackingSpent: Number(taskData.timeTrackingSpent),
+      typeId: Number(taskData.typeId),
+      listUserAsign: taskData.listUserAsign || []
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error('Error in createTask API call:', error);
     throw error;
@@ -108,17 +131,41 @@ export const updateProject = (projectData: any) => {
 };
 
 export const getTaskDetail = async (taskId: string) => {
-  const response = await api.get(`/Project/getTaskDetail`, {
-    params: {
-      taskId: Number(taskId)
-    }
-  });
-  const data = response.data as { content: any };
-  return data.content;
+  try {
+    const response = await api.get(`/Project/getTaskDetail`, {
+      params: {
+        taskId: Number(taskId)
+      }
+    });
+    return response.data.content;
+  } catch (error) {
+    console.error('Error getting task detail:', error);
+    throw error;
+  }
 };
 
-export const updateTask = (taskData: any) => {
-  return api.put(`/Task/updateTask`, taskData);
+export const updateTask = async (taskData: TaskData) => {
+  try {
+    const response = await api.post('/Project/updateTask', {
+      alias: taskData.alias,
+      description: taskData.description,
+      originalEstimate: Number(taskData.originalEstimate),
+      priorityId: Number(taskData.priorityId),
+      projectId: Number(taskData.projectId),
+      reporterId: Number(taskData.reporterId),
+      statusId: taskData.statusId,
+      taskId: Number(taskData.taskId),
+      taskName: taskData.taskName,
+      timeTrackingRemaining: Number(taskData.timeTrackingRemaining),
+      timeTrackingSpent: Number(taskData.timeTrackingSpent),
+      typeId: Number(taskData.typeId),
+      listUserAsign: taskData.listUserAsign || []
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating task:', error);
+    throw error;
+  }
 };
 
 export const getProjectDetails = (projectId: string) => {
@@ -142,10 +189,18 @@ export const deleteTask = async (taskId: number) => {
       taskId
     }
   });
-  if (response.data.statusCode === 200) {
-    return response.data;
+  
+  interface ApiResponse {
+    statusCode: number;
+    message?: string;
   }
-  throw new Error(response.data.message || 'Failed to delete task');
+
+  const data = response.data as ApiResponse;
+  
+  if (data.statusCode === 200) {
+    return data;
+  }
+  throw new Error(data.message || 'Failed to delete task');
 };
 
 export default api;

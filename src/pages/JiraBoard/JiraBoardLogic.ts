@@ -1,5 +1,5 @@
-import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes } from '../../api/api';
-import axios, { AxiosError } from 'axios';
+import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, updateTaskStatus } from '../../api/api';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 
 interface ApiResponse<T> {
   data: {
@@ -46,15 +46,15 @@ export const fetchProjects = async () => {
 
 export const fetchProjectDetails = async (projectId: string): Promise<ProjectDetails | null> => {
   try {
-    const response = await getProjectById(projectId) as ApiResponse<ProjectDetails>;
-    if (response.data && response.data.content) {
-      // Normalize task data structure
+    const response = await getProjectById(projectId) as AxiosResponse<{content: ProjectDetails}>;
+    if (response?.data?.content) {
       const normalizedContent = {
         ...response.data.content,
-        lstTask: response.data.content.lstTask.map(status => ({
+        lstTask: response.data.content.lstTask.map((status: any) => ({
           ...status,
-          lstTaskDeTail: status.lstTaskDeTail.map(task => ({
+          lstTaskDeTail: status.lstTaskDeTail.map((task: any) => ({
             id: task.taskId,
+            taskId: task.taskId,
             taskName: task.taskName,
             priority: task.priorityTask || task.priority,
             assignees: task.assigness ? task.assigness.map((assignee: any) => ({
@@ -68,10 +68,9 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectDet
       };
       return normalizedContent;
     }
-    console.error('Invalid response format for project details');
     return null;
-  } catch (error) {
-    console.error('Error fetching project details:', error);
+  } catch (error: any) {
+    console.error('Error fetching project details:', error.response?.data || error.message);
     return null;
   }
 };
@@ -107,24 +106,41 @@ export const fetchAllData = async () => {
 
 export const createNewTask = async (taskData: any) => {
   try {
-    const response = await createTask(taskData);
-    if (response && response.data && 'content' in response.data) {
+    const response = await createTask(taskData) as AxiosResponse;
+    if (response?.data?.content) {
       return response.data.content;
     }
     throw new Error('Invalid response format');
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response) {
-        console.error('Error creating task:', axiosError.response.data);
-        // Check if the task was actually created despite the error
-        if (axiosError.response.status === 200 || axiosError.response.status === 201) {
-          return axiosError.response.data.content;
-        }
-        throw new Error((axiosError.response.data as any).message || 'Failed to create task');
+  } catch (error: any) {
+    if (error?.response) {
+      console.error('Error creating task:', error.response.data);
+      // Check if the task was actually created despite the error
+      if (error.response.status === 200 || error.response.status === 201) {
+        return error.response.data.content;
       }
+      throw new Error(error.response.data?.message || 'Failed to create task');
     }
     console.error('Error creating task:', error);
+    throw error;
+  }
+};
+
+export const updateTask = async (taskData: any) => {
+  try {
+    const response = await updateTaskStatus(taskData.taskId, taskData.statusId);
+    if (response?.data) {
+      return {
+        statusCode: 200,
+        message: 'Task updated successfully',
+        content: response.data
+      };
+    }
+    throw new Error('Invalid response format');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error updating task:', error);
+      throw new Error(error.message || 'Failed to update task');
+    }
     throw error;
   }
 };
