@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Form, Input, InputNumber, Button, Slider, notification } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Editor } from '@tinymce/tinymce-react';
+import { FaProjectDiagram, FaTasks, FaExclamationTriangle, FaListUl, FaUsers, FaClock, FaChartLine, FaHourglassHalf, FaAlignLeft } from 'react-icons/fa';
 import CustomSelect from '../../../components/CustomSelect';
 import { useCreateTaskLogic } from './CreateTaskLogic';
+import TinyMCE from '../../../components/Tinymce/Tinymce';
 
 interface CreateTaskModalProps {
   isVisible: boolean;
@@ -76,15 +78,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             <h2 className="text-xl font-bold mb-4 text-purple-950">Create Task for - {currentProject?.projectName}</h2>
             <Form form={form} layout="vertical" onFinish={handleCreate}>
               <div className="flex space-x-2 mb-[-10px]">
-                <Form.Item name="projectName" label="Project" className="flex-1">
+                <Form.Item name="projectName" label={<div className="flex items-center"><FaProjectDiagram className="mr-2" />Project</div>} className="flex-1">
                   <Input disabled />
                 </Form.Item>
-                <Form.Item name="taskName" label="Task Name" className="flex-1" rules={[{ required: true }]}>
+                <Form.Item name="taskName" label={<div className="flex items-center"><FaTasks className="mr-2" />Task Name</div>} className="flex-1" rules={[{ required: true }]}>
                   <Input />
                 </Form.Item>
               </div>
               <div className="flex space-x-2 mb-[-10px]">
-                <Form.Item name="priorityId" label="Priority" className="flex-1" rules={[{ required: true }]}>
+                <Form.Item name="priorityId" label={<div className="flex items-center"><FaExclamationTriangle className="mr-2" />Priority</div>} className="flex-1" rules={[{ required: true }]}>
                   <CustomSelect
                     options={priorities.map(p => ({ value: p.priorityId, label: p.priority }))}
                     placeholder="Select priority"
@@ -92,7 +94,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                     onChange={(value) => form.setFieldsValue({ priorityId: value })}
                   />
                 </Form.Item>
-                <Form.Item name="typeId" label="Task Type" className="flex-1" rules={[{ required: true }]}>
+                <Form.Item name="typeId" label={<div className="flex items-center"><FaListUl className="mr-2" />Task Type</div>} className="flex-1" rules={[{ required: true }]}>
                   <CustomSelect
                     options={taskTypes.map(type => ({ value: type.id, label: type.taskType }))}
                     placeholder="Select task type"
@@ -101,7 +103,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   />
                 </Form.Item>
               </div>
-              <Form.Item name="statusId" label="Status" rules={[{ required: true }]}>
+              <Form.Item name="statusId" label={<div className="flex items-center"><FaChartLine className="mr-2" />Status</div>} rules={[{ required: true }]}>
                 <CustomSelect
                   options={statuses.map(s => ({ value: s.statusId, label: s.statusName }))}
                   placeholder="Select status"
@@ -111,7 +113,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               </Form.Item>
               <div className="flex space-x-2">
                 <div className="flex-1 space-y-2 mb-[-10px]">
-                  <Form.Item name="listUserAsign" label="Assignees">
+                  <Form.Item name="listUserAsign" label={<div className="flex items-center"><FaUsers className="mr-2" />Assignees</div>}>
                     <CustomSelect
                       options={allUsers.map(user => ({ value: user.userId, label: user.name }))}
                       placeholder="Select assignees"
@@ -120,12 +122,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                       onChange={(value) => form.setFieldsValue({ listUserAsign: value })}
                     />
                   </Form.Item>
-                  <Form.Item name="originalEstimate" label="Original Estimate" initialValue={0}>
+                  <Form.Item name="originalEstimate" label={<div className="flex items-center"><FaClock className="mr-2" />Original Estimate</div>} initialValue={0}>
                     <InputNumber min={0} style={{ width: '100%' }} />
                   </Form.Item>
                 </div>
                 <div className="flex-1 space-y-2 mb-[-10px]">
-                  <Form.Item label="Time Tracking">
+                  <Form.Item label={<div className="flex items-center"><FaHourglassHalf className="mr-2" />Time Tracking</div>}>
                     <div className="flex items-center">
                       <Slider
                         value={timeTracking}
@@ -155,25 +157,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   </div>
                 </div>
               </div>
-              <Form.Item label="Description">
-                <Editor
-                  apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                      'lists', 'link', 'image', 'charmap', 'preview',
-                      'searchreplace', 'code', 'fullscreen',
-                      'media', 'table', 'code', 'help', 'wordcount'
-                    ],
-                    toolbar:
-                      'undo redo | formatselect | ' +
-                      'bold italic backcolor | alignleft aligncenter ' +
-                      'alignright alignjustify | bullist numlist outdent indent | ' +
-                      'removeformat | help'
-                  }}
-                  onEditorChange={handleEditorChange}
-                />
+              <Form.Item label={<div className="flex items-center"><FaAlignLeft className="mr-2" />Description</div>}>
+                <TinyMCE value={description} onChange={handleEditorChange} height={270} />
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" className="custom-button-outline">

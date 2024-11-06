@@ -107,8 +107,14 @@ export const updateProject = (projectData: any) => {
   return api.put(`/Project/updateProject`, projectData);
 };
 
-export const getTaskDetail = (taskId: number) => {
-  return api.get(`/Task/getTaskDetail?id=${taskId}`);
+export const getTaskDetail = async (taskId: string) => {
+  const response = await api.get(`/Project/getTaskDetail`, {
+    params: {
+      taskId: Number(taskId)
+    }
+  });
+  const data = response.data as { content: any };
+  return data.content;
 };
 
 export const updateTask = (taskData: any) => {
@@ -121,6 +127,13 @@ export const getProjectDetails = (projectId: string) => {
 
 export const updateProjectDetails = (projectData: any) => {
   return api.put(`/Project/updateProject?projectId=${projectData.id}`, projectData);
+};
+
+export const updateTaskStatus = (taskId: number, statusId: string) => {
+  return api.put('/Project/updateStatus', {
+    taskId,
+    statusId
+  });
 };
 
 export default api;

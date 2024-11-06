@@ -15,12 +15,14 @@ import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NotificationMessage from '../../components/NotificationMessage';
-import EditProjectDetail from './EditTaskDetail/EditTaskDetail';
+import EditTaskDetail from './EditTaskDetail/EditTaskDetail';
 import  Footer  from '../Footer/Footer';
+import { getProjectById, updateTaskStatus } from '../../api/api';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 interface Task {
+  taskId: any;
   id: string;
   taskName: string;
   content: string;
@@ -90,7 +92,15 @@ const initialColumns: { [key: string]: Column } = {
   todo: {
     id: 'backlog',
     title: 'BACKLOG',
-    tasks: [{id: 'abc', taskName: 'abc', content: 'abc', statusId: '1'}],
+    tasks: [{
+      id: 'abc', taskName: 'abc', content: 'abc', statusId: '1',
+      taskId: '12714',
+      priority: {
+        priorityId: 1,
+        priority: "High",
+        priorityName: "High"
+      }
+    }],
     color: 'bg-[#300053]',
   },
   inProgress: {
@@ -142,6 +152,8 @@ const JiraBoard: React.FC = () => {
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -313,7 +325,34 @@ const JiraBoard: React.FC = () => {
   };
 
   const handleTaskClick = (taskId: string) => {
-    setSelectedTaskId(taskId);
+    let foundTask: Task | null = null;
+    Object.values(columns).some(column => {
+      const task = column.tasks.find(t => 
+        (t.taskId?.toString() || t.id?.toString()) === taskId
+      );
+      if (task) {
+        foundTask = task;
+        return true;
+      }
+      return false;
+    });
+
+    if (foundTask) {
+      setSelectedTaskForEdit(foundTask);
+      setIsEditModalVisible(true);
+    }
+  };
+
+  const handleTaskUpdate = async () => {
+    try {
+      if (!projectId) return;
+      
+      // Refresh the project details
+      const response = await getProjectById(projectId);
+      setProjectDetails(response.data.content);
+    } catch (error) {
+      console.error('Error refreshing project details:', error);
+    }
   };
 
   return (
@@ -387,10 +426,19 @@ const JiraBoard: React.FC = () => {
             onTaskClick={handleTaskClick}
           />
         </Reveal>
-        {selectedTaskId && (
-          <EditProjectDetail 
-            taskId={selectedTaskId}
-            key={selectedTaskId}
+        {selectedTaskForEdit && (
+          <EditTaskDetail
+            taskId={selectedTaskForEdit.id?.toString() || ''}
+            projectId={currentProject?.id.toString() || ''}
+            isVisible={isEditModalVisible}
+            onClose={() => {
+              setIsEditModalVisible(false);
+              setSelectedTaskForEdit(null);
+            }}
+            onUpdate={handleTaskUpdate}
+            taskTitle={selectedTaskForEdit.taskName}
+            taskDescription={selectedTaskForEdit.description || ''}
+            taskStatus={selectedTaskForEdit.statusId || ''}
           />
         )}
         <AnimatePresence>

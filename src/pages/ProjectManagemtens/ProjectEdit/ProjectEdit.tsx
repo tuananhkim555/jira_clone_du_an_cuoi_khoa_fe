@@ -9,6 +9,7 @@ import { FaEdit, FaSave } from 'react-icons/fa';
 import AnimationSection from '../../../components/ui/AnimationSection';
 import TextAnimation from '../../../components/ui/TextAnimation';
 import { useProjectEditLogic } from './ProjectEditLogic';
+import TinyMCE from '../../../components/Tinymce/Tinymce';
 
 const ProjectEdit: React.FC = () => {
   const navigate = useNavigate();
@@ -124,25 +125,7 @@ const ProjectEdit: React.FC = () => {
             <label htmlFor="description" className="block text-md font-medium text-gray-700 mb-1">
               <TextAnimation text='Description' />
             </label>
-            <Editor
-              apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-              value={project.description}
-              init={{
-                height: 300,
-                menubar: false,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: 'undo redo | formatselect | ' +
-                'bold italic backcolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-              }}
-              onEditorChange={handleEditorChange}
-            />
+            <TinyMCE value={project.description} onChange={handleEditorChange} />
           </div>
           <div className="mb-4">
             <label htmlFor="categoryId" className="block text-md font-medium text-gray-700 mb-1">

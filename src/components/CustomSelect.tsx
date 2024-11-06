@@ -26,11 +26,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
       setIsOpen(false);
       setSearchTerm('');
     } else {
-      const newValue = Array.isArray(value) ? value : [];
-      if (newValue.includes(selectedValue)) {
-        onChange(newValue.filter(v => v !== selectedValue));
+      const currentValue = Array.isArray(value) ? value as (string | number)[] : [];
+      if (currentValue.includes(selectedValue)) {
+        onChange(currentValue.filter(v => v !== selectedValue));
       } else {
-        onChange([...newValue, selectedValue]);
+        onChange([...currentValue, selectedValue]);
       }
     }
   }, [mode, onChange, value]);

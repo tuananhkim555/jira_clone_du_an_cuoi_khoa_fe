@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 import { Avatar, Tag, Tooltip } from 'antd';
 import { CheckCircleOutlined, InboxOutlined, RocketOutlined, SyncOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { fetchUsers, User } from './DragAndDropLogic';
+import EditTaskDetail from '../EditTaskDetail/EditTaskDetail';
 
 interface Task {
   id?: string | number;
@@ -34,10 +35,16 @@ interface DragAndDropBoardProps {
   columns: { [key: string]: Column };
   setColumns: React.Dispatch<React.SetStateAction<{ [key: string]: Column }>>;
   onTaskClick: (taskId: string) => void;
+  currentProject?: {
+    id: string | number;
+  };
 }
 
-const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns, onTaskClick }) => {
+const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns, onTaskClick, currentProject }) => {
   const [users, setUsers] = useState<User[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -96,13 +103,8 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
     }
   };
 
-  const handleTaskClick = (e: React.MouseEvent, task: Task) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const taskId = task.taskId || task.id;
-    if (taskId) {
-      onTaskClick(taskId.toString());
-    }
+  const handleTaskClick = (task: Task) => {
+    onTaskClick(task.taskId?.toString() || task.id?.toString() || '');
   };
 
   const renderProjectCard = (tasks: Task[]) => {
@@ -117,7 +119,7 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
               {...provided.draggableProps}
               {...provided.dragHandleProps}
               className="p-2 sm:p-3 mb-2 rounded-lg bg-gray-50 shadow-md cursor-pointer"
-              onClick={(e) => handleTaskClick(e, task)}
+              onClick={() => handleTaskClick(task)}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium">{task.taskName}</span>
@@ -216,6 +218,26 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
           </Droppable>
         ))}
       </div>
+      {selectedTask && (
+        <EditTaskDetail
+          taskId={selectedTaskId || ''}
+          projectId={currentProject?.id.toString() || ''}
+          isVisible={isModalVisible}
+          onClose={() => {
+            setIsModalVisible(false);
+            setSelectedTaskId(null);
+            setSelectedTask(null);
+          }}
+          onUpdate={() => {
+            setIsModalVisible(false);
+            setSelectedTaskId(null);
+            setSelectedTask(null);
+          }}
+          taskTitle={selectedTask.taskName}
+          taskDescription={selectedTask.description || ''}
+          taskStatus={selectedTask.statusId || ''}
+        />
+      )}
     </DragDropContext>
   );
 };

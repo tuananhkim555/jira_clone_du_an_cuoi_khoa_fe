@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
 import { useMediaQuery } from '@mui/material';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaProjectDiagram, FaAlignLeft, FaLayerGroup, FaHashtag } from 'react-icons/fa';
 import { fetchCategories, createProject } from './CreateProject';
 import { ProjectData, Category } from './typeCreate';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -12,6 +12,7 @@ import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
 import AnimationSection from '../../components/ui/AnimationSection';
 import TextAnimation from '../../components/ui/TextAnimation';
+import TinyMCE from '../../components/Tinymce/Tinymce';
 
 const CreateProject: React.FC = () => {
   const navigate = useNavigate();
@@ -109,7 +110,8 @@ const CreateProject: React.FC = () => {
         {error && <p style={{ color: 'red', marginBottom: '12px' }}>{error}</p>}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <div style={sectionStyle}>
-            <label htmlFor="projectName" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+            <label htmlFor="projectName" style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', fontWeight: 'bold' }}>
+              <FaProjectDiagram className="mr-2" />
               <TextAnimation text='Project Name' />
             </label>
             <input
@@ -123,34 +125,16 @@ const CreateProject: React.FC = () => {
             />
           </div>
           <div style={sectionStyle}>
-            <label htmlFor="description" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-            <TextAnimation text='Description' />
+            <label htmlFor="description" style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', fontWeight: 'bold' }}>
+              <FaAlignLeft className="mr-2" />
+              <TextAnimation text='Description' />
             </label>
-            <Editor
-              apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-              init={{
-                height: isMobile ? 200 : 280,
-                menubar: false,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: isMobile
-                  ? 'undo redo | bold italic | bullist numlist'
-                  : 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                width: '100%',
-                maxWidth: '100%',
-                resize: false
-              }}
-              onEditorChange={handleEditorChange}
-              value={formData.description}
-            />
+            <TinyMCE value={formData.description} onChange={handleEditorChange} />
           </div>
 
           <div style={sectionStyle}>
-            <label htmlFor="categoryId" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+            <label htmlFor="categoryId" style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', fontWeight: 'bold' }}>
+              <FaLayerGroup className="mr-2" />
               <TextAnimation text='Project Category' />
             </label>
             <select
@@ -173,7 +157,8 @@ const CreateProject: React.FC = () => {
           </div>
 
           <div style={sectionStyle}>
-            <label htmlFor="alias" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+            <label htmlFor="alias" style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', fontWeight: 'bold' }}>
+              <FaHashtag className="mr-2" />
               <TextAnimation text='Alias' />
             </label>
             <input

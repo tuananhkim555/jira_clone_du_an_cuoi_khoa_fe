@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   return (
     <motion.div 
-      className="p-4 bg-gray-100 min-h-screen max-w-[1400px] mx-auto mt-14"
+      className="p-4 min-h-screen max-w-[1400px] mx-auto mt-14"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

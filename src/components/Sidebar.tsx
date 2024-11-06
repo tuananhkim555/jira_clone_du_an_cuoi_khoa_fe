@@ -103,7 +103,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
           {isMobileMenuOpen ? <X /> : <Menu />}
         </button>
 
-        <nav className="h-full flex flex-col bg-gradient-to-b from-[#1f002d] via-purple-950 to-[#1f002d] text-white border-r shadow-xl rounded-r-3xl">
+        <nav className="h-full flex flex-col bg-gradient-to-t from-[#1f002d] via-purple-950 to-[#1f002d] text-white border-r shadow-xl rounded-r-3xl">
           <div className="p-4 pb-2 flex justify-between items-center">
             <img
               src={LogoAva}

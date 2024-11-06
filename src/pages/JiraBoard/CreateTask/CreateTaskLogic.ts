@@ -9,6 +9,24 @@ interface ApiResponse<T> {
   };
 }
 
+interface TaskResponse {
+  taskId: string;
+  taskName: string;
+  assigness?: {
+    id: string;
+    name: string;
+    avatar: string;
+  }[];
+  priorityTask?: {
+    priorityId: string;
+    priority: string;
+  };
+  statusId: string;
+  originalEstimate: number;
+  timeTrackingSpent: number;
+  timeTrackingRemaining: number;
+}
+
 interface Task {
   id: string;
   // Add other task properties here
@@ -75,7 +93,7 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
         priorityId: Number(values.priorityId)
       };
 
-      const response = await createTask(taskData);
+      const response = await createTask(taskData) as ApiResponse<TaskResponse>;
       
       if (response?.data?.content) {
         const normalizedTask = {
@@ -83,7 +101,7 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
           taskId: response.data.content.taskId,
           taskName: response.data.content.taskName,
           content: response.data.content.taskName,
-          assignees: response.data.content.assigness?.map((assignee: any) => ({
+          assignees: response.data.content.assigness?.map((assignee) => ({
             userId: assignee.id,
             name: assignee.name,
             avatar: assignee.avatar
