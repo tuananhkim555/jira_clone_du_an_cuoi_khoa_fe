@@ -136,4 +136,16 @@ export const updateTaskStatus = (taskId: number, statusId: string) => {
   });
 };
 
+export const deleteTask = async (taskId: number) => {
+  const response = await api.delete(`/Project/removeTask`, {
+    params: {
+      taskId
+    }
+  });
+  if (response.data.statusCode === 200) {
+    return response.data;
+  }
+  throw new Error(response.data.message || 'Failed to delete task');
+};
+
 export default api;

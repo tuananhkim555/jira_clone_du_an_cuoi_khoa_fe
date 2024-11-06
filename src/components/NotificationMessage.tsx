@@ -16,5 +16,5 @@ const NotificationMessage: React.FC<NotificationProps> = ({ type, message, durat
 
   return null;
 };
-
 export default NotificationMessage;
+

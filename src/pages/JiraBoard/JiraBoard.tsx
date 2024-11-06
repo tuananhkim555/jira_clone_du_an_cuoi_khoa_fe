@@ -95,11 +95,6 @@ const initialColumns: { [key: string]: Column } = {
     tasks: [{
       id: 'abc', taskName: 'abc', content: 'abc', statusId: '1',
       taskId: '12714',
-      priority: {
-        priorityId: 1,
-        priority: "High",
-        priorityName: "High"
-      }
     }],
     color: 'bg-[#300053]',
   },
@@ -347,9 +342,23 @@ const JiraBoard: React.FC = () => {
     try {
       if (!projectId) return;
       
-      // Refresh the project details
-      const response = await getProjectById(projectId);
-      setProjectDetails(response.data.content);
+      // Fetch updated project details
+      const updatedProject = await fetchProjectDetails(projectId);
+      if (updatedProject) {
+        setProjectDetails(updatedProject);
+        // Update columns with new data
+        const updatedColumns = updatedProject.lstTask.reduce((acc, status) => {
+          acc[status.statusId] = {
+            id: status.statusId,
+            title: status.statusName,
+            tasks: status.lstTaskDeTail,
+            color: getColumnColor(status.statusId),
+          };
+          return acc;
+        }, {} as { [key: string]: Column });
+        
+        setColumns(updatedColumns);
+      }
     } catch (error) {
       console.error('Error refreshing project details:', error);
     }

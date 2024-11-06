@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { updateTaskStatus } from '../../../api/api';
+import { updateTaskStatus, deleteTask } from '../../../api/api';
 import TinyMCE from '../../../components/Tinymce/Tinymce';
 import { Avatar, Slider } from 'antd';
 import { useMediaQuery } from '@mui/material';
-import { FaEdit, FaBug, FaTasks, FaHashtag, FaHeading, FaAlignLeft, FaUsers, FaExclamationTriangle, FaClock, FaComments, FaPaperPlane, FaSave } from 'react-icons/fa';
+import { FaEdit, FaBug, FaTasks, FaHashtag, FaHeading, FaAlignLeft, FaUsers, FaExclamationTriangle, FaClock, FaComments, FaPaperPlane, FaSave, FaCommentDots, FaLink, FaTrash } from 'react-icons/fa';
 import '../../../styles/button.css'
+import { CrownOutlined } from '@ant-design/icons';
+import ConfirmationModal from '../../../components/ConfirmationModal';
+import  NotificationMessage  from '../../../components/NotificationMessage';
 
 interface EditTaskDetailProps {
   taskId: string;
@@ -62,6 +65,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
   const [originalEstimate, setOriginalEstimate] = useState("0");
   const [timeLogged, setTimeLogged] = useState("0");
   const [timeEstimated, setTimeEstimated] = useState("0");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const isMobile = useMediaQuery('(max-width:640px)');
   const isTablet = useMediaQuery('(max-width:1024px)');
@@ -101,19 +105,59 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
     return Math.min((logged / estimated) * 100, 100);
   };
 
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteTask(Number(taskId));
+      NotificationMessage({
+        type: 'success',
+        message: 'Task deleted successfully'
+      });
+      setIsDeleteModalOpen(false);
+      onClose(); // Close the edit modal
+      onUpdate(); // This will trigger the refresh of the board
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to delete task. Please try again.'
+      });
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4" style={{paddingLeft: isMobile ? "16px" : isTablet ? "20px" : "250px"}}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4 " style={{paddingLeft: isMobile ? "16px" : isTablet ? "20px" : "250px"}}>
       <div className={`bg-white rounded-lg p-4 w-full relative z-[10000] ${isMobile ? 'max-w-full' : isTablet ? 'max-w-3xl' : 'max-w-5xl'} max-h-[90vh] overflow-y-auto`}>
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center">
+        <div className={`${isMobile ? '' : 'flex justify-between items-center'} mb-8`}>
+          <div className="flex items-center mb-4">
             <FaEdit className="text-2xl mr-2 text-purple-950" />
             <h2 className="text-lg font-semibold text-purple-950">Edit Task</h2>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className={`flex items-center ${isMobile ? 'justify-between' : 'space-x-4'}`}>
+            <button className="text-[16px] flex items-center text-gray-600 hover:text-gray-800">
+              <FaCommentDots className="mr-1" />
+              <span>Give feedback</span>
+            </button>
+            <button className="text-[16px] flex items-center text-gray-600 hover:text-gray-800">
+              <FaLink className="mr-1" />
+              <span>Copy link</span>
+            </button>
+            <button 
+              onClick={handleDeleteClick}
+              className="text-[16px] flex items-center text-red-700 hover:text-red-800"
+            >
+              <FaTrash className="mr-1" />
+              <span>Delete</span>
+            </button>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className={`flex ${isMobile ? 'flex-col' : 'gap-6'}`}>
@@ -152,7 +196,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center">
-                <FaHeading className="mr-2" />
+                <CrownOutlined  className="mr-2" />
                 Title
               </label>
               <input
@@ -190,7 +234,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
                   </div>
                   <button
                     onClick={handleCommentSubmit}
-                    className="px-3 py-1.5 custom-button-outline text-white rounded  text-sm flex items-center"
+                    className= "px-3 py-1.5 custom-button-outline text-white rounded  text-sm flex items-center"
                   >
                     <FaPaperPlane className="mr-1" />
                     Send
@@ -324,8 +368,9 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
               </div>
               <button
                 onClick={handleCommentSubmit}
-                className="custom-button-outline"
+                className="px-3 py-1.5 custom-button-outline text-white rounded  text-sm flex items-center"
               >
+                <FaPaperPlane className="mr-1" />
                 Send
               </button>
             </div>
@@ -348,6 +393,14 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({ taskId, projectId, isVi
           </button>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+      />
     </div>
   );
 };
