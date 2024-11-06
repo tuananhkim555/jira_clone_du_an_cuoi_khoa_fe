@@ -27,6 +27,21 @@ interface TaskResponse {
   timeTrackingRemaining: number;
 }
 
+interface TaskData {
+  listUserAsign: any[];
+  taskName: string;
+  description: string;
+  statusId: string;
+  originalEstimate: number;
+  timeTrackingSpent: number;
+  timeTrackingRemaining: number;
+  projectId: number;
+  typeId: number;
+  priorityId: number;
+  alias: string;
+  reporterId: string;
+}
+
 interface Task {
   id: string;
   // Add other task properties here
@@ -80,7 +95,7 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
 
   const handleCreate = async (values: any) => {
     try {
-      const taskData = {
+      const taskData: TaskData = {
         listUserAsign: values.listUserAsign || [],
         taskName: values.taskName,
         description: description,
@@ -90,14 +105,14 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
         timeTrackingRemaining: Number(values.timeTrackingRemaining) || 0,
         projectId: Number(currentProject.id),
         typeId: Number(values.typeId),
-        priorityId: Number(values.priorityId)
+        priorityId: Number(values.priorityId),
+        alias: values.taskName.toLowerCase().replace(/\s+/g, '-'),
+        reporterId: "0" // Default reporter ID
       };
 
       const response = await createTask(taskData) as ApiResponse<TaskResponse>;
       
       if (response?.data?.content) {
-        console.log('API Response:', response.data.content);
-        
         const normalizedTask = {
           id: response.data.content.taskId,
           taskId: response.data.content.taskId,
@@ -108,9 +123,9 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
             name: assignee.name,
             avatar: assignee.avatar
           })) || [],
-          priority: response.data.content.priorityTask || {
-            priorityId: values.priorityId,
-            priority: priorities.find(p => p.priorityId === values.priorityId)?.priority
+          priority: {
+            priorityId: response.data.content.priorityTask?.priorityId,
+            priority: response.data.content.priorityTask?.priority
           },
           statusId: response.data.content.statusId,
           originalEstimate: response.data.content.originalEstimate,

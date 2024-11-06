@@ -17,7 +17,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem("authToken");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
-      config.headers['Content-Type'] = 'application/json';
     }
     return config;
   },
@@ -86,40 +85,18 @@ export const getAllUsers = () => {
   });
 };
 
-// Define the interface for task data structure
-interface TaskData {
-  alias: string;
-  description: string;
-  originalEstimate: number;
-  priorityId: number;
-  projectId: number;
-  reporterId: number;
-  statusId: string;
-  taskId?: number; // Optional for creation
-  taskName: string;
-  timeTrackingRemaining: number;
-  timeTrackingSpent: number;
-  typeId: number;
-  listUserAsign?: number[]; // Optional user assignments
-}
-
-export const createTask = async (taskData: TaskData) => {
+export const createTask = async (taskData: any) => {
   try {
     const response = await api.post('/Project/createTask', {
-      alias: taskData.alias,
-      description: taskData.description,
-      originalEstimate: Number(taskData.originalEstimate),
-      priorityId: Number(taskData.priorityId),
+      ...taskData,
+      // Đảm bảo các trường bắt buộc có giá trị hợp lệ
       projectId: Number(taskData.projectId),
-      reporterId: Number(taskData.reporterId),
       statusId: taskData.statusId,
-      taskName: taskData.taskName,
-      timeTrackingRemaining: Number(taskData.timeTrackingRemaining),
-      timeTrackingSpent: Number(taskData.timeTrackingSpent),
       typeId: Number(taskData.typeId),
-      listUserAsign: taskData.listUserAsign || []
+      priorityId: Number(taskData.priorityId),
+      listUserAsign: Array.isArray(taskData.listUserAsign) ? taskData.listUserAsign : []
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error in createTask API call:', error);
     throw error;
@@ -131,41 +108,17 @@ export const updateProject = (projectData: any) => {
 };
 
 export const getTaskDetail = async (taskId: string) => {
-  try {
-    const response = await api.get(`/Project/getTaskDetail`, {
-      params: {
-        taskId: Number(taskId)
-      }
-    });
-    return response.data.content;
-  } catch (error) {
-    console.error('Error getting task detail:', error);
-    throw error;
-  }
+  const response = await api.get(`/Project/getTaskDetail`, {
+    params: {
+      taskId: Number(taskId)
+    }
+  });
+  const data = response.data as { content: any };
+  return data.content;
 };
 
-export const updateTask = async (taskData: TaskData) => {
-  try {
-    const response = await api.post('/Project/updateTask', {
-      alias: taskData.alias,
-      description: taskData.description,
-      originalEstimate: Number(taskData.originalEstimate),
-      priorityId: Number(taskData.priorityId),
-      projectId: Number(taskData.projectId),
-      reporterId: Number(taskData.reporterId),
-      statusId: taskData.statusId,
-      taskId: Number(taskData.taskId),
-      taskName: taskData.taskName,
-      timeTrackingRemaining: Number(taskData.timeTrackingRemaining),
-      timeTrackingSpent: Number(taskData.timeTrackingSpent),
-      typeId: Number(taskData.typeId),
-      listUserAsign: taskData.listUserAsign || []
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error updating task:', error);
-    throw error;
-  }
+export const updateTask = (taskData: any) => {
+  return api.put(`/Task/updateTask`, taskData);
 };
 
 export const getProjectDetails = (projectId: string) => {
