@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie, FaUsers, FaCog } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDiagram, FaLayerGroup, FaUserTie, FaUsers, FaCog, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
 import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -434,7 +434,10 @@ const ProjectTable = () => {
       </div>
       {paginatedProjects.map((project) => (
         <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-900 to-orange-800 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
+          <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-900 to-orange-800 text-transparent bg-clip-text cursor-pointer flex items-center space-x-2" onClick={() => navigate(`/board/${project.id}`)}>
+            <FaArrowRight className="text-purple-800" />
+            <span>{project.projectName}</span>
+          </h3>
           <p className="text-sm text-gray-600">ID: {project.id}</p>
           <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
           <p className="text-sm text-gray-600">
@@ -473,7 +476,10 @@ const ProjectTable = () => {
       <div className="grid grid-cols-2 gap-4">
         {paginatedProjects.map((project) => (
           <div key={project.id} className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>{project.projectName}</h3>
+            <h3 className="font-bold text-lg mb-2 bg-gradient-to-r from-purple-800 to-orange-700 text-transparent bg-clip-text cursor-pointer flex items-center space-x-2" onClick={() => navigate(`/board/${project.id}`)}>
+              <FaArrowRight className="text-purple-800" />
+              <span>{project.projectName}</span>
+            </h3>
             <p className="text-sm text-gray-600">ID: {project.id}</p>
             <p className="text-sm text-gray-600">Category: {project.categoryName}</p>
             <p className="text-sm text-gray-600">
@@ -697,7 +703,10 @@ const ProjectTable = () => {
               <tr key={project.id} className="hover:bg-gray-100">
                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{project.id}</td>
                 <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-purple-900 to-orange-800 text-transparent bg-clip-text cursor-pointer" onClick={() => navigate(`/board/${project.id}`)}>
-                  <div className="max-w-xs truncate">{project.projectName}</div>
+                  <div className="flex items-center space-x-2">
+                    <FaArrowRight className="text-purple-800" />
+                    <div className="max-w-xs truncate">{project.projectName}</div>
+                  </div>
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="max-w-xs truncate">{project.categoryName}</div>

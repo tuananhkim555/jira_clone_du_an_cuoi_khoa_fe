@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Progress, List, Avatar, Timeline } from 'antd';
-import { UserOutlined, ProjectOutlined, CheckCircleOutlined, ClockCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { UserOutlined, ProjectOutlined, CheckCircleOutlined, ClockCircleOutlined, PlusOutlined, DeleteOutlined, HistoryOutlined, TeamOutlined, FundProjectionScreenOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { getAllUsers } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
@@ -111,7 +111,14 @@ const Dashboard = () => {
         <Col xs={24} lg={14}>
           <motion.div variants={itemVariants}>
             <Card 
-              title={<span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Recent Activities</span>} 
+              title={
+                <div className="flex items-center">
+                  <HistoryOutlined className="text-purple-800 text-lg mr-2" />
+                  <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
+                    Recent Activities
+                  </span>
+                </div>
+              } 
               className="shadow-md" 
               size="small"
             >
@@ -125,11 +132,16 @@ const Dashboard = () => {
           </motion.div>
         </Col>
         <Col xs={24} lg={10}>
-          <motion.div  variants={itemVariants}>
+          <motion.div variants={itemVariants}>
             <Card 
               title={
                 <div className="flex justify-between items-center">
-                  <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Team Members</span>
+                  <div className="flex items-center">
+                    <TeamOutlined className="text-purple-800 text-lg mr-2" />
+                    <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
+                      Team Members
+                    </span>
+                  </div>
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-950 cursor-pointer hover:bg-purple-800">
                     <PlusOutlined className="text-white text-sm" />
                   </div>
@@ -146,7 +158,7 @@ const Dashboard = () => {
                     <List.Item.Meta 
                       avatar={<Avatar size="small" icon={<UserOutlined />} />}
                       title={<div className="mr-8">{user.name}</div>}
-                      description={<div className="mr-8 text-orange-800">{user.email}</div>}
+                      description={<div className="mr-8 text-orange-700">{user.email}</div>}
                       className="min-w-0"
                     />
                     <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-purple-900 to-orange-700 cursor-pointer hover:opacity-80">
@@ -164,7 +176,14 @@ const Dashboard = () => {
         <Col xs={24}>
           <motion.div variants={itemVariants}>
             <Card 
-              title={<span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">Project Progress</span>} 
+              title={
+                <div className="flex items-center">
+                  <FundProjectionScreenOutlined className="text-purple-800 text-lg mr-2" />
+                  <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
+                    Project Progress
+                  </span>
+                </div>
+              } 
               className="shadow-md" 
               size="small"
             >

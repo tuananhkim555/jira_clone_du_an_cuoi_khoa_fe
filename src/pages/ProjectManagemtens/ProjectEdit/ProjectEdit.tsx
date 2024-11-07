@@ -5,7 +5,7 @@ import NotificationMessage from '../../../components/NotificationMessage';
 import TitleGradient from '../../../components/ui/TitleGradient';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Reveal from '../../../components/Reveal';
-import { FaEdit, FaSave } from 'react-icons/fa';
+import { FaEdit, FaSave, FaProjectDiagram, FaHashtag, FaAlignLeft, FaListUl } from 'react-icons/fa';
 import AnimationSection from '../../../components/ui/AnimationSection';
 import TextAnimation from '../../../components/ui/TextAnimation';
 import { useProjectEditLogic } from './ProjectEditLogic';
@@ -96,9 +96,12 @@ const ProjectEdit: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex space-x-4">
             <div className="w-3/4">
-              <label htmlFor="projectName" className="block text-md font-medium text-gray-700 mb-1">
-                <TextAnimation text='Project Name' />
-              </label>
+              <div className="flex items-center mb-1">
+                <FaProjectDiagram className="text-gray-700 mr-2" />
+                <label htmlFor="projectName" className="block text-md font-medium text-gray-700">
+                  <TextAnimation text='Project Name' />
+                </label>
+              </div>
               <input
                 type="text"
                 id="projectName"
@@ -109,9 +112,12 @@ const ProjectEdit: React.FC = () => {
               />
             </div>
             <div className="w-1/4">
-              <label htmlFor="projectId" className="block text-md font-medium text-gray-700 mb-1">
-                <TextAnimation text='Project ID' />
-              </label>
+              <div className="flex items-center mb-1">
+                <FaHashtag className="text-gray-700 mr-2" />
+                <label htmlFor="projectId" className="block text-md font-medium text-gray-700">
+                  <TextAnimation text='Project ID' />
+                </label>
+              </div>
               <input
                 type="text"
                 id="projectId"
@@ -122,15 +128,21 @@ const ProjectEdit: React.FC = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="description" className="block text-md font-medium text-gray-700 mb-1">
-              <TextAnimation text='Description' />
-            </label>
+            <div className="flex items-center mb-1">
+              <FaAlignLeft className="text-gray-700 mr-2" />
+              <label htmlFor="description" className="block text-md font-medium text-gray-700">
+                <TextAnimation text='Description' />
+              </label>
+            </div>
             <TinyMCE value={project.description} onChange={handleEditorChange} />
           </div>
           <div className="mb-4">
-            <label htmlFor="categoryId" className="block text-md font-medium text-gray-700 mb-1">
-              <TextAnimation text='Category' />
-            </label>
+            <div className="flex items-center mb-1">
+              <FaListUl className="text-gray-700 mr-2" />
+              <label htmlFor="categoryId" className="block text-md font-medium text-gray-700">
+                <TextAnimation text='Category' />
+              </label>
+            </div>
             <select
               id="categoryId"
               name="categoryId"

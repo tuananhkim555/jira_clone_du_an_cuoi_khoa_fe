@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { setTempUser, clearTempUser } from '../../redux/slices/userSlice';
-import { FaPlus, FaEdit, FaSave, FaUser, FaUserCheck, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaSave, FaUser, FaUserCheck, FaKey, FaEye, FaEyeSlash, FaIdCard, FaEnvelope, FaPhone } from 'react-icons/fa';
 import axios from 'axios';
 import NotificationMessage from '../../components/NotificationMessage';
 import Reveal from '../../components/Reveal';
@@ -12,23 +12,18 @@ import TitleGradient from '../../components/ui/TitleGradient';
 import TextAnimation from '../../components/ui/TextAnimation';
 import AnimationSection from '../../components/ui/AnimationSection';
 import { useLocation } from 'react-router-dom';
-import { editUser } from '../../api/api';
+import { fetchUserData, updateUserProfile } from './ProfileLogic';
 import AvatarUpload from '../../components/AvatarUpload';
+import { User } from '../../api/types';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  phoneNumber?: string;
+interface ExtendedUser extends User {
   role?: string;
-  password?: string;
 }
 
 const Profile: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const currentUser = useAppSelector(state => state.auth.user);
+  const currentUser = useAppSelector(state => state.auth.user) as ExtendedUser;
   const tempUser = useAppSelector(state => state.user.tempUser);
   
   const [selectedUser, setSelectedUser] = React.useState<User | null>(location.state?.selectedUser || null);
@@ -45,13 +40,12 @@ const Profile: React.FC = () => {
   }, [currentUser, editedUser]);
 
   React.useEffect(() => {
-    const fetchUserData = async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    const initUserData = async () => {
+      await fetchUserData();
       setIsLoading(false);
     };
 
-    fetchUserData();
+    initUserData();
   }, []);
 
   React.useEffect(() => {
@@ -87,31 +81,21 @@ const Profile: React.FC = () => {
 
   const handleSave = async () => {
     if (!editedUser) return;
-
     setIsLoading(true);
 
-    try {
-      const response = await editUser({
-        id: editedUser.id,
-        email: editedUser.email,
-        name: editedUser.name,
-        phoneNumber: editedUser.phoneNumber
-      });
-
-      if (response.data.statusCode === 200) {
-        setIsEditing(false);
-        setNotification({ type: 'success', message: response.data.content || 'User updated successfully!' }); // Chuyển thông báo sang tiếng Anh
-        // Update the selectedUser state if the edit was successful
-        setSelectedUser(editedUser);
-      } else {
-        throw new Error(response.data.message || 'Failed to update user');
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      setNotification({ type: 'error', message: 'This is not a user created by you. Update failed.' }); // Chuyển thông báo sang tiếng Anh
-    } finally {
-      setIsLoading(false);
+    const result = await updateUserProfile(editedUser);
+    
+    if (result.success) {
+      setIsEditing(false);
+      setSelectedUser(editedUser);
     }
+    
+    setNotification({ 
+      type: result.success ? 'success' : 'error', 
+      message: result.message 
+    });
+    
+    setIsLoading(false);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +130,8 @@ const Profile: React.FC = () => {
         </div>
         <div className="space-y-4">
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">
+              <FaIdCard className="mr-1" />
               <TextAnimation text="ID" />
             </label>
             <input
@@ -157,7 +142,8 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">
+              <FaUser className="mr-1" />
               <TextAnimation text="Name" />
             </label>
             <input
@@ -170,7 +156,8 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">
+              <FaEnvelope className="mr-1" />
               <TextAnimation text="Email" />
             </label>
             <input
@@ -183,7 +170,8 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">
+              <FaPhone className="mr-1" />
               <TextAnimation text="Phone Number" />
             </label>
             <input
@@ -196,7 +184,8 @@ const Profile: React.FC = () => {
             />
           </div>
           <div className="flex flex-col relative">
-            <label className="text-sm font-semibold text-gray-600 mb-1">
+            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">
+              <FaKey className="mr-1" />
               <TextAnimation text="Password" />
             </label>
             <input

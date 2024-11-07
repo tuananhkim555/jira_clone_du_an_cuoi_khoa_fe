@@ -6,7 +6,7 @@ import project4 from "../../assets/FigmaMovie.png";
 import project5 from "../../assets/Samarblog.png";
 import project6 from "../../assets/aiportfolio2.png";
 import { AiOutlineGithub, AiOutlineProject, AiOutlineEdit } from "react-icons/ai";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash, FaAccusoft } from "react-icons/fa";
 import Reveal from "../../components/Reveal";
 import TitleGradient from "../../components/ui/TitleGradient";
 import React, { useState, useEffect, useCallback } from 'react';
@@ -284,7 +284,8 @@ const Portfolio = () => {
               />
               <div className="p-3 h-[56px] flex flex-col justify-between">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-600 mb-1 truncate">
+                  <h3 className="text-base font-semibold text-gray-600 mb-1 truncate flex items-center">
+                    <FaAccusoft className="mr-1" />
                     <TextAnimation text={project.title} />
                   </h3>
                   <p className="text-gray-600 mb-1 text-sm line-clamp-2">{project.description}
