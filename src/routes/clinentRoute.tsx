@@ -10,7 +10,7 @@ import JiraBoard from '../pages/JiraBoard/JiraBoard';
 import NotFound from '../pages/NotFound/NotFound';
 import Helps from '../pages/Help/Help';
 import Pages from '../pages/PagesDeploy/Pages';
-import ProjectEdit from '../pages/ProjectManagemtens/ProjectEdit/ProjectEdit';
+import ProjectEdit from '../pages/ProjectEdit/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
 import Dashboard from '../pages/JiraBoard/Dashboard';
 

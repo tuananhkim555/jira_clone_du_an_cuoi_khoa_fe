@@ -67,8 +67,22 @@ export const getAllTaskTypes = () => {
   });
 };
 
-export const assignUserTask = (taskId: number, userId: number) => {
-  return api.post('/Project/assignUserTask', { taskId, userId });
+export const assignUserTask = async (taskId: number, userId: number) => {
+  try {
+    const response = await api.post('/Project/assignUserTask', {
+      taskId,
+      userId
+    });
+    
+    const data = response.data;
+    if (data.statusCode === 200) {
+      return data;
+    }
+    throw new Error(data.message || 'Failed to assign user to task');
+  } catch (error) {
+    console.error('Error assigning user to task:', error);
+    throw error;
+  }
 };
 
 export const deleteUser = (userId: number) => {
@@ -108,13 +122,19 @@ export const updateProject = (projectData: any) => {
 };
 
 export const getTaskDetail = async (taskId: string) => {
-  const response = await api.get(`/Project/getTaskDetail`, {
-    params: {
-      taskId: Number(taskId)
-    }
-  });
-  const data = response.data as { content: any };
-  return data.content;
+  try {
+    const response = await api.get(`/Project/getTaskDetail`, {
+      params: {
+        taskId: Number(taskId)
+      }
+    });
+    console.log('Raw API response:', response.data);
+    const data = response.data as { content: any };
+    return data.content;
+  } catch (error) {
+    console.error('Error in getTaskDetail:', error);
+    throw error;
+  }
 };
 
 export const updateTask = (taskData: any) => {
@@ -154,6 +174,34 @@ export const deleteTask = async (taskId: number) => {
     return data;
   }
   throw new Error(data.message || 'Failed to delete task');
+};
+
+export const removeUserFromTask = async (taskId: number, userId: number) => {
+  try {
+    const response = await api.post('/Project/removeUserFromTask', {
+      taskId,
+      userId
+    });
+    
+    const data = response.data;
+    if (data.statusCode === 200) {
+      return data;
+    }
+    throw new Error(data.message || 'Failed to remove user from task');
+  } catch (error) {
+    console.error('Error removing user from task:', error);
+    throw error;
+  }
+};
+
+export const getUsersInProject = async (projectId: string) => {
+  try {
+    const response = await api.get(`/Users/getUserByProjectId?idProject=${projectId}`);
+    return response.data.content;
+  } catch (error) {
+    console.error('Error getting users in project:', error);
+    throw error;
+  }
 };
 
 export default api;

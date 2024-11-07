@@ -1,4 +1,4 @@
-import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, updateTaskStatus } from '../../api/api';
+import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, updateTaskStatus } from '../../common/api/api';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 
 interface ApiResponse<T> {

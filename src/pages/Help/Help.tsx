@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa';
 import axios from 'axios';
-import NotificationMessage from '../../components/NotificationMessage';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import Reveal from '../../components/Reveal';
-import TextAnimation from '../../components/ui/TextAnimation';
-import AnimationSection from '../../components/ui/AnimationSection';
+import NotificationMessage from '../../common/components/NotificationMessage';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
+import Reveal from '../../common/components/Reveal';
+import TextAnimation from '../../common/components/ui/TextAnimation';
+import AnimationSection from '../../common/components/ui/AnimationSection';
 
 const IssuesFilters = () => {
   const [formData, setFormData] = useState({

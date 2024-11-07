@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { updateTaskStatus, deleteTask } from '../../../api/api';
+import React, { useState, useEffect } from 'react';
+import { updateTaskStatus, deleteTask, removeUserFromTask, assignUserTask, getUsersInProject } from '../../../common/api/api';
 import { updateTask } from '../JiraBoardLogic';
-import TinyMCE from '../../../components/Tinymce/Tinymce';
-import { Avatar, Slider } from 'antd';
+import TinyMCE from '../../../common/components/Tinymce/Tinymce';
+import { Avatar, Slider, Select, Tooltip } from 'antd';
 import { useMediaQuery } from '@mui/material';
 import { FaEdit, FaBug, FaTasks, FaHashtag, FaHeading, FaAlignLeft, FaUsers, FaExclamationTriangle, FaClock, FaComments, FaPaperPlane, FaSave, FaCommentDots, FaLink, FaTrash } from 'react-icons/fa';
 import '../../../styles/button.css'
 import { CrownOutlined } from '@ant-design/icons';
-import ConfirmationModal from '../../../components/ConfirmationModal';
-import  NotificationMessage  from '../../../components/NotificationMessage';
+import ConfirmationModal from '../../../common/components/ConfirmationModal';
+import  NotificationMessage  from '../../../common/components/NotificationMessage';
+import '../../../styles/EditTaskDetail.css'; // Tạo file CSS riêng cho component
 
 interface EditTaskDetailProps {
   taskId?: string;
@@ -26,6 +27,12 @@ interface EditTaskDetailProps {
   timeTrackingSpent?: number;
   originalEstimate?: number;
   typeId?: number;
+  assignees?: Array<{
+    id: number;
+    avatar: string;
+    name: string;
+    alias: string;
+  }>;
 }
 
 type StatusOption = {
@@ -77,8 +84,18 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   timeTrackingRemaining = 0,
   timeTrackingSpent = 0,
   originalEstimate = 0,
-  typeId = 1
+  typeId = 1,
+  assignees = [],
 }) => {
+  console.log('EditTaskDetail props:', {
+    taskId,
+    taskTitle,
+    taskStatus,
+    assignees
+  });
+
+  console.log('EditTaskDetail received assignees:', assignees);
+
   const [status, setStatus] = useState(taskStatus);
   const [priority, setPriority] = useState(taskPriority);
   const [title, setTitle] = useState(taskTitle);
@@ -91,6 +108,38 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   const [originalEstimateValue, setOriginalEstimateValue] = useState(originalEstimate?.toString() || '0');
   const [comment, setComment] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAssignees, setSelectedAssignees] = useState<number[]>(
+    assignees?.map(a => a.id) || []
+  );
+  const [projectUsers, setProjectUsers] = useState<Array<{
+    userId: number;
+    name: string;
+    avatar: string;
+  }>>([]);
+
+  useEffect(() => {
+    console.log('Assignees changed:', assignees);
+  }, [assignees]);
+
+  // Fetch project users when component mounts
+  useEffect(() => {
+    const fetchProjectUsers = async () => {
+      try {
+        const users = await getUsersInProject(projectId);
+        setProjectUsers(users);
+      } catch (error) {
+        console.error('Error fetching project users:', error);
+        NotificationMessage({
+          type: 'error',
+          message: 'Failed to fetch project users'
+        });
+      }
+    };
+
+    if (projectId) {
+      fetchProjectUsers();
+    }
+  }, [projectId]);
 
   const isMobile = useMediaQuery('(max-width:640px)');
   const isTablet = useMediaQuery('(max-width:1024px)');
@@ -153,6 +202,10 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
     }
   };
 
+  const handleAssigneeChange = (value: number[]) => {
+    setSelectedAssignees(value);
+  };
+
   const handleUpdate = async () => {
     try {
       const taskData = {
@@ -168,7 +221,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
         timeTrackingRemaining: Number(timeEstimated) || 0,
         timeTrackingSpent: Number(timeLogged) || 0,
         typeId: Number(taskType) || 1,
-        listUserAsign: []
+        listUserAsign: selectedAssignees,
       };
 
       const response = await updateTask(taskData);
@@ -193,10 +246,100 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
     }
   };
 
+  const handleRemoveAssignee = async (userId: number) => {
+    try {
+      await removeUserFromTask(Number(taskId), userId);
+      // Update the local state to remove the user
+      setSelectedAssignees(prev => prev.filter(id => id !== userId));
+      NotificationMessage({
+        type: 'success',
+        message: 'User removed from task successfully'
+      });
+      onUpdate(); // Refresh the board
+    } catch (error) {
+      console.error('Error removing user from task:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to remove user from task'
+      });
+    }
+  };
+
+  const handleAssignUser = async (userId: number) => {
+    try {
+      await assignUserTask(Number(taskId), userId);
+      // Update local state to include the new assignee
+      setSelectedAssignees(prev => [...prev, userId]);
+      NotificationMessage({
+        type: 'success',
+        message: 'User assigned to task successfully'
+      });
+      onUpdate(); // Refresh the board
+    } catch (error) {
+      console.error('Error assigning user to task:', error);
+      NotificationMessage({
+        type: 'error',
+        message: 'Failed to assign user to task'
+      });
+    }
+  };
+
+  const selectProps = {
+    mode: "multiple",
+    style: { width: '100%' },
+    placeholder: "Search and select assignees",
+    value: selectedAssignees,
+    onChange: handleAssigneeChange,
+    optionLabelProp: "label",
+    className: "assignee-select",
+    showSearch: true, // Enable search
+    filterOption: (input: string, option: any) => {
+      // Custom filter logic
+      const user = projectUsers.find(u => u.userId === option.value);
+      return user?.name.toLowerCase().includes(input.toLowerCase()) || false;
+    },
+    onSelect: handleAssignUser, // Handle new assignee selection
+    tagRender: (props: { value: number; onClose: React.MouseEventHandler<HTMLSpanElement> | undefined; }) => {
+      const user = assignees.find(a => a.id === props.value);
+      if (!user) return null;
+      
+      return (
+        <Tooltip title={user.name} placement="top">
+          <span className="assignee-tag">
+            <Avatar 
+              size="small" 
+              src={user.avatar}
+              className="assignee-avatar"
+            />
+            <span className="assignee-name">{user.name}</span>
+            <span 
+              className="assignee-remove"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveAssignee(props.value);
+              }}
+            >
+              ×
+            </span>
+          </span>
+        </Tooltip>
+      );
+    },
+    options: projectUsers.map(user => ({
+      label: (
+        <div className="assignee-option">
+          <Avatar size="small" src={user.avatar} />
+          <span>{user.name}</span>
+        </div>
+      ),
+      value: user.userId
+    }))
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4 " style={{paddingLeft: isMobile ? "16px" : isTablet ? "20px" : "250px"}}>
-      <div className={`bg-white rounded-lg p-4 w-full relative z-[10000] ${isMobile ? 'max-w-full' : isTablet ? 'max-w-3xl' : 'max-w-5xl'} max-h-[90vh] overflow-y-auto`}>
-        <div className={`${isMobile ? '' : 'flex justify-between items-center'} mb-8`}>
+      <div className={`bg-white rounded-lg p-4 w-full relative z-[10000] ${isMobile ? 'max-w-full h-[1000px]' : isTablet ? 'max-w-3xl' : 'max-w-5xl'} max-h-[90vh] overflow-y-auto h-[700px]`}>
+        <div className={`${isMobile ? '' : 'flex justify-between items-center'} mb-8 `}>
           <div className="flex items-center mb-4">
             <FaEdit className="text-2xl mr-2 text-purple-950" />
             <h2 className="text-lg font-semibold text-purple-950">Edit Task</h2>
@@ -277,7 +420,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
                 <FaAlignLeft className="mr-2" />
                 Description
               </label>
-              <TinyMCE value={description} onChange={(content) => handleDescriptionChange(content)} height={150} />
+              <TinyMCE value={description} onChange={(content) => handleDescriptionChange(content)} height={180} />
             </div>
 
             {!isMobile && (
@@ -332,11 +475,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
                 <FaUsers className="mr-2" />
                 Assignees
               </label>
-              <select
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="">Select assignee</option>
-              </select>
+              <Select {...selectProps} />
             </div>
 
             <div className="mb-4">
@@ -445,7 +584,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
         <div className="mt-4 flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+            className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm "
           >
             Cancel
           </button>

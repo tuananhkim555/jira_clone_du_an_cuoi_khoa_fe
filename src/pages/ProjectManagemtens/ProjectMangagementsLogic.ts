@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import NotificationMessage from '../../components/NotificationMessage';
+import NotificationMessage from '../../common/components/NotificationMessage';
 
 // Types
 export interface Project {

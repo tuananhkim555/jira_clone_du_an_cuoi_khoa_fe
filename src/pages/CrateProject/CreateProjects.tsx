@@ -5,14 +5,14 @@ import { useMediaQuery } from '@mui/material';
 import { FaPlus, FaProjectDiagram, FaAlignLeft, FaLayerGroup, FaHashtag } from 'react-icons/fa';
 import { fetchCategories, createProject } from './CreateProject';
 import { ProjectData, Category } from './typeCreate';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
 import '../../index.css';
-import TitleGradient from '../../components/ui/TitleGradient';
-import NotificationMessage from '../../components/NotificationMessage';
-import Reveal from '../../components/Reveal';
-import AnimationSection from '../../components/ui/AnimationSection';
-import TextAnimation from '../../components/ui/TextAnimation';
-import TinyMCE from '../../components/Tinymce/Tinymce';
+import TitleGradient from '../../common/components/ui/TitleGradient';
+import NotificationMessage from '../../common/components/NotificationMessage';
+import Reveal from '../../common/components/Reveal';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import TextAnimation from '../../common/components/ui/TextAnimation';
+import TinyMCE from '../../common/components/Tinymce/Tinymce';
 
 const CreateProject: React.FC = () => {
   const navigate = useNavigate();
@@ -59,12 +59,10 @@ const CreateProject: React.FC = () => {
 
     try {
       const response = await createProject(formData);
-      console.log('Dự án đã được tạo thành công:', response);
-      NotificationMessage({ type: 'success', message: 'Dự án đã được tạo thành công!' });
+      NotificationMessage({ type: 'success', message: 'Project created successfully!' });
       navigate('/project', { state: { refresh: true } });
     } catch (error) {
-      console.error('Lỗi khi tạo dự án:', error);
-      NotificationMessage({ type: 'error', message: 'Có lỗi xảy ra khi tạo dự án. Vui lòng thử lại.' });
+      NotificationMessage({ type: 'error', message: 'An error occurred while creating the project. Please try again.' });
     } finally {
       setIsLoading(false);
     }

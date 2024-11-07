@@ -3,18 +3,18 @@ import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { setTempUser, clearTempUser } from '../../redux/slices/userSlice';
 import { FaPlus, FaEdit, FaSave, FaUser, FaUserCheck, FaKey, FaEye, FaEyeSlash, FaIdCard, FaEnvelope, FaPhone } from 'react-icons/fa';
 import axios from 'axios';
-import NotificationMessage from '../../components/NotificationMessage';
-import Reveal from '../../components/Reveal';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import NotificationMessage from '../../common/components/NotificationMessage';
+import Reveal from '../../common/components/Reveal';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
 import avatarImage from '../../assets/anhdaidien2.jpg'; // Ensure this path is correct
 import cloneAvatarImage from '../../assets/anhdaidien2.jpg'; // Ensure this path is correct
-import TitleGradient from '../../components/ui/TitleGradient';
-import TextAnimation from '../../components/ui/TextAnimation';
-import AnimationSection from '../../components/ui/AnimationSection';
+import TitleGradient from '../../common/components/ui/TitleGradient';
+import TextAnimation from '../../common/components/ui/TextAnimation';
+import AnimationSection from '../../common/components/ui/AnimationSection';
 import { useLocation } from 'react-router-dom';
 import { fetchUserData, updateUserProfile } from './ProfileLogic';
-import AvatarUpload from '../../components/AvatarUpload';
-import { User } from '../../api/types';
+import AvatarUpload from '../../common/components/AvatarUpload';
+import { User } from '../../common/api/types';
 
 interface ExtendedUser extends User {
   role?: string;

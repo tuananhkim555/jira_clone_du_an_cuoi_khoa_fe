@@ -9,6 +9,7 @@ interface Task {
   id?: string | number;
   taskId?: string | number;
   taskName: string;
+  description?: string;
   priority?: {
     priorityId: string | number;
     priority: string;

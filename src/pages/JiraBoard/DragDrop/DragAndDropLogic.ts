@@ -1,4 +1,4 @@
-import { getAllUsers } from '../../../api/api';
+import { getAllUsers } from '../../../common/api/api';
 
 export interface User {
   userId: string;

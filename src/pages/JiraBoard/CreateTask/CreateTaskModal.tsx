@@ -3,9 +3,9 @@ import { Form, Input, InputNumber, Button, Slider, notification } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Editor } from '@tinymce/tinymce-react';
 import { FaProjectDiagram, FaTasks, FaExclamationTriangle, FaListUl, FaUsers, FaClock, FaChartLine, FaHourglassHalf, FaAlignLeft } from 'react-icons/fa';
-import CustomSelect from '../../../components/CustomSelect';
+import CustomSelect from '../../../common/components/CustomSelect';
 import { useCreateTaskLogic } from './CreateTaskLogic';
-import TinyMCE from '../../../components/Tinymce/Tinymce';
+import TinyMCE from '../../../common/components/Tinymce/Tinymce';
 
 interface CreateTaskModalProps {
   isVisible: boolean;

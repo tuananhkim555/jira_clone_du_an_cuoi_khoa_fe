@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchProjects, fetchProjectDetails, fetchAllData, createNewTask, ProjectDetails } from './JiraBoardLogic';
 import { FaLeaf } from 'react-icons/fa';
-import TextGradient from '../../components/ui/TitleGradient';
+import TextGradient from '../../common/components/ui/TitleGradient';
 import { Input, Button } from 'antd';
 import { SearchOutlined, PlusOutlined, UserOutlined, FolderOutlined, CrownOutlined } from '@ant-design/icons';
-import AnimationSection from '../../components/ui/AnimationSection';
-import TextAnimation from '../../components/ui/TextAnimation';
-import Reveal from '../../components/Reveal';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import TextAnimation from '../../common/components/ui/TextAnimation';
+import Reveal from '../../common/components/Reveal';
 import DragAndDropBoard from './DragDrop/DragAndDropBoard';
 import CreateTaskModal from './CreateTask/CreateTaskModal';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import NotificationMessage from '../../components/NotificationMessage';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
+import NotificationMessage from '../../common/components/NotificationMessage';
 import EditTaskDetail from './EditTaskDetail/EditTaskDetail';
 import  Footer  from '../Footer/Footer';
 
@@ -22,7 +22,11 @@ interface Task {
   id: string;
   taskName: string;
   content: string;
-  assignees?: any[];
+  assignees: Array<{
+    id: number;
+    name: string;
+    avatar: string;
+  }>;
   priority?: {
     priorityId: number;
     priority: string;
@@ -244,7 +248,7 @@ const JiraBoard: React.FC = () => {
             taskName: task.taskName,
             content: task.taskName,
             assignees: Array.isArray(task.assigness) ? task.assigness.map((assignee: any) => ({
-              userId: assignee.id,
+              id: assignee.id,
               name: assignee.name,
               avatar: assignee.avatar
             })) : [],
@@ -329,7 +333,11 @@ const JiraBoard: React.FC = () => {
     });
 
     if (foundTask) {
-      setSelectedTaskForEdit(foundTask);
+      console.log('Found task for edit:', foundTask);
+      setSelectedTaskForEdit({
+        ...foundTask,
+        assignees: foundTask.assignees || []
+      });
       setIsEditModalVisible(true);
     }
   };
@@ -427,7 +435,7 @@ const JiraBoard: React.FC = () => {
         <Reveal>
           <DragAndDropBoard 
             columns={columns} 
-            setColumns={setColumns}
+            setColumns={setColumns as React.Dispatch<React.SetStateAction<{ [key: string]: Column }>>}
             onTaskClick={handleTaskClick}
           />
         </Reveal>
@@ -443,7 +451,10 @@ const JiraBoard: React.FC = () => {
               onUpdate={handleTaskUpdate}
               taskTitle={selectedTaskForEdit.taskName}
               taskDescription={selectedTaskForEdit.description || ''}
-              taskStatus={selectedTaskForEdit.statusId || ''} taskPriority={''}          />
+              taskStatus={selectedTaskForEdit.statusId || ''}
+              taskPriority={selectedTaskForEdit.priority?.priorityId?.toString() || ''}
+              assignees={selectedTaskForEdit.assignees || []}
+          />
         )}
       </div>
       <CreateTaskModal

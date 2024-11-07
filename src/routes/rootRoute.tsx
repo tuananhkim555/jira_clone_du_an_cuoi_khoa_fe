@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { LoadingProvider } from '../context/LoadingContext';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../common/components/Sidebar';
 
 import ClientRoute from './clinentRoute';
 

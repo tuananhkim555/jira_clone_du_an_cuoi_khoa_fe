@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ImageNotFound from '../../assets/page-not-found.svg';
-import Reveal from '../../components/Reveal';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import Reveal from '../../common/components/Reveal';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
 
 const NotFound: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);

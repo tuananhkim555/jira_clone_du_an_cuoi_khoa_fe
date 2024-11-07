@@ -1,5 +1,5 @@
-import { editUser } from '../../api/api';
-import { ApiResponse, User } from '../../api/types';
+import { editUser } from '../../common/api/api';
+import { ApiResponse, User } from '../../common/api/types';
 
 
 export const fetchUserData = async (): Promise<void> => {

@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
 import logoLogin from "../../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from "react-router-dom";
-import ShinyEffect from "../../../components/ShinyEffect";
-import { BackgroundBeamsWithCollision } from "../../../components/ui/Background-beams-with-collision";
-import Reveal from "../../../components/Reveal";
+import ShinyEffect from "../../../common/components/ShinyEffect";
+import { BackgroundBeamsWithCollision } from "../../../common/components/ui/Background-beams-with-collision";
+import Reveal from "../../../common/components/Reveal";
 import axios from "axios";
 import { notification } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../common/components/LoadingSpinner';
 import styles from "../auth.module.css"
 import { calculateTokenExpiration } from '../../../utils/tokenUtils'; // Updated path
 import { useAppDispatch } from '../../../redux/hooks';
 import { setUser as setUserSlice, setStatus } from '../../../redux/slices/authSlice';
-import TextAnimation from '../../../components/ui/TextAnimation';
+import TextAnimation from '../../../common/components/ui/TextAnimation';
 import { handleGoogleLogin, handleUserLogin } from './LoginLogic';
 
 interface GoogleLoginResponse {

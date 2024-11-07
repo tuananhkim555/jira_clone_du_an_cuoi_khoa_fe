@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getProjectDetails, getProjectCategories, updateProjectDetails } from '../../../api/api';
+import { getProjectDetails, getProjectCategories, updateProjectDetails } from '../../common/api/api';
 
 interface ProjectDetails {
   id: number;

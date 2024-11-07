@@ -3,17 +3,17 @@ import { FaPencilAlt, FaTrash, FaPlus, FaTimes, FaSearch, FaHashtag, FaProjectDi
 import axios from 'axios';
 import { Pagination, Modal, message, Select, Tooltip, Input, Popover, Checkbox, Button } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import NotificationMessage from '../../components/NotificationMessage';
+import NotificationMessage from '../../common/components/NotificationMessage';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import TitleGradient from '../../components/ui/TitleGradient';
-import Reveal from '../../components/Reveal';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import TitleGradient from '../../common/components/ui/TitleGradient';
+import Reveal from '../../common/components/Reveal';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
 import styled from 'styled-components';
 import '../../styles/pagination.css';
 import '../../styles/modal.css';
-import AnimationSection from '../../components/ui/AnimationSection';
-import { getAllPriorities, getAllStatuses } from '../../api/api';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import { getAllPriorities, getAllStatuses } from '../../common/api/api';
 import { 
   fetchProjects, 
   fetchUsers, 

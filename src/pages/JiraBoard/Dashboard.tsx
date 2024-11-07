@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Progress, List, Avatar, Timeline } from 'antd';
 import { UserOutlined, ProjectOutlined, CheckCircleOutlined, ClockCircleOutlined, PlusOutlined, DeleteOutlined, HistoryOutlined, TeamOutlined, FundProjectionScreenOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import { getAllUsers } from '../../api/api';
+import { getAllUsers } from '../../common/api/api';
 import { useNavigate } from 'react-router-dom';
 
 interface User {
@@ -113,7 +113,7 @@ const Dashboard = () => {
             <Card 
               title={
                 <div className="flex items-center">
-                  <HistoryOutlined className="text-purple-800 text-lg mr-2" />
+                  <HistoryOutlined className="text-purple-950 text-lg mr-2" />
                   <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
                     Recent Activities
                   </span>
@@ -137,7 +137,7 @@ const Dashboard = () => {
               title={
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <TeamOutlined className="text-purple-800 text-lg mr-2" />
+                    <TeamOutlined className="text-purple-950 text-lg mr-2" />
                     <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
                       Team Members
                     </span>
@@ -178,7 +178,7 @@ const Dashboard = () => {
             <Card 
               title={
                 <div className="flex items-center">
-                  <FundProjectionScreenOutlined className="text-purple-800 text-lg mr-2" />
+                  <FundProjectionScreenOutlined className="text-purple-950 text-lg mr-2" />
                   <span className="bg-gradient-to-r from-purple-950 to-orange-800 bg-clip-text text-transparent">
                     Project Progress
                   </span>
@@ -189,16 +189,16 @@ const Dashboard = () => {
             >
               <Row gutter={[12, 12]}>
                 <Col xs={24} sm={8}>
-                  <Progress type="circle" percent={75} size={80} />
-                  <p className="text-center mt-2 text-sm">Project A</p>
+                  <Progress type="circle" className='text-purple-950' percent={75} size={80} />
+                  <p className="text-center mt-2 text-sm text-purple-950">Project A</p>
                 </Col>
                 <Col xs={24} sm={8}>
-                  <Progress type="circle" percent={45} status="active" size={80} />
-                  <p className="text-center mt-2 text-sm">Project B</p>
+                  <Progress type="circle" className='text-purple-950' percent={45} status="active" size={80} />
+                  <p className="text-center mt-2 text-sm text-purple-950">Project B</p>
                 </Col>
                 <Col xs={24} sm={8}>
-                  <Progress type="circle" percent={90} strokeColor="#52c41a" size={80} />
-                  <p className="text-center mt-2 text-sm">Project C</p>
+                  <Progress type="circle" className='text-purple-950' percent={90} strokeColor="#52c41a" size={80} />
+                  <p className="text-center mt-2 text-sm text-purple-950">Project C</p>
                 </Col>
               </Row>
             </Card>

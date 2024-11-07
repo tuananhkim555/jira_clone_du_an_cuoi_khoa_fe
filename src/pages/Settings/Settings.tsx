@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FaCog, FaUser, FaBell, FaLock, FaPalette, FaSave } from 'react-icons/fa';
-import TextAnimation from '../../components/ui/TextAnimation';
+import TextAnimation from '../../common/components/ui/TextAnimation';
 import { motion } from 'framer-motion';
-import TitleGradient from '../../components/ui/TitleGradient';
+import TitleGradient from '../../common/components/ui/TitleGradient';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('general');

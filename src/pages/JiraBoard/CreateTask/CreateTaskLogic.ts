@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Form } from 'antd';
-import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../api/api';
+import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../common/api/api';
 import axios from 'axios';
 
 interface ApiResponse<T> {

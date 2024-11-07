@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
-import NotificationMessage from '../../../components/NotificationMessage';
-import TitleGradient from '../../../components/ui/TitleGradient';
-import LoadingSpinner from '../../../components/LoadingSpinner';
-import Reveal from '../../../components/Reveal';
+import NotificationMessage from '../../common/components/NotificationMessage';
+import TitleGradient from '../../common/components/ui/TitleGradient';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
+import Reveal from '../../common/components/Reveal';
 import { FaEdit, FaSave, FaProjectDiagram, FaHashtag, FaAlignLeft, FaListUl } from 'react-icons/fa';
-import AnimationSection from '../../../components/ui/AnimationSection';
-import TextAnimation from '../../../components/ui/TextAnimation';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import TextAnimation from '../../common/components/ui/TextAnimation';
 import { useProjectEditLogic } from './ProjectEditLogic';
-import TinyMCE from '../../../components/Tinymce/Tinymce';
+import TinyMCE from '../../common/components/Tinymce/Tinymce';
 
 const ProjectEdit: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { getAllUsers, deleteUser } from '../../api/api';
-import NotificationMessage from '../../components/NotificationMessage';
+import { getAllUsers, deleteUser } from '../../common/api/api';
+import NotificationMessage from '../../common/components/NotificationMessage';
 
 interface User {
   id: number;

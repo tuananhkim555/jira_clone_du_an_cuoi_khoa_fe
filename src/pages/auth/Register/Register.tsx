@@ -3,12 +3,12 @@ import { FaEnvelope, FaCheckCircle, FaTimesCircle, FaLock, FaEye, FaEyeSlash, Fa
 import logoLogin from "../../../assets/Logo Jira 5.png";
 import { Link, useNavigate } from 'react-router-dom';
 import styles from "../auth.module.css";
-import ShinyEffect from '../../../components/ShinyEffect';
-import { BackgroundBeamsWithCollision } from '../../../components/ui/Background-beams-with-collision';
-import Reveal from '../../../components/Reveal';
+import ShinyEffect from '../../../common/components/ShinyEffect';
+import { BackgroundBeamsWithCollision } from '../../../common/components/ui/Background-beams-with-collision';
+import Reveal from '../../../common/components/Reveal';
 import { validateEmail, validatePhoneNumber, registerUser } from './RegisterLogic';
 import { Alert } from 'antd';
-import TextAnimation from '../../../components/ui/TextAnimation';
+import TextAnimation from '../../../common/components/ui/TextAnimation';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();

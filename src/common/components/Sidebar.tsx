@@ -1,13 +1,13 @@
 import {  ChevronLast, ChevronFirst, Menu, X } from "lucide-react"
 import { useContext, createContext, useState, useEffect } from "react"
 import { useSelector } from "react-redux"
-import LogoAva from "../assets/Jira_Logo.svg"
+import LogoAva from "../../assets/Jira_Logo.svg"
 import { FaPlus, FaProjectDiagram, FaExclamationCircle, FaFileAlt, FaCogs, FaUser, FaUserFriends, FaTrello, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from "../redux/store.ts";
+import { RootState } from "../../redux/store.ts";
 import NotificationMessage from "./NotificationMessage";
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
-import AvatarPage from "../assets/anhdaidien2.jpg"
+import AvatarPage from "../../assets/anhdaidien2.jpg"
 
 interface SidebarProps {
   onMenuClick: React.Dispatch<React.SetStateAction<string>>;
@@ -103,7 +103,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
           {isMobileMenuOpen ? <X /> : <Menu />}
         </button>
 
-        <nav className="h-full flex flex-col bg-gradient-to-t from-[#1f002d] via-purple-950 to-[#1f002d] text-white border-r shadow-xl rounded-r-3xl">
+        <nav className="h-full flex flex-col bg-gradient-to-t from-[#170221] via-purple-950 to-[#170021] text-white shadow-2xl rounded-r-3xl">
           <div className="p-4 pb-2 flex justify-between items-center">
             <img
               src={LogoAva}

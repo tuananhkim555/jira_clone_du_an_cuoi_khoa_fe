@@ -13,4 +13,14 @@ export interface ApiResponse {
     content?: string;
     message?: string;
   }
-  
+// Project interface Pages.tsx
+export interface Project {
+    id?: number;
+    img: string;
+    title: string;
+    description: string;
+    links: {
+      site: string;
+      github: string;
+    };
+  }

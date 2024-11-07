@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Pagination, Modal, Input, Button, Select } from 'antd';
 import { DeleteOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import NotificationMessage from '../../components/NotificationMessage';
+import LoadingSpinner from '../../common/components/LoadingSpinner';
+import NotificationMessage from '../../common/components/NotificationMessage';
 import '../../styles/pagination.css';
 import '../../styles/modal.css';
 import '../../styles/button.css';
-import TitleGradient from '../../components/ui/TitleGradient';
+import TitleGradient from '../../common/components/ui/TitleGradient';
 import { FaUserFriends, FaCircle } from 'react-icons/fa';
-import Reveal from '../../components/Reveal';
+import Reveal from '../../common/components/Reveal';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTempUser } from '../../redux/slices/userSlice';
-import AnimationSection from '../../components/ui/AnimationSection';
-import TextAnimation from '../../components/ui/TextAnimation';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import TextAnimation from '../../common/components/ui/TextAnimation';
 import { RootState } from '../../redux/store';
 import { useUserManagementLogic } from './UserManagementsLogic';
 

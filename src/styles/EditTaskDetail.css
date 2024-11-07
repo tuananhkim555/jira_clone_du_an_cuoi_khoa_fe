@@ -1,0 +1,128 @@
+/* Custom styles for the assignee select */
+.assignee-select.ant-select {
+  /* Select container */
+  .ant-select-selector {
+    border-radius: 6px;
+    padding: 2px 4px !important;
+    min-height: 36px;
+  }
+
+  /* Selected tags container */
+  .ant-select-selection-overflow {
+    gap: 4px;
+  }
+}
+
+/* Tag style */
+.assignee-tag {
+  display: inline-flex;
+  align-items: center;
+  background: #f0f0f0;
+  border-radius: 16px;
+  padding: 2px 8px;
+  margin: 2px;
+  max-width: 200px;
+  transition: all 0.3s;
+}
+
+.assignee-tag:hover {
+  background: #e6e6e6;
+}
+
+/* Avatar in tag */
+.assignee-avatar {
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+/* Name in tag */
+.assignee-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Remove button */
+.assignee-remove {
+  margin-left: 6px;
+  color: #999;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 4px;
+  transition: all 0.3s;
+}
+
+.assignee-remove:hover {
+  color: #ff4d4f;
+}
+
+/* Dropdown option style */
+.assignee-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+/* Dropdown menu customization */
+.ant-select-dropdown {
+  .ant-select-item-option {
+    padding: 8px 12px;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    &-selected {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+/* Tooltip customization */
+.ant-tooltip {
+  .ant-tooltip-inner {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .assignee-tag {
+    max-width: 150px;
+  }
+
+  .assignee-name {
+    max-width: 80px;
+  }
+}
+
+.task-assignees .ant-select-selection-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 8px;
+}
+
+.task-assignees .ant-select-selection-item-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-assignees .ant-avatar {
+  flex-shrink: 0;
+}
+
+.task-assignees .ant-select-selection-search {
+  margin-left: 8px;
+}
+
+.task-assignees .ant-select-selection-placeholder {
+  padding-left: 8px;
+}

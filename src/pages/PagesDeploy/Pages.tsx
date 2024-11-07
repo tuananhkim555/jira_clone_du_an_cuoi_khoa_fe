@@ -7,31 +7,21 @@ import project5 from "../../assets/Samarblog.png";
 import project6 from "../../assets/aiportfolio2.png";
 import { AiOutlineGithub, AiOutlineProject, AiOutlineEdit } from "react-icons/ai";
 import { FaPlus, FaTrash, FaAccusoft } from "react-icons/fa";
-import Reveal from "../../components/Reveal";
-import TitleGradient from "../../components/ui/TitleGradient";
+import Reveal from "../../common/components/Reveal";
+import TitleGradient from "../../common/components/ui/TitleGradient";
 import React, { useState, useEffect, useCallback } from 'react';
-import LoadingSniper from '../../components/LoadingSpinner';
+import LoadingSniper from '../../common/components/LoadingSpinner';
 import { Pagination, Input, Modal } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../../styles/pagination.css';
 import UploadProject from './UploadProject';
-import axios from 'axios';
-import { getAdminStatus } from '../../utils/Admin';
-import NotificationMessage from '../../components/NotificationMessage';
-import AnimationSection from '../../components/ui/AnimationSection';
-import TextAnimation from "../../components/ui/TextAnimation";
+import { fetchProjects, deleteProject } from './PageLogic';
+import { Project } from '../../common/api/types';
+import NotificationMessage from '../../common/components/NotificationMessage';
+import AnimationSection from '../../common/components/ui/AnimationSection';
+import TextAnimation from "../../common/components/ui/TextAnimation";
 import EditProject from './EditProject';
-
-interface Project {
-  id?: number;
-  img: string;
-  title: string;
-  description: string;
-  links: {
-    site: string;
-    github: string;
-  };
-}
+import { getAdminStatus } from "../../utils/Admin";
 
 const initialProjects: Project[] = [
   {
@@ -96,7 +86,7 @@ const initialProjects: Project[] = [
   },
 ];
 
-const Portfolio = () => {
+const Pages = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,8 +110,12 @@ const Portfolio = () => {
   }, []);
 
   const callapi = useCallback(async () => {
-    const result = await axios.get(`http://localhost:3069/get-data`)
-    console.log(result.data);
+    try {
+      const data = await fetchProjects();
+      console.log(data);
+    } catch (error) {
+      setNotification({ type: 'error', message: 'Failed to fetch projects' });
+    }
   }, []);
 
   useEffect(() => {
@@ -222,14 +216,13 @@ const Portfolio = () => {
     if (!projectToDelete) return;
 
     try {
-      await axios.delete(`http://your-api-endpoint/projects/${projectToDelete}`);
+      await deleteProject(projectToDelete);
       const updatedProjects = projects.filter(project => project.id !== projectToDelete);
       setProjects(updatedProjects);
       setFilteredProjects(updatedProjects);
       setTotalProjects(totalProjects - 1);
       setNotification({ type: 'success', message: 'Project deleted successfully.' });
     } catch (error) {
-      console.error('Error deleting project:', error);
       setNotification({ type: 'error', message: 'Unable to delete project. Please try again.' });
     }
     setIsDeleteModalVisible(false);
@@ -237,7 +230,7 @@ const Portfolio = () => {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto p-4 md:my-16 overflow-x-hidden overflow-y-hidden" id="portfolio">
+    <div className="max-w-[1000px] mx-auto p-4 md:my-16 mt-16 overflow-x-hidden overflow-y-hidden" id="pages">
       {notification && (
         <NotificationMessage type={notification.type} message={notification.message} />
       )}
@@ -377,4 +370,4 @@ const Portfolio = () => {
   );
 };
 
-export default Portfolio;
+export default Pages;
