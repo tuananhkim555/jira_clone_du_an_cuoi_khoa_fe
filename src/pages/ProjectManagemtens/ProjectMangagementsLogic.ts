@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import NotificationMessage from '../../common/components/NotificationMessage';
 
 // Types
@@ -75,7 +75,7 @@ export const deleteProject = async (projectId: number): Promise<void> => {
       params: { projectId },
     });
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 403) {
+    if (error instanceof axios.AxiosError && error.response?.status === 403) {
       throw new Error('Permission denied: Only project creator can delete projects');
     }
     throw new Error('Failed to delete project');
@@ -89,7 +89,7 @@ export const addMemberToProject = async (projectId: number, userId: number): Pro
       userId
     });
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 403) {
+    if (error instanceof axios.AxiosError && error.response?.status === 403) {
       throw new Error('Permission denied: Only project creator can add members');
     }
     throw new Error('Failed to add member');
@@ -103,7 +103,7 @@ export const removeMemberFromProject = async (projectId: number, userId: number)
       userId
     });
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 403) {
+    if (error instanceof axios.AxiosError && error.response?.status === 403) {
       throw new Error('Permission denied: Only project creator can remove members');
     }
     throw new Error('Failed to remove member');
@@ -112,7 +112,7 @@ export const removeMemberFromProject = async (projectId: number, userId: number)
 
 // Helper Functions
 export const handleApiError = (error: unknown, defaultMessage: string): void => {
-  if (error instanceof AxiosError) {
+  if (error instanceof axios.AxiosError) {
     const errorMessage = error.response?.data?.message || defaultMessage;
     NotificationMessage({
       type: 'error',

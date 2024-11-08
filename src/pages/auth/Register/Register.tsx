@@ -14,7 +14,6 @@ const Register: React.FC = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState<string>('');
-    const [emailValid, setEmailValid] = useState<boolean>(false);
     const [emailError, setEmailError] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [passwordError, setPasswordError] = useState<string>('');
@@ -154,10 +153,6 @@ const Register: React.FC = () => {
             console.error('Signup error:', error);
             setAlert({ message: 'Registration failed! Email already exists', type: 'error' });
         }
-    };
-
-    const onClose = () => {
-        setAlert(null);
     };
 
     return (
