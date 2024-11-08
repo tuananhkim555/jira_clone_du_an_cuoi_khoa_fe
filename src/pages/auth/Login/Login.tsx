@@ -12,7 +12,7 @@ import LoadingSpinner from '../../../common/components/LoadingSpinner';
 import styles from "../auth.module.css"
 import { calculateTokenExpiration } from '../../../utils/tokenUtils'; // Updated path
 import { useAppDispatch } from '../../../redux/hooks';
-import { setUser as setUserSlice, setStatus } from '../../../redux/slices/authSlice';
+import { setUser as setUserSlice, setStatus, clearUser } from '../../../redux/slices/authSlice';
 import TextAnimation from '../../../common/components/ui/TextAnimation';
 import { handleGoogleLogin, handleUserLogin } from './LoginLogic';
 
@@ -59,6 +59,13 @@ const Login: React.FC = () => {
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      dispatch(clearUser());
+    }
+  }, [dispatch]);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);

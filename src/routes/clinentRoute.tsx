@@ -13,7 +13,7 @@ import Pages from '../pages/PagesDeploy/Pages';
 import ProjectEdit from '../pages/ProjectEdit/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
 import Dashboard from '../pages/JiraBoard/Dashboard';
-
+import PrivateRoute from '../redux/PrivateRoute.tsx';
 
 const ClientRoute: React.FC = () => {
   return (
@@ -21,16 +21,56 @@ const ClientRoute: React.FC = () => {
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/create" element={<CreateProject />} />
-      <Route path="/project" element={<ProjectManagement />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/help" element={<Helps />} />
-      <Route path="/board/:id" element={<JiraBoard />} />
-      <Route path="/board" element={<Dashboard />} />
-      <Route path="/pages" element={<Pages />} />
-      <Route path="/project/edit/:id" element={<ProjectEdit />} />
-      <Route path="/users-managements" element={<UserManagements />} />
+      <Route path="/create" element={
+        <PrivateRoute>
+          <CreateProject />
+        </PrivateRoute>
+      } />
+      <Route path="/project" element={
+        <PrivateRoute>
+          <ProjectManagement />
+        </PrivateRoute>
+      } />
+      <Route path="/settings" element={
+        <PrivateRoute>
+          <Settings />
+        </PrivateRoute>
+      } />
+      <Route path="/profile" element={
+        <PrivateRoute>
+          <Profile />
+        </PrivateRoute>
+      } />
+      <Route path="/help" element={
+        <PrivateRoute>
+          <Helps />
+        </PrivateRoute>
+      } />
+      <Route path="/board/:id" element={
+        <PrivateRoute>
+          <JiraBoard />
+        </PrivateRoute>
+      } />
+      <Route path="/board" element={
+        <PrivateRoute>
+          <Dashboard />
+        </PrivateRoute>
+      } />
+      <Route path="/pages" element={
+        <PrivateRoute>
+          <Pages />
+        </PrivateRoute>
+      } />
+      <Route path="/project/edit/:id" element={
+        <PrivateRoute>
+          <ProjectEdit />
+        </PrivateRoute>
+      } />
+      <Route path="/users-managements" element={
+        <PrivateRoute>
+          <UserManagements />
+        </PrivateRoute>
+      } />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

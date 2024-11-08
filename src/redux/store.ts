@@ -1,8 +1,9 @@
-import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { configureStore, createSlice, PayloadAction, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
 // Định nghĩa kiểu dữ liệu cho user
 interface User {
@@ -73,19 +74,23 @@ const persistConfig = {
   whitelist: ['auth', 'user']
 };
 
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
-const persistedUserReducer = persistReducer(persistConfig, userReducer);
+// Tạo rootReducer
+const rootReducer = combineReducers({
+  auth: authReducer,
+  user: userReducer,
+});
 
+// Persist rootReducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Tạo store
 export const store = configureStore({
-  reducer: {
-    auth: persistedAuthReducer,
-    user: persistedUserReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
     }),
 });
 

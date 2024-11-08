@@ -8,6 +8,8 @@ import { RootState } from "../../redux/store.ts";
 import NotificationMessage from "./NotificationMessage";
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true })
 import AvatarPage from "../../assets/anhdaidien2.jpg"
+import { useDispatch } from "react-redux";
+import { clearUser } from "../../redux/slices/authSlice";
 
 interface SidebarProps {
   onMenuClick: React.Dispatch<React.SetStateAction<string>>;
@@ -19,6 +21,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [notification, setNotification] = useState<{type: "success" | "error" | "info" | "warning", message: string} | null>(null);
+  const dispatch = useDispatch();
 
   // Lấy thông tin user từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
@@ -43,9 +46,43 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleMenuClick = (menu: string) => {
+  const handleMenuClick = async (menu: string) => {
     setActiveMenu(menu);
     onMenuClick(menu);
+    
+    if (menu === 'logout') {
+      try {
+        // Dispatch actions để clear Redux state
+        dispatch(clearUser());
+        
+        // Clear localStorage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        
+        // Show notification using NotificationMessage
+        setNotification({
+          type: "success",
+          message: "Logout successful!"
+        });
+        
+        // Navigate to login page after a short delay
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1000);
+        
+        return;
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Show error notification using NotificationMessage
+        setNotification({
+          type: "error", 
+          message: "Logout failed. Please try again."
+        });
+      }
+      return;
+    }
+
+    // Handle other menu items...
     let path;
     switch (menu) {
       case 'dashboard':
@@ -60,21 +97,10 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
       case 'user-management':
         path = '/users-managements';
         break;
-      case 'logout':
-        if (!notification) { // Only show notification if there isn't one already
-          setNotification({
-            type: "success",
-            message: 'Logout successful!'
-          });
-          setTimeout(() => {
-            setNotification(null);
-            navigate('/login');
-          }, 1500);
-        }
-        return;
       default:
         path = `/${menu}`;
     }
+    
     navigate(path);
     if (window.innerWidth < 1024) {
       setIsMobileMenuOpen(false);

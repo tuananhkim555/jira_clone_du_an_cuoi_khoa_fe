@@ -35,10 +35,35 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.status = 'idle';
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
     },
     setStatus: (state, action: PayloadAction<'idle' | 'loading' | 'succeeded' | 'failed'>) => {
       state.status = action.payload;
     },
+    checkTokenExpiration: (state) => {
+      const token = localStorage.getItem('authToken');
+      const user = localStorage.getItem('user');
+      
+      if (!token || !user) {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.status = 'idle';
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        return;
+      }
+
+      if (state.user?.tokenExpiration) {
+        if (Date.now() > state.user.tokenExpiration) {
+          state.user = null;
+          state.isAuthenticated = false;
+          state.status = 'idle';
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+        }
+      }
+    }
   },
 });
 
