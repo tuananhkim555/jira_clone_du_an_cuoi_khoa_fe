@@ -29,13 +29,21 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized error - could redirect to login or refresh token
-      localStorage.removeItem("authToken");
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+      }
     }
     return Promise.reject(error);
   }
 );
+
+// Add type for API responses
+interface ApiResponse<T = any> {
+  statusCode: number;
+  content?: T;
+  message?: string;
+}
 
 export const getProjectById = (projectId: string) => {
   return api.get(`/Project/getProjectDetail?id=${projectId}`);
@@ -72,7 +80,7 @@ export const assignUserTask = async (taskId: number, userId: number) => {
     const response = await api.post('/Project/assignUserTask', {
       taskId,
       userId
-    });
+    }) as { data: ApiResponse };
     
     const data = response.data;
     if (data.statusCode === 200) {

@@ -18,21 +18,20 @@ import  Footer  from '../Footer/Footer';
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 interface Task {
-  taskId: any;
   id: string;
+  taskId: string | number;
   taskName: string;
   content: string;
   assignees: Array<{
-    id: number;
+    userId: string | number;
     name: string;
     avatar: string;
   }>;
   priority?: {
     priorityId: number;
     priority: string;
-    priorityName: string;
+    description?: string;
   };
-  priorityTask?: any;
   statusId: string;
   originalEstimate?: number;
   timeTrackingSpent?: number;

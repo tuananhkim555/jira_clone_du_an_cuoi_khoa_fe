@@ -7,8 +7,8 @@ interface Option {
 
 interface CustomSelectProps {
   options: Option[];
-  value: string | string[] | number | number[];
-  onChange: (value: string | string[] | number | number[]) => void;
+  value: string | number | (string | number)[];
+  onChange: (value: string | number | (string | number)[]) => void;
   placeholder?: string;
   mode?: 'single' | 'multiple';
 }
