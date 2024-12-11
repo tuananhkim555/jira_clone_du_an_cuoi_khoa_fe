@@ -16,7 +16,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import '../../styles/pagination.css';
 import UploadProject from './UploadProject';
 import { fetchProjects, deleteProject } from './PageLogic';
-import { Project } from '../../common/api/types';
+import { Project, NotificationType } from './PagesType';
 import NotificationMessage from '../../common/components/NotificationMessage';
 import AnimationSection from '../../common/components/ui/AnimationSection';
 import TextAnimation from "../../common/components/ui/TextAnimation";
@@ -95,7 +95,7 @@ const Pages = () => {
   const [totalProjects, setTotalProjects] = useState(initialProjects.length);
   const projectsPerPage = 4;
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [notification, setNotification] = useState<NotificationType | null>(null);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<number | undefined>(undefined);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);

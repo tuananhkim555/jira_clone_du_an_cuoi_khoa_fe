@@ -16,7 +16,7 @@ const Settings = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 mt-[50px] md:mt-0">
       <motion.div 
         className="w-full max-w-6xl bg-white rounded-lg shadow-lg overflow-hidden"
         initial={{ opacity: 0, y: 50 }}

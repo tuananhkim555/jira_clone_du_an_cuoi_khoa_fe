@@ -20,10 +20,18 @@ import {
   deleteProject, 
   addMemberToProject,
   removeMemberFromProject,
-  handleApiError,
-  type Project,
-  type User
+  handleApiError
 } from './ProjectMangagementsLogic';
+import {
+  Project,
+  User,
+  ProjectManagement,
+  TeamMember,
+  Task,
+  ProjectStatus,
+  PriorityLevel,
+  ProjectFormData
+} from './ProjectManagmentsType';
 
 interface ApiResponse {
   content: Project[];

@@ -2,23 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-
-interface Project {
-  id?: number;
-  img: string;
-  title: string;
-  description: string;
-  links: {
-    site: string;
-    github: string;
-  };
-}
-
-interface EditProjectProps {
-  project: Project;
-  onClose: () => void;
-  onSubmit: (updatedProject: Project) => void;
-}
+import { Project, EditProjectProps } from './PagesType';
 
 const EditProject: React.FC<EditProjectProps> = ({ project, onClose, onSubmit }) => {
   const [form] = Form.useForm();

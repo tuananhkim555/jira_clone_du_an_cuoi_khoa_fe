@@ -1,33 +1,6 @@
 import { getProjectById, getAllProjects, getProjectCategories, getAllUsers, createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, updateTaskStatus } from '../../common/api/api';
-import axios, { AxiosResponse, AxiosError } from 'axios';
-
-interface ApiResponse<T> {
-  data: {
-    content?: T;
-  };
-}
-
-export interface ProjectDetails {
-  lstTask: {
-    lstTaskDeTail: any[];
-    statusId: string;
-    statusName: string;
-    alias: string;
-  }[];
-  members: any[];
-  creator: {
-    id: number;
-    name: string;
-  };
-  id: number;
-  projectName: string;
-  description: string;
-  projectCategory: {
-    id: number;
-    name: string;
-  };
-  alias: string;
-}
+import axios, { AxiosResponse } from 'axios';
+import { ApiResponse, ProjectDetails, Task } from './JiraboardType';
 
 export const fetchProjects = async () => {
   try {

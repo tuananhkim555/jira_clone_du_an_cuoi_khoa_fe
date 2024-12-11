@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchProjects, fetchProjectDetails, fetchAllData, createNewTask, ProjectDetails } from './JiraBoardLogic';
+import { fetchProjects, fetchProjectDetails, fetchAllData, createNewTask } from './JiraBoardLogic';
 import { FaLeaf } from 'react-icons/fa';
 import TextGradient from '../../common/components/ui/TitleGradient';
 import { Input, Button } from 'antd';
@@ -14,67 +14,16 @@ import LoadingSpinner from '../../common/components/LoadingSpinner';
 import NotificationMessage from '../../common/components/NotificationMessage';
 import EditTaskDetail from './EditTaskDetail/EditTaskDetail';
 import  Footer  from '../Footer/Footer';
+import { 
+  Project, 
+  Status, 
+  Priority, 
+  TaskType,
+  ProjectDetails
+} from './JiraboardType';
+import { Task, Column } from './DragDrop/DragDropType';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
-
-interface Task {
-  id: string;
-  taskId: string | number;
-  taskName: string;
-  content: string;
-  assignees: Array<{
-    userId: string | number;
-    name: string;
-    avatar: string;
-  }>;
-  priority?: {
-    priorityId: number;
-    priority: string;
-    description?: string;
-  };
-  statusId: string;
-  originalEstimate?: number;
-  timeTrackingSpent?: number;
-  timeTrackingRemaining?: number;
-  description?: string;
-  typeId?: number;
-}
-
-interface Column {
-  id: string;
-  title: string;
-  tasks: Task[];
-  color: string;
-}
-
-interface Project {
-  id: number;
-  projectName: string;
-}
-
-interface Status {
-  statusId: string;
-  statusName: string;
-  alias: string;
-  deleted: string;
-}
-
-interface Priority {
-  priorityId: number;
-  priority: string;
-  description: string;
-  deleted: boolean;
-  alias: string;
-}
-
-interface TaskType {
-  id: number;
-  taskType: string;
-}
-
-interface EditProjectDetailProps {
-  taskId: string;
-}
 
 const statusColors: { [key: string]: string } = {
   '1': 'bg-[#300053]',
@@ -120,10 +69,7 @@ const initialColumns: { [key: string]: Column } = {
 const JiraBoard: React.FC = () => {
   const { id: projectId } = useParams<{ id: string }>();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [columns, setColumns] = useState<{ [key: string]: Column }>(() => {
-    const savedColumns = localStorage.getItem('columns');
-    return savedColumns ? JSON.parse(savedColumns) : initialColumns;
-  });
+  const [columns, setColumns] = useState<{ [key: string]: Column }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [timeTracking, setTimeTracking] = useState(0);
@@ -333,10 +279,7 @@ const JiraBoard: React.FC = () => {
 
     if (foundTask) {
       console.log('Found task for edit:', foundTask);
-      setSelectedTaskForEdit({
-        ...foundTask,
-        assignees: foundTask.assignees || []
-      });
+      setSelectedTaskForEdit(foundTask);
       setIsEditModalVisible(true);
     }
   };
@@ -433,9 +376,30 @@ const JiraBoard: React.FC = () => {
         )}
         <Reveal>
           <DragAndDropBoard 
-            columns={columns} 
+            columns={Object.fromEntries(
+              Object.entries(columns).map(([key, column]) => [
+                key,
+                {
+                  ...column,
+                  tasks: column.tasks.map(task => ({
+                    id: task.id || task.taskId || generateId(),
+                    taskId: task.taskId || task.id || generateId(),
+                    taskName: task.taskName || '',
+                    content: task.taskName || task.content || '',
+                    statusId: task.statusId || column.id,
+                    priority: task.priority || null,
+                    assignees: task.assignees || [],
+                    description: task.description || '',
+                    originalEstimate: task.originalEstimate || 0,
+                    timeTrackingSpent: task.timeTrackingSpent || 0,
+                    timeTrackingRemaining: task.timeTrackingRemaining || 0,
+                    typeId: task.typeId || ''
+                  }))
+                }
+              ])
+            ) as any}
             setColumns={setColumns as React.Dispatch<React.SetStateAction<{ [key: string]: Column }>>}
-            onTaskClick={handleTaskClick}
+            onTaskClick={(taskId: string) => handleTaskClick(taskId)}
           />
         </Reveal>
         {selectedTaskForEdit && (
@@ -460,7 +424,7 @@ const JiraBoard: React.FC = () => {
         isVisible={isModalVisible}
         onCancel={handleCancel}
         onCreate={handleCreate}
-        currentProject={currentProject}
+        currentProject={currentProject!}
       />
     </div>
     <Footer />

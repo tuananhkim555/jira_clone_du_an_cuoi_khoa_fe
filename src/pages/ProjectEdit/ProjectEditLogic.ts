@@ -1,37 +1,6 @@
 import { useState, useCallback } from 'react';
 import { getProjectDetails, getProjectCategories, updateProjectDetails } from '../../common/api/api';
-
-interface ProjectDetails {
-  id: number;
-  projectName: string;
-  description: string;
-  projectCategory: {
-    id: number;
-    name: string;
-  };
-  alias: string;
-  creator: {
-    id: number; 
-    name: string;
-  };
-}
-
-interface Category {
-  id: number;
-  projectCategoryName: string;
-}
-
-interface ProjectResponse {
-  data: {
-    content: ProjectDetails;
-  };
-}
-
-interface CategoriesResponse {
-  data: {
-    content: Category[];
-  };
-}
+import { ProjectDetails, Category, ProjectResponse, CategoriesResponse } from './ProjectEditType';
 
 export const useProjectEditLogic = (id: string | undefined, navigate: (path: string) => void) => {
   const [project, setProject] = useState<ProjectDetails | null>(null);
@@ -40,6 +9,8 @@ export const useProjectEditLogic = (id: string | undefined, navigate: (path: str
   const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchProjectAndCategories = async () => {
+    setLoading(true);
+    console.time("Load Initial Data");
     try {
       const [projectResponse, categoriesResponse] = await Promise.all([
         getProjectDetails(id!),
@@ -56,6 +27,7 @@ export const useProjectEditLogic = (id: string | undefined, navigate: (path: str
       setNotification({ type: 'error', message: 'Failed to fetch project details or categories.' });
     } finally {
       setLoading(false);
+      console.timeEnd("Load Initial Data");
     }
   };
 

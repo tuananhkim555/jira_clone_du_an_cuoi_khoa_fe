@@ -6,15 +6,15 @@ import axios from 'axios';
 import NotificationMessage from '../../common/components/NotificationMessage';
 import Reveal from '../../common/components/Reveal';
 import LoadingSpinner from '../../common/components/LoadingSpinner';
-import avatarImage from '../../assets/anhdaidien2.jpg'; // Ensure this path is correct
-import cloneAvatarImage from '../../assets/anhdaidien2.jpg'; // Ensure this path is correct
 import TitleGradient from '../../common/components/ui/TitleGradient';
 import TextAnimation from '../../common/components/ui/TextAnimation';
 import AnimationSection from '../../common/components/ui/AnimationSection';
 import { useLocation } from 'react-router-dom';
 import { fetchUserData, updateUserProfile } from './ProfileLogic';
 import AvatarUpload from '../../common/components/AvatarUpload';
-import { User } from '../../common/api/types';
+import avatarImage from '../../assets/anhdaidien2.jpg';
+import cloneAvatarImage from '../../assets/anhdaidien2.jpg';
+import { User } from '../../types/types';
 
 interface ExtendedUser extends User {
   role?: string;
@@ -123,9 +123,12 @@ const Profile: React.FC = () => {
         <div className="flex justify-center mb-6">
           <AvatarUpload 
             currentAvatar={editedUser?.avatar || ''}
+            // defaultAvatar={editedUser?.avatar || ''}
             defaultAvatar={avatarImage}
             isCurrentUser={isCurrentUser}
+            // cloneAvatar={editedUser?.avatar || ''}
             cloneAvatar={cloneAvatarImage}
+
           />
         </div>
         <div className="space-y-4">

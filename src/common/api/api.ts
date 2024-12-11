@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
@@ -29,7 +29,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (axios.isAxiosError(error)) {
+    if (error instanceof AxiosError) {
       if (error.response?.status === 401) {
         localStorage.removeItem("authToken");
       }
@@ -191,7 +191,7 @@ export const removeUserFromTask = async (taskId: number, userId: number) => {
       userId
     });
     
-    const data = response.data;
+    const data = response.data as ApiResponse;
     if (data.statusCode === 200) {
       return data;
     }
@@ -205,7 +205,8 @@ export const removeUserFromTask = async (taskId: number, userId: number) => {
 export const getUsersInProject = async (projectId: string) => {
   try {
     const response = await api.get(`/Users/getUserByProjectId?idProject=${projectId}`);
-    return response.data.content;
+    const data = response.data as ApiResponse;
+    return data.content;
   } catch (error) {
     console.error('Error getting users in project:', error);
     throw error;

@@ -6,13 +6,7 @@ import { FaProjectDiagram, FaTasks, FaExclamationTriangle, FaListUl, FaUsers, Fa
 import CustomSelect from '../../../common/components/CustomSelect';
 import { useCreateTaskLogic } from './CreateTaskLogic';
 import TinyMCE from '../../../common/components/Tinymce/Tinymce';
-
-interface CreateTaskModalProps {
-  isVisible: boolean;
-  onCancel: () => void;
-  onCreate: (taskData: any) => void;
-  currentProject: any;
-}
+import { CreateTaskModalProps } from './CreateTaskType';
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   isVisible,
@@ -48,18 +42,23 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     handleTimeSpentChange,
     handleTimeRemainingChange,
     handleSliderChange,
-  } = useCreateTaskLogic(isVisible, currentProject, onCancel, async (newTaskData) => {
-    setIsLoading(true);
-    try {
-      await onCreate(newTaskData);
-      notification.success({
-        message: 'Success',
-        description: 'Task created successfully!',
-      });
-    } catch (error) {
-      handleSubmitError(error);
-    } finally {
-      setIsLoading(false);
+  } = useCreateTaskLogic({
+    isVisible,
+    currentProject,
+    onCancel,
+    onCreate: async (newTaskData) => {
+      setIsLoading(true);
+      try {
+        await onCreate(newTaskData);
+        notification.success({
+          message: 'Success',
+          description: 'Task created successfully!',
+        });
+      } catch (error) {
+        handleSubmitError(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   });
 

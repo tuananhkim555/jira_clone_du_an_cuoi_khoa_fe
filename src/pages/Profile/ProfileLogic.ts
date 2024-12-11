@@ -1,16 +1,13 @@
 import { editUser } from '../../common/api/api';
-import { ApiResponse, User } from '../../common/api/types';
-
+import { ApiResponse, User } from '../../types/types';
+import { ProfileUpdateResponse } from './ProfileType';
 
 export const fetchUserData = async (): Promise<void> => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
-export const updateUserProfile = async (editedUser: User): Promise<{
-  success: boolean;
-  message: string;
-}> => {
+export const updateUserProfile = async (editedUser: User): Promise<ProfileUpdateResponse> => {
   try {
     const response = await editUser({
       id: editedUser.id,

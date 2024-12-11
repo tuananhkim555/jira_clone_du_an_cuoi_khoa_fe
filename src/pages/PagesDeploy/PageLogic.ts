@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Project } from '../../common/api/types';
+import { Project } from './PagesType';
 
 export const fetchProjects = async () => {
   try {

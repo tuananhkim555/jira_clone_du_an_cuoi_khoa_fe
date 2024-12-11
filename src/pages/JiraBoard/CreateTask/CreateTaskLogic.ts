@@ -2,52 +2,9 @@ import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../common/api/api';
 import axios from 'axios';
+import { ApiResponse, TaskResponse, TaskData, Task, CreateTaskLogicProps } from './CreateTaskType';
 
-interface ApiResponse<T> {
-  data: {
-    content: T;
-  };
-}
-
-interface TaskResponse {
-  taskId: string;
-  taskName: string;
-  assigness?: {
-    id: string;
-    name: string;
-    avatar: string;
-  }[];
-  priorityTask?: {
-    priorityId: string;
-    priority: string;
-  };
-  statusId: string;
-  originalEstimate: number;
-  timeTrackingSpent: number;
-  timeTrackingRemaining: number;
-}
-
-interface TaskData {
-  listUserAsign: any[];
-  taskName: string;
-  description: string;
-  statusId: string;
-  originalEstimate: number;
-  timeTrackingSpent: number;
-  timeTrackingRemaining: number;
-  projectId: number;
-  typeId: number;
-  priorityId: number;
-  alias: string;
-  reporterId: string;
-}
-
-interface Task {
-  id: string;
-  // Add other task properties here
-}
-
-export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCancel: () => void, onCreate: (taskData: any) => void) => {
+export const useCreateTaskLogic = ({ isVisible, currentProject, onCancel, onCreate }: CreateTaskLogicProps) => {
   const [form] = Form.useForm();
   const [statuses, setStatuses] = useState<any[]>([]);
   const [priorities, setPriorities] = useState<any[]>([]);
@@ -124,8 +81,8 @@ export const useCreateTaskLogic = (isVisible: boolean, currentProject: any, onCa
             avatar: assignee.avatar
           })) || [],
           priority: {
-            priorityId: response.data.content.priorityTask?.priorityId,
-            priority: response.data.content.priorityTask?.priority
+            priorityId: response.data.content.priorityTask?.priorityId || '0',
+            priority: response.data.content.priorityTask?.priority || 'None'
           },
           statusId: response.data.content.statusId,
           originalEstimate: response.data.content.originalEstimate,

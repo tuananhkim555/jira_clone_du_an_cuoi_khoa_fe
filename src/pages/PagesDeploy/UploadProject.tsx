@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UploadButton } from "@bytescale/upload-widget-react";
 import { Input, Button } from 'antd';
+import { Project, UploadProjectProps } from './PagesType';
 
 // -----
 // Configuration:
@@ -16,21 +17,6 @@ const options = {
     }
   }
 };
-
-interface Project {
-  img: string;
-  title: string;
-  description: string;
-  links: {
-    site: string;
-    github: string;
-  };
-}
-
-interface UploadProjectProps {
-  onClose: () => void;
-  onSubmit: (project: Project) => void;
-}
 
 const UploadProject: React.FC<UploadProjectProps> = ({ onClose, onSubmit }) => {
   const [title, setTitle] = useState('');

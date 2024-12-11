@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { updateTaskStatus, deleteTask, removeUserFromTask, assignUserTask, getUsersInProject } from '../../../common/api/api';
 import { updateTask } from '../JiraBoardLogic';
 import TinyMCE from '../../../common/components/Tinymce/Tinymce';
@@ -8,66 +8,19 @@ import { FaEdit, FaBug, FaTasks, FaHashtag, FaHeading, FaAlignLeft, FaUsers, FaE
 import '../../../styles/button.css'
 import { CrownOutlined } from '@ant-design/icons';
 import ConfirmationModal from '../../../common/components/ConfirmationModal';
-import  NotificationMessage  from '../../../common/components/NotificationMessage';
-import '../../../styles/EditTaskDetail.css'; // Tạo file CSS riêng cho component
-
-interface EditTaskDetailProps {
-  taskId?: string;
-  projectId?: string;
-  isVisible: boolean;
-  onClose: () => void;
-  onUpdate: () => void;
-  taskTitle?: string;
-  taskDescription?: string;
-  taskStatus?: string;
-  taskPriority?: string;
-  alias?: string;
-  reporterId?: number;
-  timeTrackingRemaining?: number;
-  timeTrackingSpent?: number;
-  originalEstimate?: number;
-  typeId?: number;
-  assignees?: Array<{
-    id: number;
-    avatar: string;
-    name: string;
-    alias: string;
-  }>;
-}
-
-type StatusOption = {
-  statusId: string;
-  statusName: string;
-};
-
-type PriorityOption = {
-  priorityId: string;
-  priority: string;
-};
-
-type TaskType = {
-  id: string;
-  name: string;
-};
-
-const TASK_TYPES: TaskType[] = [
-  { id: "1", name: "Bug" },
-  { id: "2", name: "New Task" }
-];
-
-const STATUS_OPTIONS: StatusOption[] = [
-  { statusId: "1", statusName: "BACKLOG" },
-  { statusId: "2", statusName: "IN PROGRESS" },
-  { statusId: "3", statusName: "SELECTED FOR DEVELOPMENT" },
-  { statusId: "4", statusName: "DONE" }
-];
-
-const PRIORITY_OPTIONS: PriorityOption[] = [
-  { priorityId: "1", priority: "High" },
-  { priorityId: "2", priority: "Medium" },
-  { priorityId: "3", priority: "Low" },
-  { priorityId: "4", priority: "Lowest" }
-];
+import NotificationMessage from '../../../common/components/NotificationMessage';
+import '../../../styles/EditTaskDetail.css';
+import { EditTaskDetailProps } from '../JiraboardType';
+import { TASK_TYPES } from '../../../common/constants/taskTypes';
+import { 
+  StatusOption, 
+  PriorityOption, 
+  ProjectUser, 
+  Assignee, 
+  SelectProps,
+  STATUS_OPTIONS,
+  PRIORITY_OPTIONS 
+} from './EditTaskType';
 
 const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   taskId = '',
@@ -111,17 +64,12 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   const [selectedAssignees, setSelectedAssignees] = useState<number[]>(
     assignees?.map(a => a.id) || []
   );
-  const [projectUsers, setProjectUsers] = useState<Array<{
-    userId: number;
-    name: string;
-    avatar: string;
-  }>>([]);
+  const [projectUsers, setProjectUsers] = useState<ProjectUser[]>([]);
 
   useEffect(() => {
     console.log('Assignees changed:', assignees);
   }, [assignees]);
 
-  // Fetch project users when component mounts
   useEffect(() => {
     const fetchProjectUsers = async () => {
       try {
@@ -146,7 +94,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
 
   if (!isVisible) return null;
 
-  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value);
     try {
       await updateTaskStatus(Number(taskId), e.target.value);
@@ -156,7 +104,7 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
     }
   };
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
 
@@ -164,12 +112,11 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
     setDescription(content);
   };
 
-  const handlePriorityChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePriorityChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     setPriority(e.target.value);
   };
 
   const handleCommentSubmit = () => {
-    // Handle comment submission
     setComment("");
   };
 
@@ -191,8 +138,8 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
         message: 'Task deleted successfully'
       });
       setIsDeleteModalOpen(false);
-      onClose(); // Close the edit modal
-      onUpdate(); // This will trigger the refresh of the board
+      onClose();
+      onUpdate();
     } catch (error) {
       console.error('Error deleting task:', error);
       NotificationMessage({
@@ -232,8 +179,8 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
           message: 'Task updated successfully'
         });
         
-        onUpdate(); // Refresh the board
-        onClose(); // Close the modal
+        onUpdate();
+        onClose();
       } else {
         throw new Error(response?.message || 'Failed to update task');
       }
@@ -249,13 +196,12 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   const handleRemoveAssignee = async (userId: number) => {
     try {
       await removeUserFromTask(Number(taskId), userId);
-      // Update the local state to remove the user
       setSelectedAssignees(prev => prev.filter(id => id !== userId));
       NotificationMessage({
         type: 'success',
         message: 'User removed from task successfully'
       });
-      onUpdate(); // Refresh the board
+      onUpdate();
     } catch (error) {
       console.error('Error removing user from task:', error);
       NotificationMessage({
@@ -268,13 +214,12 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   const handleAssignUser = async (userId: number) => {
     try {
       await assignUserTask(Number(taskId), userId);
-      // Update local state to include the new assignee
       setSelectedAssignees(prev => [...prev, userId]);
       NotificationMessage({
         type: 'success',
         message: 'User assigned to task successfully'
       });
-      onUpdate(); // Refresh the board
+      onUpdate();
     } catch (error) {
       console.error('Error assigning user to task:', error);
       NotificationMessage({
@@ -285,23 +230,22 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
   };
 
   const selectProps = {
-    mode: "multiple",
+    mode: "multiple" as const,
     style: { width: '100%' },
     placeholder: "Search and select assignees",
     value: selectedAssignees,
     onChange: handleAssigneeChange,
     optionLabelProp: "label",
     className: "assignee-select",
-    showSearch: true, // Enable search
+    showSearch: true,
     filterOption: (input: string, option: any) => {
-      // Custom filter logic
       const user = projectUsers.find(u => u.userId === option.value);
       return user?.name.toLowerCase().includes(input.toLowerCase()) || false;
     },
-    onSelect: handleAssignUser, // Handle new assignee selection
-    tagRender: (props: { value: number; onClose: React.MouseEventHandler<HTMLSpanElement> | undefined; }) => {
+    onSelect: handleAssignUser,
+    tagRender: (props: SelectProps) => {
       const user = assignees.find(a => a.id === props.value);
-      if (!user) return null;
+      if (!user) return <span></span>;
       
       return (
         <Tooltip title={user.name} placement="top">
@@ -465,7 +409,9 @@ const EditTaskDetail: React.FC<EditTaskDetailProps> = ({
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               >
                 {STATUS_OPTIONS.map((option) => (
-                  <option key={option.statusId} value={option.statusId}>{option.statusName}</option>
+                  <option key={option.statusId} value={option.statusId}>
+                    {option.statusName}
+                  </option>
                 ))}
               </select>
             </div>

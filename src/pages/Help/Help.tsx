@@ -73,7 +73,7 @@ const IssuesFilters = () => {
   console.log('isModalVisible:', isModalVisible);
 
   return (
-    <div className='overflow-y-hidden'>
+    <div className='overflow-y-hidden mt-[30px] md:mt-0'>
     <Reveal>
       <div className="flex justify-center items-center min-h-screen p-4 relative">
         {isSubmitting && <LoadingSpinner />}

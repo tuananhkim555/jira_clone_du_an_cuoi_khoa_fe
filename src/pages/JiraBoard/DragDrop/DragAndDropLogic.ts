@@ -1,10 +1,5 @@
 import { getAllUsers } from '../../../common/api/api';
-
-export interface User {
-  userId: string;
-  name: string;
-  avatar: string;
-}
+import { User } from './DragDropType';
 
 export const fetchUsers = async (): Promise<User[]> => {
   try {

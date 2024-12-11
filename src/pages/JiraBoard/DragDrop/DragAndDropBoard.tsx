@@ -2,44 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Avatar, Tag, Tooltip } from 'antd';
 import { CheckCircleOutlined, InboxOutlined, RocketOutlined, SyncOutlined, CheckSquareOutlined } from '@ant-design/icons';
-import { fetchUsers, User } from './DragAndDropLogic';
+import { fetchUsers } from './DragAndDropLogic';
 import EditTaskDetail from '../EditTaskDetail/EditTaskDetail';
-
-interface Task {
-  id?: string | number;
-  taskId?: string | number;
-  taskName: string;
-  description?: string;
-  priority?: {
-    priorityId: string | number;
-    priority: string;
-    description?: string;
-    deleted?: boolean;
-    alias?: string;
-  };
-  statusId?: string;
-  assignees?: {
-    userId: string | number;
-    name: string;
-    avatar: string;
-  }[];
-}
-
-interface Column {
-  id: string;
-  title: string;
-  tasks: Task[];
-  color: string;
-}
-
-interface DragAndDropBoardProps {
-  columns: { [key: string]: Column };
-  setColumns: React.Dispatch<React.SetStateAction<{ [key: string]: Column }>>;
-  onTaskClick: (taskId: string) => void;
-  currentProject?: {
-    id: string | number;
-  };
-}
+import { User, Task, Column, DragAndDropBoardProps } from './DragDropType';
 
 const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns, onTaskClick, currentProject }) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -126,7 +91,7 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
                 <span className="font-medium">{task.taskName}</span>
                 {task.priority && (
                   <Tag color={getPriorityColor(task.priority)}>
-                    {task.priority.priority}
+                    {typeof task.priority === 'string' ? task.priority : task.priority.priority}
                   </Tag>
                 )}
               </div>
@@ -134,7 +99,7 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
                 <div className="flex -space-x-2 overflow-hidden">
                   {task.assignees?.map((assignee, assigneeIndex) => (
                     <Tooltip 
-                      key={`${uniqueKey}-assignee-${assignee.userId || assigneeIndex}`} 
+                      key={`${uniqueKey}-assignee-${assignee.id || assigneeIndex}`} 
                       title={assignee.name}
                     >
                       <Avatar 
@@ -196,6 +161,32 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
     }
   };
 
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetColumnId: string) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("taskId");
+    const sourceColumnId = e.dataTransfer.getData("sourceColumnId");
+
+    if (taskId && sourceColumnId !== targetColumnId) {
+      // Logic to move task from sourceColumnId to targetColumnId
+      const sourceColumn = columns[sourceColumnId];
+      const targetColumn = columns[targetColumnId];
+
+      const taskToMove = sourceColumn.tasks.find(task => task.taskId === taskId);
+      if (taskToMove) {
+        // Remove task from source column
+        const updatedSourceTasks = sourceColumn.tasks.filter(task => task.taskId !== taskId);
+        const updatedTargetTasks = [...targetColumn.tasks, taskToMove];
+
+        // Update columns state
+        setColumns({
+          ...columns,
+          [sourceColumnId]: { ...sourceColumn, tasks: updatedSourceTasks },
+          [targetColumnId]: { ...targetColumn, tasks: updatedTargetTasks },
+        });
+      }
+    }
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto h-[400px]">
@@ -206,6 +197,8 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className="bg-white rounded-lg flex flex-col h-full"
+                onDrop={(e) => handleDrop(e, columnId)}
+                onDragOver={(e) => e.preventDefault()}
               >
                 <h2 className={`text-sm font-semibold p-2 sm:p-3 rounded-t-lg text-white bg-gradient-to-r ${column.color} flex items-center gap-2`}>
                   {getColumnTitle(column.title)}
