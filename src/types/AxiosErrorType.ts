@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import axios /* , { AxiosError } */ from 'axios';
 import { TypeApiResponse } from './typeApiResponse';
 
 // Cập nhật ErrorResponse để phù hợp với TypeApiResponse

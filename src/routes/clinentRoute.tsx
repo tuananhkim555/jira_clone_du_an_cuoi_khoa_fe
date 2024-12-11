@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Login from '../pages/Auth/Login/Login.tsx';
-import Register from '../pages/Auth/Register/Register.tsx';
+import Login from '../pages/Auth/Login/Login';
+import Register from '../pages/Auth/Register/Register';
 import CreateProject from '../pages/CrateProject/CreateProjects';
 import ProjectManagement from '../pages/ProjectManagemtens/ProjectManagement';
 import Settings from '../pages/Settings/Settings';

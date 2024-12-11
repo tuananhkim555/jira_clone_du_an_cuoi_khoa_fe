@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
