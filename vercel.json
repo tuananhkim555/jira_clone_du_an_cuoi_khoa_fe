@@ -1,6 +1,23 @@
 {
-    "buildCommand": "yarn run build",
+  "buildCommand": "next build",
     "rewrites": [
       { "src": "/[^.]+", "dest": "/", "status": 200 }
-    ]
+    ],
+      "cleanUrls": true,
+      
+        "crons": [
+          {
+            "path": "/board",
+            "schedule": "* * * * *"
+          },
+          {
+            "path": "/project",
+            "schedule": "0 * * * *"
+          },
+          {
+            "path": "/create",
+            "schedule": "0 0 * * *"
+          }
+        ]
+
 }
