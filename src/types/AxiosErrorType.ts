@@ -1,4 +1,4 @@
-import axios /* , { AxiosError } */ from 'axios';
+import axios  from 'axios';
 import { TypeApiResponse } from './typeApiResponse';
 
 // Cập nhật ErrorResponse để phù hợp với TypeApiResponse
@@ -10,7 +10,7 @@ export interface ErrorResponse {
 }
 
 // Type chung cho AxiosError
-export type TAxiosError = AxiosError<ErrorResponse>
+export type TAxiosError = ErrorResponse
 
 // Định nghĩa chi tiết hơn cho lỗi validation
 export interface ValidationError extends ErrorResponse {
@@ -19,7 +19,7 @@ export interface ValidationError extends ErrorResponse {
   }
 }
 
-export type TValidationAxiosError = AxiosError<ValidationError>
+export type TValidationAxiosError = ValidationError
 
 // Thêm một số type error phổ biến
 export interface AuthError extends ErrorResponse {
@@ -29,4 +29,4 @@ export interface AuthError extends ErrorResponse {
   }
 }
 
-export type TAuthAxiosError = AxiosError<AuthError>
+export type TAuthAxiosError = AuthError

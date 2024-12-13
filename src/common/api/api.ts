@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
 
@@ -29,7 +30,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error instanceof AxiosError) {
+    if (error) {
       if (error.response?.status === 401) {
         localStorage.removeItem("authToken");
       }
