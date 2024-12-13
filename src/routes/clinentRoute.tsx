@@ -1,7 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Login from '../pages/Auth/Login/Login';
-import Register from '../pages/Auth/Register/Register';
+
 import CreateProject from '../pages/CrateProject/CreateProjects';
 import ProjectManagement from '../pages/ProjectManagemtens/ProjectManagement';
 import Settings from '../pages/Settings/Settings';
@@ -14,6 +13,8 @@ import ProjectEdit from '../pages/ProjectEdit/ProjectEdit';
 import UserManagements from '../pages/UserManagaments/UserManagements';
 import Dashboard from '../pages/JiraBoard/Dashboard';
 import PrivateRoute from '../redux/PrivateRoute.tsx';
+import Login from '../pages/auth/Login/Login.tsx';
+import Register from '../pages/auth/Register/Register.tsx';
 
 const ClientRoute: React.FC = () => {
   return (

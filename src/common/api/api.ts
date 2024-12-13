@@ -29,7 +29,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error instanceof AxiosError) {
+    if (error) {
       if (error.response?.status === 401) {
         localStorage.removeItem("authToken");
       }

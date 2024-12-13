@@ -4,7 +4,7 @@ import { Avatar, Tag, Tooltip } from 'antd';
 import { CheckCircleOutlined, InboxOutlined, RocketOutlined, SyncOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { fetchUsers } from './DragAndDropLogic';
 import EditTaskDetail from '../EditTaskDetail/EditTaskDetail';
-import { User, Task, Column, DragAndDropBoardProps } from './DragDropType';
+import { User, Task, DragAndDropBoardProps } from './DragDropType';
 
 const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns, onTaskClick, currentProject }) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -171,10 +171,10 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
       const sourceColumn = columns[sourceColumnId];
       const targetColumn = columns[targetColumnId];
 
-      const taskToMove = sourceColumn.tasks.find(task => task.taskId === taskId);
+      const taskToMove = sourceColumn.tasks.find((task : any) => task.taskId === taskId);
       if (taskToMove) {
         // Remove task from source column
-        const updatedSourceTasks = sourceColumn.tasks.filter(task => task.taskId !== taskId);
+        const updatedSourceTasks = sourceColumn.tasks.filter((task : any) => task.taskId !== taskId);
         const updatedTargetTasks = [...targetColumn.tasks, taskToMove];
 
         // Update columns state
