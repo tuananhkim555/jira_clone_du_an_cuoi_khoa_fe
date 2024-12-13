@@ -1,5 +1,5 @@
 {
-    "buildCommand": "npm run build",
+    "buildCommand": "yarn run build",
     "rewrites": [
       { "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }] }
   ]
