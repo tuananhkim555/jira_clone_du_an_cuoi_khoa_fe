@@ -84,7 +84,7 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
-              className="p-2 mb-2 rounded-lg bg-white shadow-md cursor-pointer"
+              className="p-2 sm:p-3 mb-2 rounded-lg bg-gray-50 shadow-md cursor-pointer"
               onClick={() => handleTaskClick(task)}
             >
               <div className="flex items-center justify-between mb-2">

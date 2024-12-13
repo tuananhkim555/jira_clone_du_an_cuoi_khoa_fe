@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { createTask, getAllStatuses, getAllPriorities, getAllTaskTypes, getAllUsers } from '../../../common/api/api';
 import axios from 'axios';
-import { ApiResponse, TaskResponse, TaskData, CreateTaskLogicProps } from './CreateTaskType';
+import { ApiResponse, TaskResponse, TaskData, Task, CreateTaskLogicProps } from './CreateTaskType';
 
 export const useCreateTaskLogic = ({ isVisible, currentProject, onCancel, onCreate }: CreateTaskLogicProps) => {
   const [form] = Form.useForm();

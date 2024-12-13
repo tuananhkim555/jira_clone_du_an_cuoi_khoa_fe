@@ -64,4 +64,3 @@ const RootRoute: React.FC = () => {
 };
 
 export default RootRoute;
-

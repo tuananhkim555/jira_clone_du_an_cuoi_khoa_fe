@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 const API_BASE_URL = 'https://jiranew.cybersoft.edu.vn/api';
 const TOKEN_CYBERSOFT = import.meta.env.VITE_CYBERSOFT_TOKEN;
 
@@ -210,22 +209,6 @@ export const getUsersInProject = async (projectId: string) => {
     return data.content;
   } catch (error) {
     console.error('Error getting users in project:', error);
-    throw error;
-  }
-};
-
-export const getAllComments = async (taskId: number) => {
-  try {
-    const response = await api.get(`/Comment/getAll`, {
-      params: { taskId }
-    });
-    const data = response.data as ApiResponse;
-    if (data.statusCode === 200) {
-      return data.content; // Trả về danh sách comment
-    }
-    throw new Error(data.message || 'Failed to fetch comments');
-  } catch (error) {
-    console.error('Error fetching comments:', error);
     throw error;
   }
 };
