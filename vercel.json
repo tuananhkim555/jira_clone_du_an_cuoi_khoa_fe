@@ -1,6 +1,6 @@
 {
     "buildCommand": "npm run build",
     "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
