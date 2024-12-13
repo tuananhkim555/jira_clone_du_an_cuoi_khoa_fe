@@ -214,4 +214,20 @@ export const getUsersInProject = async (projectId: string) => {
   }
 };
 
+export const getAllComments = async (taskId: number) => {
+  try {
+    const response = await api.get(`/Comment/getAll`, {
+      params: { taskId }
+    });
+    const data = response.data as ApiResponse;
+    if (data.statusCode === 200) {
+      return data.content; // Trả về danh sách comment
+    }
+    throw new Error(data.message || 'Failed to fetch comments');
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    throw error;
+  }
+};
+
 export default api;
