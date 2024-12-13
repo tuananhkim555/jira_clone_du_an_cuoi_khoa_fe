@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import CreateProject from '../pages/CrateProject/CreateProjects';
 import ProjectManagement from '../pages/ProjectManagemtens/ProjectManagement';
 import Settings from '../pages/Settings/Settings';

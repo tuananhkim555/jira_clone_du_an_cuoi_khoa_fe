@@ -1,5 +1,5 @@
-{   
-    "buildCommand": "yarn run build",
+{
+    "buildCommand": "npm run build",
     "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]

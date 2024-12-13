@@ -9,12 +9,26 @@ const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/';
+  const isLoggedIn = !!localStorage.getItem('authToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
 
   useEffect(() => {
-    if (isAuthPage && localStorage.getItem('authToken')) {
+    if (isAuthPage && isLoggedIn) {
       navigate('/board', { replace: true });
     }
-  }, [isAuthPage, navigate]);
+  }, [isAuthPage, navigate, isLoggedIn]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (!isLoggedIn) {
+        navigate('/board', { replace: true }); // Điều hướng về trang dashboard nếu chưa đăng xuất
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isLoggedIn, navigate]);
 
   return (
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
@@ -29,7 +43,7 @@ const MainLayout = () => {
         </>
       )}
       {isAuthPage && (
-        <div className="flex-grow"> 
+        <div className="flex-grow">    
           <ClientRoute />
         </div>
       )}
@@ -48,3 +62,4 @@ const RootRoute: React.FC = () => {
 };
 
 export default RootRoute;
+

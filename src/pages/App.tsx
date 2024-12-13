@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import RootRoute from '../routes/rootRoute';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUser } from '../redux/store';
+import { checkTokenExpiration, clearUser } from '../redux/store';
 import { RootState } from '../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor } from '../redux/store';
@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
         checkAuth();
         
-        // Check token expiration every minute
+        // Check token expiration mỗi phút
         const interval = setInterval(checkAuth, 60000);
         return () => clearInterval(interval);
     }, [dispatch]);

@@ -5,21 +5,17 @@ import { CheckCircleOutlined, InboxOutlined, RocketOutlined, SyncOutlined, Check
 import { fetchUsers } from './DragAndDropLogic';
 import EditTaskDetail from '../EditTaskDetail/EditTaskDetail';
 import { User, Task, DragAndDropBoardProps } from './DragDropType';
-import LoadingSpinner from '../../../common/components/LoadingSpinner';
 
 const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns, onTaskClick, currentProject }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUsers = async () => {
-      setLoading(true);
       const fetchedUsers = await fetchUsers();
       setUsers(fetchedUsers);
-      setLoading(false);
     };
 
     loadUsers();
@@ -193,11 +189,6 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {loading ? (
-        <div className="flex justify-center items-center h-screen">
-          <LoadingSpinner />
-        </div>
-      ) : (
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto h-[400px]">
         {Object.entries(columns).map(([columnId, column]) => (
           <Droppable key={column.id} droppableId={column.id}>
@@ -221,7 +212,6 @@ const DragAndDropBoard: React.FC<DragAndDropBoardProps> = ({ columns, setColumns
           </Droppable>
         ))}
       </div>
-      )}
       {selectedTask && (
         <EditTaskDetail
           taskId={selectedTaskId || ''}
