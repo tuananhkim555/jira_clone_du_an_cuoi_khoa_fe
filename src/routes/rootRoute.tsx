@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import { LoadingProvider } from '../context/LoadingContext';
 import Sidebar from '../common/components/Sidebar';
 
@@ -7,8 +7,15 @@ import ClientRoute from './clinentRoute';
 
 const MainLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/';
- 
+
+  useEffect(() => {
+    if (isAuthPage && localStorage.getItem('authToken')) {
+      navigate('/board', { replace: true });
+    }
+  }, [isAuthPage, navigate]);
+
   return (
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
       {!isAuthPage && (
@@ -22,7 +29,7 @@ const MainLayout = () => {
         </>
       )}
       {isAuthPage && (
-        <div className="flex-grow">    
+        <div className="flex-grow"> 
           <ClientRoute />
         </div>
       )}
@@ -41,4 +48,3 @@ const RootRoute: React.FC = () => {
 };
 
 export default RootRoute;
-
