@@ -21,6 +21,8 @@ const MainLayout = () => {
     const handlePopState = () => {
       if (!isLoggedIn) {
         navigate('/board', { replace: true }); // Điều hướng về trang dashboard nếu chưa đăng xuất
+      } else if (isAuthPage) {
+        navigate('/board', { replace: true }); // Nếu đang ở trang auth mà đã đăng nhập, điều hướng về dashboard
       }
     };
 
@@ -28,7 +30,7 @@ const MainLayout = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, isAuthPage]);
 
   return (
     <div className={`flex ${isAuthPage ? '' : 'flex-col md:flex-row'}`}>
