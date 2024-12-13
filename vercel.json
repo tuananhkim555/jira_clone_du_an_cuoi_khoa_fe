@@ -1,6 +1,6 @@
 {
     "buildCommand": "yarn run build",
     "rewrites": [
-      { "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }] }
-  ]
+      { "src": "/[^.]+", "dest": "/", "status": 200 }
+    ]
 }
